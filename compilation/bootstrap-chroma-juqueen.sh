@@ -20,7 +20,7 @@ set -e
 set -u
 set -x
 
-cd $HOME
+cd $HOME/Sources
 
 # Load the appropriate modules and output the present versions.
 
