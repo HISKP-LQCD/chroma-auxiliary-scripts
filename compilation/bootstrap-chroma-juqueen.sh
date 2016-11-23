@@ -180,6 +180,23 @@ make-make-install
 popd
 
 ###############################################################################
+#                      Bagel assembler kernel generator                       #
+###############################################################################
+
+wget-if-needed http://www2.ph.ed.ac.uk/~paboyle/bagel/bagel-3.3.tar bagel
+
+pushd bagel
+cflags="$base_cflags"
+cxxflags="$base_cxxflags"
+if ! [[ -f configure ]]; then autoreconf -f; fi
+if ! [[ -f Makefile ]]; then
+    ./configure $base_configure \
+        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+fi
+make-make-install
+popd
+
+###############################################################################
 #                             bagel_wilson_dslash                             #
 ###############################################################################
 
@@ -193,24 +210,8 @@ if ! [[ -f Makefile ]]; then
     CC=$cc CXX=$cxx ./configure $base_configure \
         --enable-comms=qmp \
         --enable-target-cpu=bgl \
+        --with-bagel=$prefix \
         --with-qmp=$prefix \
-        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
-fi
-make-make-install
-popd
-
-###############################################################################
-#                      Bagel assembler kernel generator                       #
-###############################################################################
-
-wget-if-needed http://www2.ph.ed.ac.uk/~paboyle/bagel/bagel-3.3.tar bagel
-
-pushd bagel
-cflags="$base_cflags"
-cxxflags="$base_cxxflags"
-if ! [[ -f configure ]]; then autoreconf -f; fi
-if ! [[ -f Makefile ]]; then
-    ./configure $base_configure \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
