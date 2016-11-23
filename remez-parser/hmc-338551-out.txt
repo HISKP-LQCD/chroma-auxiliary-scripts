@@ -1,0 +1,1009 @@
+QDP use OpenMP threading. We have 64 threads
+Thread Bindings
+OMP thread 0: core = 0 hardware thread = 0
+OMP thread 1: core = 0 hardware thread = 1
+OMP thread 2: core = 0 hardware thread = 2
+OMP thread 3: core = 0 hardware thread = 3
+OMP thread 4: core = 1 hardware thread = 0
+OMP thread 5: core = 1 hardware thread = 1
+OMP thread 6: core = 1 hardware thread = 2
+OMP thread 7: core = 1 hardware thread = 3
+OMP thread 8: core = 2 hardware thread = 0
+OMP thread 9: core = 2 hardware thread = 1
+OMP thread 10: core = 2 hardware thread = 2
+OMP thread 11: core = 2 hardware thread = 3
+OMP thread 12: core = 3 hardware thread = 0
+OMP thread 13: core = 3 hardware thread = 1
+OMP thread 14: core = 3 hardware thread = 2
+OMP thread 15: core = 3 hardware thread = 3
+OMP thread 16: core = 4 hardware thread = 0
+OMP thread 17: core = 4 hardware thread = 1
+OMP thread 18: core = 4 hardware thread = 2
+OMP thread 19: core = 4 hardware thread = 3
+OMP thread 20: core = 5 hardware thread = 0
+OMP thread 21: core = 5 hardware thread = 1
+OMP thread 22: core = 5 hardware thread = 2
+OMP thread 23: core = 5 hardware thread = 3
+OMP thread 24: core = 6 hardware thread = 0
+OMP thread 25: core = 6 hardware thread = 1
+OMP thread 26: core = 6 hardware thread = 2
+OMP thread 27: core = 6 hardware thread = 3
+OMP thread 28: core = 7 hardware thread = 0
+OMP thread 29: core = 7 hardware thread = 1
+OMP thread 30: core = 7 hardware thread = 2
+OMP thread 31: core = 7 hardware thread = 3
+OMP thread 32: core = 8 hardware thread = 0
+OMP thread 33: core = 8 hardware thread = 1
+OMP thread 34: core = 8 hardware thread = 2
+OMP thread 35: core = 8 hardware thread = 3
+OMP thread 36: core = 9 hardware thread = 0
+OMP thread 37: core = 9 hardware thread = 1
+OMP thread 38: core = 9 hardware thread = 2
+OMP thread 39: core = 9 hardware thread = 3
+OMP thread 40: core = 10 hardware thread = 0
+OMP thread 41: core = 10 hardware thread = 1
+OMP thread 42: core = 10 hardware thread = 2
+OMP thread 43: core = 10 hardware thread = 3
+OMP thread 44: core = 11 hardware thread = 0
+OMP thread 45: core = 11 hardware thread = 1
+OMP thread 46: core = 11 hardware thread = 2
+OMP thread 47: core = 11 hardware thread = 3
+OMP thread 48: core = 12 hardware thread = 0
+OMP thread 49: core = 12 hardware thread = 1
+OMP thread 50: core = 12 hardware thread = 2
+OMP thread 51: core = 12 hardware thread = 3
+OMP thread 52: core = 13 hardware thread = 0
+OMP thread 53: core = 13 hardware thread = 1
+OMP thread 54: core = 13 hardware thread = 2
+OMP thread 55: core = 13 hardware thread = 3
+OMP thread 56: core = 14 hardware thread = 0
+OMP thread 57: core = 14 hardware thread = 1
+OMP thread 58: core = 14 hardware thread = 2
+OMP thread 59: core = 14 hardware thread = 3
+OMP thread 60: core = 15 hardware thread = 0
+OMP thread 61: core = 15 hardware thread = 1
+OMP thread 62: core = 15 hardware thread = 2
+OMP thread 63: core = 15 hardware thread = 3
+Initialize done
+Linkage = bool Chroma::MapObjectDiskEnv::registerAll(): registering map obj key colorvec
+0
+Monomials xml is:
+<Monomials>
+      <!-- (gauge) Gauge {{{ -->
+      <elem>
+        <!-- Tree level Symanzik improved gauge, here it is called Lüscher-Weiß. The β is set to the value from the paper. -->
+        <Name>GAUGE_MONOMIAL</Name>
+        <GaugeAction>
+          <Name>LW_TREE_GAUGEACT</Name>
+          <beta>3.3</beta>
+          <u0>0.832605301399891</u0>
+          <GaugeBC>
+            <Name>PERIODIC_GAUGEBC</Name>
+          </GaugeBC>
+        </GaugeAction>
+        <NamedObject>
+          <monomial_id>gauge</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+
+      <!-- (up_down_hasenbusch_1) Wilson + clover: up, down {{{ -->
+      <elem>
+        <Name>TWO_FLAVOR_EOPREC_CONSTDET_RATIO_CONV_CONV_FERM_MONOMIAL</Name>
+        <Action>
+          <InvertParam>
+            <invType>CG_INVERTER</invType>
+            <RsdCG>1.0e-12</RsdCG>
+            <MaxCG>1000</MaxCG>
+          </InvertParam>
+          <FermionAction>
+            <FermAct>CLOVER</FermAct>
+            <Mass>-0.1265</Mass>
+            <clovCoeff>1.0</clovCoeff>
+            <FermState>
+              <Name>STOUT_FERM_STATE</Name>
+              <rho>1.1</rho>
+              <n_smear>1</n_smear>
+              <FermionBC>
+                <FermBC>PERIODIC_FERMBC</FermBC>
+                <boundary>1 1 1 -1</boundary>
+              </FermionBC>
+            </FermState>
+          </FermionAction>
+        </Action>
+        <PrecAction>
+          <InvertParam>
+            <invType>CG_INVERTER</invType>
+            <RsdCG>1.0e-12</RsdCG>
+            <MaxCG>1000</MaxCG>
+          </InvertParam>
+          <FermionAction>
+            <FermAct>CLOVER</FermAct>
+            <Mass>-0.057</Mass>
+            <clovCoeff>1.0</clovCoeff>
+            <FermState>
+              <Name>STOUT_FERM_STATE</Name>
+              <rho>1.1</rho>
+              <n_smear>1</n_smear>
+              <FermionBC>
+                <FermBC>PERIODIC_FERMBC</FermBC>
+                <boundary>1 1 1 -1</boundary>
+              </FermionBC>
+            </FermState>
+          </FermionAction>
+        </PrecAction>
+        <ChronologicalPredictor>
+          <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
+        </ChronologicalPredictor>
+        <NamedObject>
+          <monomial_id>up_down_hasenbusch_1</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+
+      <!-- (up_down_hasenbusch_last) Wilson + clover: up, down {{{ -->
+      <elem>
+        <Name>TWO_FLAVOR_EOPREC_CONSTDET_FERM_MONOMIAL</Name>
+        <InvertParam>
+          <invType>CG_INVERTER</invType>
+          <RsdCG>1.0e-12</RsdCG>
+          <MaxCG>1000</MaxCG>
+        </InvertParam>
+        <FermionAction>
+          <FermAct>CLOVER</FermAct>
+          <Mass>-0.057</Mass>
+          <clovCoeff>1.0</clovCoeff>
+          <FermState>
+            <Name>STOUT_FERM_STATE</Name>
+            <rho>1.1</rho>
+            <n_smear>1</n_smear>
+            <FermionBC>
+              <FermBC>PERIODIC_FERMBC</FermBC>
+              <boundary>1 1 1 -1</boundary>
+            </FermionBC>
+          </FermState>
+        </FermionAction>
+        <ChronologicalPredictor>
+          <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
+        </ChronologicalPredictor>
+        <NamedObject>
+          <monomial_id>up_down_hasenbusch_last</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+
+      <!-- (up_down_clover) Clover even-even: up, down {{{ -->
+      <elem>
+        <Name>N_FLAVOR_LOGDET_EVEN_EVEN_FERM_MONOMIAL</Name>
+        <FermionAction>
+          <FermAct>CLOVER</FermAct>
+          <Mass>-0.1265</Mass>
+          <clovCoeff>1.0</clovCoeff>
+          <FermState>
+            <Name>STOUT_FERM_STATE</Name>
+            <rho>1.1</rho>
+            <n_smear>1</n_smear>
+            <FermionBC>
+              <FermBC>PERIODIC_FERMBC</FermBC>
+              <boundary>1 1 1 -1</boundary>
+            </FermionBC>
+          </FermState>
+        </FermionAction>
+        <num_flavors>2</num_flavors>
+        <NamedObject>
+          <monomial_id>up_down_clover</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+
+      <!-- (strange) Wilson + clover: strange {{{ -->
+      <elem>
+        <Name>ONE_FLAVOR_EOPREC_CONSTDET_FERM_RAT_MONOMIAL</Name>
+        <num_pf>1</num_pf>
+        <Action>
+          <FermionAction>
+            <FermAct>CLOVER</FermAct>
+            <Mass>-0.057</Mass>
+            <clovCoeff>1.0</clovCoeff>
+            <FermState>
+              <Name>STOUT_FERM_STATE</Name>
+              <rho>1.1</rho>
+              <n_smear>1</n_smear>
+              <FermionBC>
+                <FermBC>PERIODIC_FERMBC</FermBC>
+                <boundary>1 1 1 -1</boundary>
+              </FermionBC>
+            </FermState>
+          </FermionAction>
+          <ActionApprox>
+            <InvertParam>
+              <invType>CG_INVERTER</invType>
+              <RsdCG>1.0e-12</RsdCG>
+              <MaxCG>1000</MaxCG>
+            </InvertParam>
+            <RationalApprox>
+              <ratApproxType>REMEZ</ratApproxType>
+              <lowerMin>1.0e-3</lowerMin>
+              <upperMax>33</upperMax>
+              <numPower>-1</numPower>
+              <denPower>4</denPower>
+              <degree>16</degree>
+            </RationalApprox>
+          </ActionApprox>
+          <ForceApprox>
+            <InvertParam>
+              <invType>CG_INVERTER</invType>
+              <RsdCG>1e-7 1e-7 1e-7 1e-8 1e-8 1e-8 1e-9 1e-9 1e-9 1e-9 1e-10 1e-10 1e-10 1e-10</RsdCG>
+              <MaxCG>5000</MaxCG>
+            </InvertParam>
+            <RationalApprox>
+              <ratApproxType>REMEZ</ratApproxType>
+              <lowerMin>1.0e-3</lowerMin>
+              <upperMax>33</upperMax>
+              <numPower>-1</numPower>
+              <denPower>2</denPower>
+              <degree>14</degree>
+            </RationalApprox>
+          </ForceApprox>
+        </Action>
+        <ChronologicalPredictor>
+          <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
+        </ChronologicalPredictor>
+        <NamedObject>
+          <monomial_id>strange</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+
+      <!-- (strange_clover) Clover even-even: strange {{{ -->
+      <elem>
+        <Name>N_FLAVOR_LOGDET_EVEN_EVEN_FERM_MONOMIAL</Name>
+        <FermionAction>
+          <FermAct>CLOVER</FermAct>
+          <Mass>-0.057</Mass>
+          <clovCoeff>1.0</clovCoeff>
+          <FermState>
+            <Name>STOUT_FERM_STATE</Name>
+            <rho>1.1</rho>
+            <n_smear>1</n_smear>
+            <FermionBC>
+              <FermBC>PERIODIC_FERMBC</FermBC>
+              <boundary>1 1 1 -1</boundary>
+            </FermionBC>
+          </FermState>
+        </FermionAction>
+        <num_flavors>1</num_flavors>
+        <NamedObject>
+          <monomial_id>strange_clover</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+    </Monomials>
+
+HMC_xml is: 
+<Hamiltonian><!--{{{-->
+      <monomial_ids>
+        <elem>gauge</elem>
+        <elem>strange</elem>
+        <elem>strange_clover</elem>
+        <elem>up_down_hasenbusch_last</elem>
+        <elem>up_down_clover</elem>
+        <elem>up_down_hasenbusch_1</elem>
+        <!--
+        -->
+      </monomial_ids>
+    </Hamiltonian>
+Integrator XML is: 
+<MDIntegrator><!--{{{-->
+      <tau0>0.5</tau0>
+      <Integrator>
+        <Name>LCM_STS_MIN_NORM_2</Name>
+        <n_steps>25</n_steps>
+        <monomial_ids>
+          <elem>gauge</elem>
+          <elem>strange</elem>
+          <elem>strange_clover</elem>
+          <elem>up_down_hasenbusch_last</elem>
+          <elem>up_down_clover</elem>
+          <elem>up_down_hasenbusch_1</elem>
+          <!--
+          -->
+        </monomial_ids>
+        <!--
+        <SubIntegrator>
+          <Name>LCM_STS_MIN_NORM_2</Name>
+          <n_steps>2</n_steps>
+          <monomial_ids>
+          </monomial_ids>
+        </SubIntegrator>
+        -->
+      </Integrator>
+    </MDIntegrator>
+
+InlineMeasurements are: 
+<InlineMeasurements>
+      <elem>
+        <Name>POLYAKOV_LOOP</Name>
+        <Frequency>1</Frequency>
+        <Param>
+          <version>2</version>
+        </Param>
+        <NamedObject>
+          <gauge_id>default_gauge_field</gauge_id>
+        </NamedObject>
+      </elem>
+    </InlineMeasurements>
+
+Call QDP create layout
+Lattice initialized:
+  problem size = 24 24 24 64
+  layout size = 12 24 24 64
+  logical machine size = 1 2 2 8
+  subgrid size = 24 12 12 8
+  total number of nodes = 32
+  total volume = 884736
+  subgrid volume = 27648
+Finished init of RNG
+Finished lattice layout
+Finished with QDP create layout
+Initialize gauge field
+Gauge initialization: cfg_type = DISORDERED
+Starting up disordered (random/hot) config
+Gauge field successfully initialized: time= 0.202798 secs
+Gauge field reunitarized: time=0.022868 secs
+Create monomial: GAUGE_MONOMIAL
+GaugeMonomialParams: read 
+<GaugeAction>
+      <Name>LW_TREE_GAUGEACT</Name>
+      <beta>3.3</beta>
+      <u0>0.832605301399891</u0>
+      <GaugeBC>
+        <Name>PERIODIC_GAUGEBC</Name>
+      </GaugeBC>
+    </GaugeAction>
+
+GaugeBC Callback: Creating PeriodicGaugeBC 
+Read Monomial with monomial id: gauge
+Constructor: EvenOddPrecConstDetTwoFlavorRatioConvConvWilsonTypeFermMonomial
+Construct numer fermion action= CLOVER
+Using Default value: orthog_dir = 3, spatial only smearing
+u0 is 1
+Construct denom fermion action= CLOVER
+Using Default value: orthog_dir = 3, spatial only smearing
+u0 is 1
+Finished constructing: EvenOddPrecConstDetTwoFlavorRatioConvConvWilsonTypeFermMonomial
+Read Monomial with monomial id: up_down_hasenbusch_1
+TwoFlavorWilsonTypeFermMonomialParams: read 
+CLOVER
+EvanOddPrecConstDetTwoFlavorWilsonTypeFermMonomial: construct CLOVER
+Using Default value: orthog_dir = 3, spatial only smearing
+u0 is 1
+Read Monomial with monomial id: up_down_hasenbusch_last
+EvenOddPrecLogDetEvenEvenMonomialParams: read 
+CLOVER
+EvanOddPrecLogDetTwoFlavorWilsonTypeFermMonomial: construct CLOVER
+Using Default value: orthog_dir = 3, spatial only smearing
+u0 is 1
+Read Monomial with monomial id: up_down_clover
+Constructor: EvenOddPrecConstDetOneFlavorWilsonTypeFermRatMonomial
+Construct fermion action= CLOVER
+Using Default value: orthog_dir = 3, spatial only smearing
+u0 is 1
+Construct action rational approx= REMEZ
+GenApprox: Numerator  : -1  Denominator: 4
+           Action Degree 16
+Compute partial fraction expansion
+Numerator Power=1 Denominator Power=4
+RemezGMP: approximation bounds are [0.001 , 33]
+generateApprox: Iteration 0 spread 1e+37 delta 0.25
+generateApprox: Iteration 100 spread 249401441475367 delta 0.25
+generateApprox: Iteration 200 spread 96790.5858006899 delta 0.25
+generateApprox: Iteration 300 spread 0.312800131700673 delta 0.25
+generateApprox: Iteration 400 spread 0.00205070589273769 delta 0.25
+generateApprox: Iteration 500 spread 1.55208804794981e-05 delta 0.25
+generateApprox: Iteration 600 spread 1.17594959102416e-07 delta 0.25
+generateApprox: Iteration 700 spread 8.90972984532793e-10 delta 0.25
+generateApprox: Iteration 800 spread 6.75056918336997e-12 delta 0.25
+generateApprox: Iteration 900 spread 5.11465387967911e-14 delta 0.25
+generateApprox Converged at 981 iterations, error = 5.15211405051482e-11
+root: Normalisation constant is 6.42674252912215
+root[0] = -6.64546366309794e-05
+root[1] = -0.000487449195727835
+root[2] = -0.00157062032741528
+root[3] = -0.00404382974795785
+root[4] = -0.00956902321293471
+root[5] = -0.0218606410513497
+root[6] = -0.0491901693924068
+root[7] = -0.109989034422501
+root[8] = -0.245460798566869
+root[9] = -0.548409030799076
+root[10] = -1.23135074841675
+root[11] = -2.79887228398744
+root[12] = -6.54558220539221
+root[13] = -16.3751974576828
+root[14] = -48.6939394291419
+root[15] = -253.394153115071
+pole[0] = -0.000130231892071377
+pole[1] = -0.000677702407873996
+pole[2] = -0.00201524287479766
+pole[3] = -0.00504156833792643
+pole[4] = -0.0117904629620992
+pole[5] = -0.0267998375299895
+pole[6] = -0.0601740637857774
+pole[7] = -0.134441019473055
+pole[8] = -0.300029909102002
+pole[9] = -0.670865752397552
+pole[10] = -1.50956231898618
+pole[11] = -3.44862785528548
+pole[12] = -8.16058094845985
+pole[13] = -21.0108066373413
+pole[14] = -67.6993629063764
+pole[15] = -496.579346046959
+Sign = -1
+pfe: Residue = 0.000520383284200624 Pole = 6.64546366309794e-05
+pfe: Residue = 0.00102660572124056 Pole = 0.000487449195727835
+pfe: Residue = 0.00181178793402857 Pole = 0.00157062032741528
+pfe: Residue = 0.00321671030885498 Pole = 0.00404382974795785
+pfe: Residue = 0.00577691086696587 Pole = 0.00956902321293471
+pfe: Residue = 0.0104481579630266 Pole = 0.0218606410513497
+pfe: Residue = 0.0189694277532285 Pole = 0.0491901693924068
+pfe: Residue = 0.0345269234349506 Pole = 0.109989034422501
+pfe: Residue = 0.0630140232665876 Pole = 0.245460798566869
+pfe: Residue = 0.11554658170993 Pole = 0.548409030799076
+pfe: Residue = 0.21397301598633 Pole = 1.23135074841675
+pfe: Residue = 0.404952046467655 Pole = 2.79887228398744
+pfe: Residue = 0.804682609571783 Pole = 6.54558220539221
+pfe: Residue = 1.78771947718812 Pole = 16.3751974576828
+pfe: Residue = 5.1998544047142 Pole = 48.6939394291419
+pfe: Residue = 33.2821966055558 Pole = 253.394153115071
+pfe: Residue = -7.29056568824904e-06 Pole = 0.000130231892071377
+pfe: Residue = -3.08449297938295e-05 Pole = 0.000677702407873996
+pfe: Residue = -9.37710341257919e-05 Pole = 0.00201524287479766
+pfe: Residue = -0.000264162081194322 Pole = 0.00504156833792643
+pfe: Residue = -0.000727076084674794 Pole = 0.0117904629620992
+pfe: Residue = -0.00198489654440102 Pole = 0.0267998375299895
+pfe: Residue = -0.00540368881578466 Pole = 0.0601740637857774
+pfe: Residue = -0.0147100906225067 Pole = 0.134441019473055
+pfe: Residue = -0.0401422330222872 Pole = 0.300029909102002
+pfe: Residue = -0.110265593261843 Pole = 0.670865752397552
+pfe: Residue = -0.307507964338403 Pole = 1.50956231898618
+pfe: Residue = -0.887366185888659 Pole = 3.44862785528548
+pfe: Residue = -2.76674191920454 Pole = 8.16058094845985
+pfe: Residue = -10.330167418357 Pole = 21.0108066373413
+pfe: Residue = -60.7697414728541 Pole = 67.6993629063764
+pfe: Residue = -1657.35364282683 Pole = 496.579346046959
+Construct force rational approx= REMEZ
+GenApprox: Numerator  : -1  Denominator: 2
+           Action Degree 14
+Compute partial fraction expansion
+Numerator Power=1 Denominator Power=2
+RemezGMP: approximation bounds are [0.001 , 33]
+generateApprox: Iteration 0 spread 1e+37 delta 0.25
+generateApprox: Iteration 100 spread 272345203831.892 delta 0.25
+generateApprox: Iteration 200 spread 401.515563421433 delta 0.25
+generateApprox: Iteration 300 spread 0.0336068971394863 delta 0.25
+generateApprox: Iteration 400 spread 0.00012336205454299 delta 0.25
+generateApprox: Iteration 500 spread 4.60759330605484e-07 delta 0.25
+generateApprox: Iteration 600 spread 1.72105496226466e-09 delta 0.25
+generateApprox: Iteration 700 spread 6.42858581023824e-12 delta 0.25
+generateApprox: Iteration 800 spread 2.40124321777988e-14 delta 0.25
+generateApprox Converged at 857 iterations, error = 1.4743562084473e-09
+root: Normalisation constant is 39.7182766178435
+root[0] = -5.25088256299576e-05
+root[1] = -0.000541070967033193
+root[2] = -0.00195024255755797
+root[3] = -0.00552632726119316
+root[4] = -0.0144330242366399
+root[5] = -0.0365557187762636
+root[6] = -0.091516089737837
+root[7] = -0.22828194229081
+root[8] = -0.570076879879339
+root[9] = -1.43344757660573
+root[10] = -3.67347605678986
+root[11] = -9.89378007837651
+root[12] = -30.5627463768969
+root[13] = -149.277768177754
+pole[0] = -0.000221064398288062
+pole[1] = -0.00107974589695072
+pole[2] = -0.00333542889962994
+pole[3] = -0.00898331702448543
+pole[4] = -0.0230214209006101
+pole[5] = -0.0578869292278345
+pole[6] = -0.144558083170508
+pole[7] = -0.360592329660653
+pole[8] = -0.902731531609977
+pole[9] = -2.28642309878658
+pole[10] = -5.97141617575416
+pole[11] = -16.9209721488805
+pole[12] = -60.9901510349853
+pole[13] = -628.465778925603
+Sign = -1
+pfe: Residue = 0.00938447081670725 Pole = 5.25088256299576e-05
+pfe: Residue = 0.0113556356385765 Pole = 0.000541070967033193
+pfe: Residue = 0.0157122457753289 Pole = 0.00195024255755797
+pfe: Residue = 0.0233704650580646 Pole = 0.00552632726119316
+pfe: Residue = 0.0359432248979228 Pole = 0.0144330242366399
+pfe: Residue = 0.0560886542713153 Pole = 0.0365557187762636
+pfe: Residue = 0.0881062194115078 Pole = 0.091516089737837
+pfe: Residue = 0.138988372319098 Pole = 0.22828194229081
+pfe: Residue = 0.220476881003024 Pole = 0.570076879879339
+pfe: Residue = 0.353893180549329 Pole = 1.43344757660573
+pfe: Residue = 0.584538806469361 Pole = 3.67347605678986
+pfe: Residue = 1.03738468679401 Pole = 9.89378007837651
+pfe: Residue = 2.21944414498477 Pole = 30.5627463768969
+pfe: Residue = 8.30625906187251 Pole = 149.277768177754
+pfe: Residue = -2.23452961610184e-06 Pole = 0.000221064398288062
+pfe: Residue = -1.42439478447941e-05 Pole = 0.00107974589695072
+pfe: Residue = -6.35310799261578e-05 Pole = 0.00333542889962994
+pfe: Residue = -0.00025967481522029 Pole = 0.00898331702448543
+pfe: Residue = -0.00103247483279225 Pole = 0.0230214209006101
+pfe: Residue = -0.00406693386569719 Pole = 0.0578869292278345
+pfe: Residue = -0.0159884462327013 Pole = 0.144558083170508
+pfe: Residue = -0.0630641527026447 Pole = 0.360592329660653
+pfe: Residue = -0.251614273909366 Pole = 0.902731531609977
+pfe: Residue = -1.03436369354839 Pole = 2.28642309878658
+pfe: Residue = -4.58738368000716 Pole = 5.97141617575416
+pfe: Residue = -24.7646340755357 Pole = 16.9209721488805
+pfe: Residue = -232.527272190937 Pole = 60.9901510349853
+pfe: Residue = -20404.0362904484 Pole = 628.465778925603
+Finished constructing: EvenOddPrecConstDetOneFlavorWilsonTypeFermRatMonomial
+Read Monomial with monomial id: strange
+EvenOddPrecLogDetEvenEvenMonomialParams: read 
+CLOVER
+EvanOddPrecLogDetTwoFlavorWilsonTypeFermMonomial: construct CLOVER
+Using Default value: orthog_dir = 3, spatial only smearing
+u0 is 1
+Read Monomial with monomial id: strange_clover
+ExactHamiltonian::create(): Trying to bind monomial with ID gauge
+ExactHamiltonian::create(): Trying to bind monomial with ID strange
+ExactHamiltonian::create(): Trying to bind monomial with ID strange_clover
+ExactHamiltonian::create(): Trying to bind monomial with ID up_down_hasenbusch_last
+ExactHamiltonian::create(): Trying to bind monomial with ID up_down_clover
+ExactHamiltonian::create(): Trying to bind monomial with ID up_down_hasenbusch_1
+Warning no lambda param found for minimum norm integrator
+Using default value lambda_c=0.193183327503784
+Binding Monomials
+There are 6 IDs to bind 
+Monomial with ID = gauge bound
+Monomial with ID = strange bound
+Monomial with ID = strange_clover bound
+Monomial with ID = up_down_hasenbusch_last bound
+Monomial with ID = up_down_clover bound
+Monomial with ID = up_down_hasenbusch_1 bound
+All monomials successfully bound
+<InlineMeasurements>
+      <elem>
+        <Name>POLYAKOV_LOOP</Name>
+        <Frequency>1</Frequency>
+        <Param>
+          <version>2</version>
+        </Param>
+        <NamedObject>
+          <gauge_id>default_gauge_field</gauge_id>
+        </NamedObject>
+      </elem>
+    </InlineMeasurements>
+
+There are 1 user measurements 
+Setting Force monitoring to 1
+MC Control: About to do 100 updates
+Doing Update: 1 warm_up_p = 0
+Before HMC trajectory call
+MInvCG2: 36 iterations
+QDP:FlopCount:minvcg Performance/CPU: t=3.021977(s) Flops=4606377984 => 1524.29286655722 Mflops/cpu.
+QDP:FlopCount:minvcg Total performance:  48774.1790785814 Mflops = 48.7741790785814 Gflops = 0.0487741790785814 Tflops
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.125204
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+TwoFlavWilson4DMonomial: resetting Predictor after field refresh
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.001685
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.708439(s) Flops=4107718656 => 1516.63694696465 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  48521.4665978852 Mflops = 48.5214665978852 Gflops = 0.0485214665978852 Tflops
+CG_SOLVER: 37 iterations. Rsd = 6.08991207156025e-09 Relative Rsd = 6.54430345664521e-13
+CG_SOLVER_TIME: 2.855817 sec
+TwoFlavRatioConvConvWilson4DMonomial: resetting Predictor at end of field refresh
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.134926
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.001683
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.001673
+MInvCG2: 36 iterations
+QDP:FlopCount:minvcg Performance/CPU: t=3.023694(s) Flops=4615667712 => 1526.49961007959 Mflops/cpu.
+QDP:FlopCount:minvcg Total performance:  48845.5194602505 Mflops = 48.8455194602505 Gflops = 0.0488455194602505 Tflops
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.124785
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+TwoFlavWilson4DMonomial: resetting Predictor before energy calc solve
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.781586(s) Flops=4107718656 => 1476.75414529696 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  47261.5394976768 Mflops = 47.2615394976768 Gflops = 0.0472615394976768 Tflops
+CG_SOLVER: 37 iterations. Rsd = 6.2047434125008e-09 Relative Rsd = 6.56573746875623e-13
+CG_SOLVER_TIME: 2.932299 sec
+2Flav::invert,  n_count = 37
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.134799
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+TwoFlavRatioConvConvWilson4DMonomial: resetting Predictor before energy calc solve
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.888823(s) Flops=4215877632 => 1459.3755422191 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  46691.6612003055 Mflops = 46.6916612003055 Gflops = 0.0466916612003055 Tflops
+CG_SOLVER: 38 iterations. Rsd = 9.25113550954236e-09 Relative Rsd = 9.94139773802682e-13
+CG_SOLVER_TIME: 3.040758 sec
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.13901
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.003363
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+Working through Copy List of length 0
+MD: Resetting Chrono Predictors at start of trajectory
+Monitoring force
+FORCE TIME: gauge : 0.577839
+num_pf = 1
+MInvCG2: 26 iterations
+QDP:FlopCount:minvcg Performance/CPU: t=2.173919(s) Flops=3290554368 => 1513.65086187664 Mflops/cpu.
+QDP:FlopCount:minvcg Total performance:  48422.7092341304 Mflops = 48.4227092341304 Gflops = 0.0484227092341304 Tflops
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.091188
+CLOV_LINOP: Time spent in clov deriv (total) = 1.238611
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.070058
+FORCE TIME: strange : 7.185461
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: strange_clover : 0.991522
+LastSolution4DChronoPredictor: No available last guess. Giving you zero
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.773985(s) Flops=4107718656 => 1480.80060130102 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  47358.7029008137 Mflops = 47.3587029008137 Gflops = 0.0473587029008137 Tflops
+CG_SOLVER: 37 iterations. Rsd = 6.2047434125008e-09 Relative Rsd = 6.56573746875623e-13
+CG_SOLVER_TIME: 2.924149 sec
+LastSolutionPredictor: registering new solution
+2Flav::invert,  n_count = 37
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798231
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.00494
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.134586
+FORCE TIME: up_down_hasenbusch_last : 4.895544
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: up_down_clover : 0.991657
+LastSolution4DChronoPredictor: No available last guess. Giving you zero
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.895939(s) Flops=4215877632 => 1455.78951490346 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  46569.7454246285 Mflops = 46.5697454246285 Gflops = 0.0465697454246285 Tflops
+CG_SOLVER: 38 iterations. Rsd = 9.25113550954236e-09 Relative Rsd = 9.94139773802682e-13
+CG_SOLVER_TIME: 3.048332 sec
+LastSolutionPredictor: registering new solution
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798484
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.005057
+CLOV_LINOP: Time spent in clov deriv (total) = 0.79956
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.004995
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.138321
+FORCE TIME: up_down_hasenbusch_1 : 6.371128
+Monitoring force
+FORCE TIME: gauge : 0.584639
+num_pf = 1
+MInvCG2: 26 iterations
+QDP:FlopCount:minvcg Performance/CPU: t=2.173856(s) Flops=3290554368 => 1513.69472862968 Mflops/cpu.
+QDP:FlopCount:minvcg Total performance:  48423.9764523763 Mflops = 48.4239764523763 Gflops = 0.0484239764523763 Tflops
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.091159
+CLOV_LINOP: Time spent in clov deriv (total) = 1.23821
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.070082
+FORCE TIME: strange : 7.18537
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: strange_clover : 0.991883
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.409584(s) Flops=3566923776 => 1480.30688118779 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  47348.4357414474 Mflops = 47.3484357414474 Gflops = 0.0473484357414474 Tflops
+CG_SOLVER: 32 iterations. Rsd = 7.53089791406391e-09 Relative Rsd = 7.96904808474885e-13
+CG_SOLVER_TIME: 2.55968 sec
+LastSolutionPredictor: registering new solution
+2Flav::invert,  n_count = 32
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798709
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.004992
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.117748
+FORCE TIME: up_down_hasenbusch_last : 4.532397
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: up_down_clover : 0.992017
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.524396(s) Flops=3675082752 => 1455.8265628689 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  46568.7665842605 Mflops = 46.5687665842605 Gflops = 0.0465687665842605 Tflops
+CG_SOLVER: 33 iterations. Rsd = 4.93364349182152e-09 Relative Rsd = 5.30175568868581e-13
+CG_SOLVER_TIME: 2.676739 sec
+LastSolutionPredictor: registering new solution
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798716
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.004988
+CLOV_LINOP: Time spent in clov deriv (total) = 0.799769
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.005028
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.121389
+FORCE TIME: up_down_hasenbusch_1 : 5.99899
+Monitoring force
+FORCE TIME: gauge : 0.5864
+num_pf = 1
+MInvCG2: 26 iterations
+QDP:FlopCount:minvcg Performance/CPU: t=2.174059(s) Flops=3290554368 => 1513.55338930544 Mflops/cpu.
+QDP:FlopCount:minvcg Total performance:  48418.7229306028 Mflops = 48.4187229306028 Gflops = 0.0484187229306028 Tflops
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.091069
+CLOV_LINOP: Time spent in clov deriv (total) = 1.239673
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.070174
+FORCE TIME: strange : 7.188192
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: strange_clover : 0.991703
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.409208(s) Flops=3566923776 => 1480.53790955368 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  47346.0780389303 Mflops = 47.3460780389303 Gflops = 0.0473460780389303 Tflops
+CG_SOLVER: 32 iterations. Rsd = 7.39889115707755e-09 Relative Rsd = 7.82936113029267e-13
+CG_SOLVER_TIME: 2.559246 sec
+LastSolutionPredictor: registering new solution
+2Flav::invert,  n_count = 32
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0.79855
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.004945
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.117972
+FORCE TIME: up_down_hasenbusch_last : 4.531998
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: up_down_clover : 0.991788
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.524547(s) Flops=3675082752 => 1455.7394859355 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  46565.0217610203 Mflops = 46.5650217610203 Gflops = 0.0465650217610203 Tflops
+CG_SOLVER: 33 iterations. Rsd = 4.9354419804832e-09 Relative Rsd = 5.30368428849694e-13
+CG_SOLVER_TIME: 2.676667 sec
+LastSolutionPredictor: registering new solution
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798503
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.005027
+CLOV_LINOP: Time spent in clov deriv (total) = 0.799752
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.005003
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.121311
+FORCE TIME: up_down_hasenbusch_1 : 6.000284
+Monitoring force
+FORCE TIME: gauge : 0.600196
+num_pf = 1
+MInvCG2: 26 iterations
+QDP:FlopCount:minvcg Performance/CPU: t=2.174139(s) Flops=3290554368 => 1513.49769632944 Mflops/cpu.
+QDP:FlopCount:minvcg Total performance:  48417.9694171342 Mflops = 48.4179694171342 Gflops = 0.0484179694171342 Tflops
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.09113
+CLOV_LINOP: Time spent in clov deriv (total) = 1.238356
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.070122
+FORCE TIME: strange : 7.186917
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: strange_clover : 0.991775
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.409681(s) Flops=3566923776 => 1480.24729248394 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  47349.4073067439 Mflops = 47.3494073067439 Gflops = 0.0473494073067439 Tflops
+CG_SOLVER: 32 iterations. Rsd = 7.1788176707813e-09 Relative Rsd = 7.59648369462886e-13
+CG_SOLVER_TIME: 2.559834 sec
+LastSolutionPredictor: registering new solution
+2Flav::invert,  n_count = 32
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798618
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.004976
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.117817
+FORCE TIME: up_down_hasenbusch_last : 4.531854
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: up_down_clover : 0.991889
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.524678(s) Flops=3675082752 => 1455.66395080878 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  46563.380859554 Mflops = 46.563380859554 Gflops = 0.046563380859554 Tflops
+CG_SOLVER: 33 iterations. Rsd = 4.95256163825996e-09 Relative Rsd = 5.32209226585655e-13
+CG_SOLVER_TIME: 2.677043 sec
+LastSolutionPredictor: registering new solution
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798759
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.005043
+CLOV_LINOP: Time spent in clov deriv (total) = 0.799873
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.005016
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.121252
+FORCE TIME: up_down_hasenbusch_1 : 6.001603
+Monitoring force
+FORCE TIME: gauge : 0.585678
+num_pf = 1
+MInvCG2: 26 iterations
+QDP:FlopCount:minvcg Performance/CPU: t=2.174116(s) Flops=3290554368 => 1513.51370764025 Mflops/cpu.
+QDP:FlopCount:minvcg Total performance:  48417.9582954505 Mflops = 48.4179582954505 Gflops = 0.0484179582954505 Tflops
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.091146
+CLOV_LINOP: Time spent in clov deriv (total) = 1.238627
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.070028
+FORCE TIME: strange : 7.187774
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: strange_clover : 0.995046
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.409361(s) Flops=3566923776 => 1480.4438919697 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  47342.755573863 Mflops = 47.342755573863 Gflops = 0.047342755573863 Tflops
+CG_SOLVER: 32 iterations. Rsd = 6.95279843433232e-09 Relative Rsd = 7.35731458307093e-13
+CG_SOLVER_TIME: 2.559428 sec
+LastSolutionPredictor: registering new solution
+2Flav::invert,  n_count = 32
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798365
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.004952
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.117952
+FORCE TIME: up_down_hasenbusch_last : 4.534463
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: up_down_clover : 0.993998
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.524705(s) Flops=3675082752 => 1455.6483834745 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  46562.2741530348 Mflops = 46.5622741530348 Gflops = 0.0465622741530348 Tflops
+CG_SOLVER: 33 iterations. Rsd = 4.97563392181474e-09 Relative Rsd = 5.34689808690396e-13
+CG_SOLVER_TIME: 2.677062 sec
+LastSolutionPredictor: registering new solution
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798649
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.005044
+CLOV_LINOP: Time spent in clov deriv (total) = 0.799761
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.004996
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.121197
+FORCE TIME: up_down_hasenbusch_1 : 6.001142
+Monitoring force
+FORCE TIME: gauge : 0.599435
+num_pf = 1
+MInvCG2: 26 iterations
+QDP:FlopCount:minvcg Performance/CPU: t=2.174859(s) Flops=3290554368 => 1512.99664392036 Mflops/cpu.
+QDP:FlopCount:minvcg Total performance:  48401.6008259471 Mflops = 48.4016008259471 Gflops = 0.0484016008259471 Tflops
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.091205
+CLOV_LINOP: Time spent in clov deriv (total) = 1.238436
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.07006
+FORCE TIME: strange : 7.188238
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: strange_clover : 0.991547
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.40941(s) Flops=3566923776 => 1480.41378428744 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  47352.2163426656 Mflops = 47.3522163426656 Gflops = 0.0473522163426656 Tflops
+CG_SOLVER: 32 iterations. Rsd = 6.80850595855285e-09 Relative Rsd = 7.20462712257479e-13
+CG_SOLVER_TIME: 2.559593 sec
+LastSolutionPredictor: registering new solution
+2Flav::invert,  n_count = 32
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798809
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.00502
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.117948
+FORCE TIME: up_down_hasenbusch_last : 4.531717
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: up_down_clover : 0.991511
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.525502(s) Flops=3675082752 => 1455.18900875945 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  46548.4402108275 Mflops = 46.5484402108275 Gflops = 0.0465484402108275 Tflops
+CG_SOLVER: 33 iterations. Rsd = 4.97452319622896e-09 Relative Rsd = 5.34573079187214e-13
+CG_SOLVER_TIME: 2.6779 sec
+LastSolutionPredictor: registering new solution
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798586
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.00501
+CLOV_LINOP: Time spent in clov deriv (total) = 0.799822
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.005006
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.121179
+FORCE TIME: up_down_hasenbusch_1 : 5.999281
+Monitoring force
+FORCE TIME: gauge : 0.585941
+num_pf = 1
+MInvCG2: 26 iterations
+QDP:FlopCount:minvcg Performance/CPU: t=2.174269(s) Flops=3290554368 => 1513.40720398442 Mflops/cpu.
+QDP:FlopCount:minvcg Total performance:  48414.6697767572 Mflops = 48.4146697767572 Gflops = 0.0484146697767572 Tflops
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.091152
+CLOV_LINOP: Time spent in clov deriv (total) = 1.238279
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.070072
+FORCE TIME: strange : 7.186064
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: strange_clover : 0.991941
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.410209(s) Flops=3566923776 => 1479.92301746446 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  47326.0747539269 Mflops = 47.3260747539269 Gflops = 0.0473260747539269 Tflops
+CG_SOLVER: 32 iterations. Rsd = 6.73307823493516e-09 Relative Rsd = 7.12481098865668e-13
+CG_SOLVER_TIME: 2.560329 sec
+LastSolutionPredictor: registering new solution
+2Flav::invert,  n_count = 32
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798652
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.005034
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.117753
+FORCE TIME: up_down_hasenbusch_last : 4.53319
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+FORCE TIME: up_down_clover : 0.993492
+LastSolution4DChronoPredictor: Giving you the last solution
+InvCG2: starting
+QDP:FlopCount:invcg2 Performance/CPU: t=2.524681(s) Flops=3675082752 => 1455.66222108853 Mflops/cpu.
+QDP:FlopCount:invcg2 Total performance:  46563.0311578439 Mflops = 46.5630311578439 Gflops = 0.0465630311578439 Tflops
+CG_SOLVER: 33 iterations. Rsd = 4.93001431864889e-09 Relative Rsd = 5.29792645409397e-13
+CG_SOLVER_TIME: 2.677067 sec
+LastSolutionPredictor: registering new solution
+Monitoring force
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0
+CLOV_LINOP: Time spent in clov deriv (total) = 0.798579
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.004954
+CLOV_LINOP: Time spent in clov deriv (total) = 0.79999
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.004977
+CLOV_LINOP: Time spent in clov deriv (total) = 0
+CLOV_LINOP: Time spent in clov apply/invapply (total) = 0.121419
+FORCE TIME: up_down_hasenbusch_1 : 6.001465
+Monitoring force
+FORCE TIME: gauge : 0.586206
+num_pf = 1
+MInvCG2: 26 iterations
+QDP:FlopCount:minvcg Performance/CPU: t=2.174168(s) Flops=3290554368 => 1513.47750863779 Mflops/cpu.
+QDP:FlopCount:minvcg Total performance:  48416.803402776 Mflops = 48.416803402776 Gflops = 0.048416803402776 Tflops
+2016-11-21 15:27:39.213 (WARN ) [0x40000f39030] :ibm.runjob.LogSignalInfo: received signal 15
+2016-11-21 15:27:39.213 (WARN ) [0x40000f39030] :ibm.runjob.LogSignalInfo: signal sent from USER
+2016-11-21 15:27:39.214 (WARN ) [0x40000f39030] :ibm.runjob.LogSignalInfo: sent from uid 0 (root)
