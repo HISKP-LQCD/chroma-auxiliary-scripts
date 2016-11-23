@@ -20,6 +20,8 @@ set -e
 set -u
 set -x
 
+cd $HOME
+
 # Load the appropriate modules and output the present versions.
 
 module load autotools
