@@ -200,54 +200,54 @@ popd
 #                             bagel_wilson_dslash                             #
 ###############################################################################
 
-wget-if-needed http://www2.ph.ed.ac.uk/~paboyle/bagel/bagel_wilson_dslash-1.4.6.tar.gz bagel_wilson_dslash-1.4.6
-
-pushd bagel_wilson_dslash-1.4.6
-cflags="$base_cflags"
-cxxflags="$base_cxxflags"
-if ! [[ -f configure ]]; then autoreconf -f; fi
-if ! [[ -f Makefile ]]; then
-    CC=$cc CXX=$cxx ./configure $base_configure \
-        --enable-comms=qmp \
-        --enable-target-cpu=bgl \
-        --with-bagel=$prefix \
-        --with-qmp=$prefix \
-        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
-fi
-make-make-install
-popd
+#wget-if-needed http://www2.ph.ed.ac.uk/~paboyle/bagel/bagel_wilson_dslash-1.4.6.tar.gz bagel_wilson_dslash-1.4.6
+#
+#pushd bagel_wilson_dslash-1.4.6
+#cflags="$base_cflags"
+#cxxflags="$base_cxxflags"
+#if ! [[ -f configure ]]; then autoreconf -f; fi
+#if ! [[ -f Makefile ]]; then
+#    CC=$cc CXX=$cxx ./configure $base_configure \
+#        --enable-comms=qmp \
+#        --enable-target-cpu=bgl \
+#        --with-bagel=$prefix \
+#        --with-qmp=$prefix \
+#        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+#fi
+#make-make-install
+#popd
 
 ###############################################################################
 #                                     bfm                                     #
 ###############################################################################
 
-#module load gsl
-#
-#clone-if-needed https://github.com/martin-ueding/bfm.git bfm master
-#
-#pushd bfm
-#extra_common="-I$GSL_INCLUDE -I$HOME/local/include -I$HOME/local/include/libxml2 -fpermissive"
-#cflags="$base_cflags $extra_common $openmp_flags"
-#cxxflags="$base_cxxflags $extra_common $openmp_flags $cxx11_flags"
-#if ! [[ -f configure ]]; then
-#    automake --add-missing
-#    autoreconf -f
-#fi
-#if ! [[ -f Makefile ]]; then
-#    ./configure $base_configure \
-#        --enable-itype=uint64_t --enable-isize=8 --enable-ifmt=%lx \
-#        --enable-istype=uint32_t --enable-issize=4 --enable-isfmt=%x \
-#        --enable-comms=QMP \
-#        --enable-qdp \
-#        --enable-spidslash=yes \
-#        --with-libxml2="$prefix/bin/xml2-config" \
-#        --enable-thread-model=spi \
-#        --with-bagel=$prefix \
-#        --with-qdp=$prefix \
-#        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
-#fi
-#make-make-install
-#popd
+module load gsl
+
+clone-if-needed https://github.com/martin-ueding/bfm.git bfm master
+
+pushd bfm
+extra_common="-I$GSL_INCLUDE -I$HOME/local/include -I$HOME/local/include/libxml2 -fpermissive"
+cflags="$base_cflags $extra_common $openmp_flags"
+cxxflags="$base_cxxflags $extra_common $openmp_flags $cxx11_flags"
+if ! [[ -f configure ]]; then
+    automake --add-missing
+    autoreconf -f
+fi
+if ! [[ -f Makefile ]]; then
+    ./configure $base_configure \
+        --enable-itype=uint64_t --enable-isize=8 --enable-ifmt=%lx \
+        --enable-istype=uint32_t --enable-issize=4 --enable-isfmt=%x \
+        --enable-comms=QMP \
+        --enable-qdp \
+        --enable-spidslash=yes \
+        --with-libxml2="$prefix/bin/xml2-config" \
+        --enable-thread-model=spi \
+        --with-bagel=$prefix \
+        --with-qdp=$prefix \
+        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+fi
+make-make-install
+popd
 
 ###############################################################################
 #                   bagel_qdp: Bagel code generator for QDP                   #
