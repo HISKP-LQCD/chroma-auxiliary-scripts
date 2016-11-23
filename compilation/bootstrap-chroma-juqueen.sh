@@ -192,7 +192,7 @@ if ! [[ -f configure ]]; then autoreconf -f; fi
 if ! [[ -f Makefile ]]; then
     CC=$cc CXX=$cxx ./configure $base_configure \
         --enable-comms=qmp \
-        --enable-target-cpu=bgq \
+        --enable-target-cpu=bgl \
         --with-qmp=$prefix \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
