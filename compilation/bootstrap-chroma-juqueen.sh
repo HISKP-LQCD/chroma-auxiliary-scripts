@@ -191,6 +191,9 @@ cxxflags="$base_cxxflags"
 if ! [[ -f configure ]]; then autoreconf -f; fi
 if ! [[ -f Makefile ]]; then
     CC=$cc CXX=$cxx ./configure $base_configure \
+        --enable-comms=qmp \
+        --enable-target-cpu=bgq \
+        --with-qmp=$prefix \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
