@@ -105,7 +105,7 @@ case $compiler in
         cc_name=mpicc
         cxx_name=mpic++
         openmp_flags="-fopenmp"
-        base_flags="-O2 -finline-limit=50000 -Wall -Wpedantic -ferror-limit=1"
+        base_flags="-O2 -Wall -Wpedantic -ferror-limit=1"
         cxx11_flags="--std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
         ;;
