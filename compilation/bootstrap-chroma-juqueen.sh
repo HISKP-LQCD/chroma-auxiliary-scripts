@@ -80,23 +80,34 @@ case $compiler in
         openmp_flags="-qsmp=omp -qnosave"
         base_flags="-qarch=qp -O2"
         cxx11_flags="-qlanglvl=extended0x"
+        disable_warnings_flags=""
         ;;
-    gcc)
+    gcc-4.9)
         module load gcc/4.9.3
         cc_name=mpigcc
         cxx_name=mpig++
         color_flags="-fdiagnostics-color=auto"
         openmp_flags="-fopenmp"
-        base_flags="-O2 -finline-limit=50000 -Wall -Wpedantic $color_flags"
+        base_flags="-O2 -finline-limit=50000 -Wall -Wpedantic -fmax-errors=1 $color_flags"
         cxx11_flags="--std=c++11"
+        disable_warnings_flags="-Wno-all -Wno-pedantic"
+        ;;
+    gcc-4.4)
+        cc_name=mpigcc
+        cxx_name=mpig++
+        openmp_flags="-fopenmp"
+        base_flags="-O2 -finline-limit=50000 -Wall -pedantic"
+        cxx11_flags=""
+        disable_warnings_flags=""
         ;;
     clang)
         module load clang/3.7.r236977
         cc_name=mpicc
         cxx_name=mpic++
         openmp_flags="-fopenmp"
-        base_flags="-O2 -finline-limit=50000 -Wall -Wpedantic"
+        base_flags="-O2 -finline-limit=50000 -Wall -Wpedantic -ferror-limit=1"
         cxx11_flags="--std=c++11"
+        disable_warnings_flags="-Wno-all -Wno-pedantic"
         ;;
     *)
         echo "This compiler is not supported by this script. Choose another one."
@@ -230,7 +241,7 @@ if ! qdp++-config --cxxflags; then
 fi
 
 pushd bfm
-extra_common="-I$GSL_INCLUDE -I$HOME/local/include -I$HOME/local/include/libxml2 -fpermissive"
+extra_common="-I$GSL_INCLUDE -I$HOME/local/include -I$HOME/local/include/libxml2 -fpermissive $disable_warnings_flags"
 cflags="$base_cflags $extra_common $openmp_flags"
 cxxflags="$base_cxxflags $extra_common $openmp_flags $cxx11_flags"
 if ! [[ -f configure ]]; then
