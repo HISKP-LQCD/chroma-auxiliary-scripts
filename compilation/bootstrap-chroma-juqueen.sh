@@ -23,14 +23,11 @@ set -x
 cd $HOME/Sources
 
 # Load the appropriate modules and output the present versions.
-
 module load autotools
-
 module list
 
 # Clones a git repository if the directory does not exist. It does not call
 # `git pull`.
-
 clone-if-needed() {
     local url="$1"
     local dir="$2"
@@ -56,7 +53,6 @@ wget-if-needed() {
 # Runs `make && make install` with appropriate flags that make compilation
 # parallel on multiple cores. A sentinel file is created such that `make` is
 # not invoked once it has correctly built.
-
 make_smp_template="-j $(nproc)"
 make_smp_flags="${SMP-$make_smp_template}"
 
@@ -72,7 +68,6 @@ make-make-install() {
 }
 
 # Basic flags that are used for every single project compiled.
-
 prefix="$HOME/local"
 
 compiler=${COMPILER-clang}
@@ -226,6 +221,13 @@ popd
 module load gsl
 
 clone-if-needed https://github.com/martin-ueding/bfm.git bfm master
+
+# Make sure that `qdp++-config` can be found in the `PATH`. The `Makefile` of
+# `bfm` will call that on every compiler invocation.
+if ! qdp++-config --cxxflags; then
+    echo 'qdp++-config cannot be found in $PATH, please make sure it can be called.'
+    exit 1
+fi
 
 pushd bfm
 extra_common="-I$GSL_INCLUDE -I$HOME/local/include -I$HOME/local/include/libxml2 -fpermissive"
