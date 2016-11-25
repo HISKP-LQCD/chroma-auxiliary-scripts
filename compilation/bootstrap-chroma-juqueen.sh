@@ -259,7 +259,11 @@ if ! [[ -f Makefile ]]; then
         --with-qdp=$prefix \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
+# The tests do not compile (yet), so we will just not build them. Installing
+# `bfm` might be sufficient.
+pushd bfm
 make-make-install
+popd
 popd
 
 ###############################################################################
@@ -271,10 +275,15 @@ clone-if-needed https://github.com/usqcd-software/bagel_qdp.git bagel_qdp master
 pushd bagel_qdp
 cflags="$base_cflags"
 cxxflags="$base_cxxflags"
-if ! [[ -f configure ]]; then autoreconf -f; fi
+if ! [[ -f configure ]]; then
+    automake --add-missing
+    autoreconf -f
+fi
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         --enable-target-cpu=bgl \
+        --with-bagel=$prefix \
+        --with-qdp=$prefix \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
