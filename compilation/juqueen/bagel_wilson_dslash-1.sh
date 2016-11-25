@@ -1,8 +1,10 @@
 print-fancy-heading bagel_wilson_dslash 1.4.6
 
-wget-if-needed http://www2.ph.ed.ac.uk/~paboyle/bagel/bagel_wilson_dslash-1.4.6.tar.gz bagel_wilson_dslash-1.4.6
+clone-if-needed https://github.com/martin-ueding/bagel_wilson_dslash.git bagel_wilson_dslash master
 
-pushd bagel_wilson_dslash-1.4.6
+module rm autotools
+
+pushd bagel_wilson_dslash
 cflags="$base_cflags"
 cxxflags="$base_cxxflags $cxx11_flags"
 autoreconf-if-needed
@@ -12,7 +14,10 @@ if ! [[ -f Makefile ]]; then
         --enable-target-cpu=bgl \
         --with-bagel=$prefix \
         --with-qmp=$prefix \
+        --enable-allocator=malloc \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
 popd
+
+module load autotools
