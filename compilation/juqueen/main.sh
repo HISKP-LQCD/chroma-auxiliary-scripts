@@ -20,15 +20,18 @@ set -e
 set -u
 set -x
 
+basedir=$(pwd)
+
 cd $HOME/Sources
 
-source setup.sh
+source $basedir/setup.sh
 
-source libxml2.sh
-source gmp.sh
-source bagel-3.sh
-source qmp.sh
-source qdpxx.sh
-source chroma.sh
+source $basedir/libxml2.sh
+source $basedir/gmp.sh
+source $basedir/bagel-3.sh
+source $basedir/bfm-3.sh
+source $basedir/qmp.sh
+source $basedir/qdpxx.sh
+source $basedir/chroma.sh
 
 echo "This took $SECONDS seconds."
