@@ -5,7 +5,7 @@ clone-if-needed https://github.com/martin-ueding/chroma.git chroma submodules-vi
 pushd chroma
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags"
-if ! [[ -f configure ]]; then ./autogen.sh; fi
+autoreconf-if-needed
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         --enable-bgq-thread-binding \

@@ -5,7 +5,7 @@ clone-if-needed https://github.com/martin-ueding/qdpxx.git qdpxx martins-fedora2
 pushd qdpxx
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
-if ! [[ -f configure ]]; then autoreconf -f; fi
+autoreconf-if-needed
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         --enable-bgq-thread-binding \

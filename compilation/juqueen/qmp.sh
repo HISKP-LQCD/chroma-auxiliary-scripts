@@ -5,7 +5,7 @@ clone-if-needed https://github.com/usqcd-software/qmp.git qmp master
 pushd qmp
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags"
-if ! [[ -f configure ]]; then autoreconf -f; fi
+autoreconf-if-needed
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         --enable-bgspi \

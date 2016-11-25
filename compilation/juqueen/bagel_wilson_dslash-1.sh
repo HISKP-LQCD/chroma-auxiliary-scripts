@@ -5,7 +5,7 @@ wget-if-needed http://www2.ph.ed.ac.uk/~paboyle/bagel/bagel_wilson_dslash-1.4.6.
 pushd bagel_wilson_dslash-1.4.6
 cflags="$base_cflags"
 cxxflags="$base_cxxflags $cxx11_flags"
-if ! [[ -f configure ]]; then autoreconf -f; fi
+autoreconf-if-needed
 if ! [[ -f Makefile ]]; then
     CC=$cc CXX=$cxx ./configure $base_configure \
         --enable-comms=qmp \

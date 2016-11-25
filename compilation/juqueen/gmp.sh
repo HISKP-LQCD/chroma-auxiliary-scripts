@@ -8,6 +8,7 @@ fi
 pushd gmp-6.1.1
 cflags="$base_cflags"
 cxxflags="$base_cxxflags"
+autoreconf-if-needed
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         CFLAGS="$cflags"

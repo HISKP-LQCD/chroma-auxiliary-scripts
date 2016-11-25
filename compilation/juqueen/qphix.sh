@@ -5,7 +5,7 @@ clone-if-needed https://github.com/JeffersonLab/qphix.git qphix master
 pushd qphix
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
-if ! [[ -f configure ]]; then autoreconf -f; fi
+autoreconf-if-needed
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         --disable-mm-malloc \

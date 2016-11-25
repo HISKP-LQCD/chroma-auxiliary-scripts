@@ -51,6 +51,13 @@ print-fancy-heading() {
     set -x
 }
 
+autoreconf-if-needed() {
+    if ! [[ -f configure ]]; then
+        automake --add-missing
+        autoreconf -f
+    fi
+}
+
 # Basic flags that are used for every single project compiled.
 prefix="$HOME/local"
 

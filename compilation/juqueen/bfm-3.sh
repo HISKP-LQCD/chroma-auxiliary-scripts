@@ -15,10 +15,7 @@ pushd bfm
 extra_common="-I$GSL_INCLUDE -I$HOME/local/include -I$HOME/local/include/libxml2 -fpermissive $disable_warnings_flags"
 cflags="$base_cflags $extra_common $openmp_flags"
 cxxflags="$base_cxxflags $extra_common $openmp_flags $cxx11_flags"
-if ! [[ -f configure ]]; then
-    automake --add-missing
-    autoreconf -f
-fi
+autoreconf-if-needed
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         --enable-comms=QMP \
