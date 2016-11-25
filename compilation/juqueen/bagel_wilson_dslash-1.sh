@@ -1,3 +1,5 @@
+print-fancy-heading bagel_wilson_dslash
+
 wget-if-needed http://www2.ph.ed.ac.uk/~paboyle/bagel/bagel_wilson_dslash-1.4.6.tar.gz bagel_wilson_dslash-1.4.6
 
 pushd bagel_wilson_dslash-1.4.6

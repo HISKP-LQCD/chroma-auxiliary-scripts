@@ -43,6 +43,14 @@ make-make-install() {
     fi
 }
 
+print-fancy-heading() {
+    set +x
+    echo "######################################################################"
+    echo "# $*"
+    echo "######################################################################"
+    set -x
+}
+
 # Basic flags that are used for every single project compiled.
 prefix="$HOME/local"
 

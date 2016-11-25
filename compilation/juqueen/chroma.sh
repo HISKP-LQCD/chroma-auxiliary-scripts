@@ -15,6 +15,8 @@ if ! [[ -f Makefile ]]; then
         --with-gmp="$prefix" \
         --with-libxml2="$prefix/bin/xml2-config" \
         --with-qdp="$prefix" \
+        --with-bagel-wilson-dslash=$prefix \
+        --with-bagel-clover=$prefix \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
