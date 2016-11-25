@@ -1,3 +1,5 @@
+print-fancy-heading qmp
+
 clone-if-needed https://github.com/usqcd-software/qmp.git qmp master
 
 pushd qmp

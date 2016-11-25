@@ -1,3 +1,5 @@
+print-fancy-heading chroma
+
 clone-if-needed https://github.com/martin-ueding/chroma.git chroma submodules-via-https
 
 pushd chroma

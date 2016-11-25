@@ -1,3 +1,5 @@
+print-fancy-heading libxml2
+
 clone-if-needed git://git.gnome.org/libxml2 libxml2 v2.9.4
 
 pushd libxml2

@@ -1,3 +1,5 @@
+print-fancy-heading qdpxx
+
 clone-if-needed https://github.com/martin-ueding/qdpxx.git qdpxx martins-fedora24-build
 
 pushd qdpxx

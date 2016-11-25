@@ -1,3 +1,5 @@
+print-fancy-heading gmp
+
 if ! [[ -d gmp-6.1.1 ]]; then
     wget https://gmplib.org/download/gmp/gmp-6.1.1.tar.xz
     tar -xf gmp-6.1.1.tar.xz

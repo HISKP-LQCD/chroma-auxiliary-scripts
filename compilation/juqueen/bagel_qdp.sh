@@ -1,3 +1,5 @@
+print-fancy-heading bagel_qdp
+
 clone-if-needed https://github.com/usqcd-software/bagel_qdp.git bagel_qdp master
 
 pushd bagel_qdp

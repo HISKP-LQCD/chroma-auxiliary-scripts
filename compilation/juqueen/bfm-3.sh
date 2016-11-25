@@ -1,3 +1,5 @@
+print-fancy-heading bfm 3.3
+
 module load gsl
 
 clone-if-needed https://github.com/martin-ueding/bfm.git bfm master

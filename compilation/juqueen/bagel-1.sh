@@ -1,6 +1,8 @@
-wget-if-needed http://www2.ph.ed.ac.uk/~paboyle/bagel/bagel-3.3.tar bagel
+print-fancy-heading bagel 1.4.0
 
-pushd bagel
+wget-if-needed http://www2.ph.ed.ac.uk/~paboyle/bagel/bagel-1.4.0.tar.gz bagel-1.4.0
+
+pushd bagel-1.4.0
 cflags="$base_cflags"
 cxxflags="$base_cxxflags"
 if ! [[ -f configure ]]; then autoreconf -f; fi

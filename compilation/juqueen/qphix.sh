@@ -1,3 +1,5 @@
+print-fancy-heading qphix
+
 clone-if-needed https://github.com/JeffersonLab/qphix.git qphix master
 
 pushd qphix

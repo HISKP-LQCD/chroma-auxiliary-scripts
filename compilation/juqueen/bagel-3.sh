@@ -1,3 +1,5 @@
+print-fancy-heading bagel 3.3
+
 wget-if-needed http://www2.ph.ed.ac.uk/~paboyle/bagel/bagel-3.3.tar bagel
 
 pushd bagel
