@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
@@ -64,7 +64,9 @@ def main():
             gflops_val = np.mean(gflops_dist)
             gflops_err = np.std(gflops_dist)
 
-            print(nodes, subgrid_volume, gflops_val)
+            print('Nodes:', nodes)
+            print('Subgrid Volume:', subgrid_volume)
+            print('Gflops: {} +- {}'.format(gflops_val, gflops_err))
 
 
 def _parse_args():
