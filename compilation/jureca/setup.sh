@@ -67,41 +67,25 @@ case $compiler in
     icc)
         module load Intel/2017.0.098-GCC-5.4.0
         module load IntelMPI/2017.0.098
-        cc_name=mpiicpc
-        cxx_name=mpiicc
+        cc_name=mpiicc
+        cxx_name=mpiicpc
         color_flags=""
         openmp_flags="-fopenmp"
         base_flags="-O2 -Wall"
         cxx11_flags="--std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
         ;;
-#   gcc-4.9)
-#       module load gcc/4.9.3
-#       cc_name=mpigcc
-#       cxx_name=mpig++
-#       color_flags="-fdiagnostics-color=auto"
-#       openmp_flags="-fopenmp"
-#       base_flags="-O2 -finline-limit=50000 -Wall -Wpedantic -fmax-errors=1 $color_flags"
-#       cxx11_flags="--std=c++11"
-#       disable_warnings_flags="-Wno-all -Wno-pedantic"
-#       ;;
-#   gcc-4.4)
-#       cc_name=mpigcc
-#       cxx_name=mpig++
-#       openmp_flags="-fopenmp"
-#       base_flags="-O2 -finline-limit=50000 -Wall -pedantic"
-#       cxx11_flags=""
-#       disable_warnings_flags=""
-#       ;;
-#   clang)
-#       module load clang/3.7.r236977
-#       cc_name=mpicc
-#       cxx_name=mpic++
-#       openmp_flags="-fopenmp"
-#       base_flags="-O2 -Wall -Wpedantic -ferror-limit=1"
-#       cxx11_flags="--std=c++11"
-#       disable_warnings_flags="-Wno-all -Wno-pedantic"
-#       ;;
+    gcc)
+        module load GCC
+        module load ParaStationMPI
+        cc_name=mpicc
+        cxx_name=mpic++
+        color_flags="-fdiagnostics-color=auto"
+        openmp_flags="-fopenmp"
+        base_flags="-O2 -finline-limit=50000 -Wall -Wpedantic -fmax-errors=1 $color_flags"
+        cxx11_flags="--std=c++11"
+        disable_warnings_flags="-Wno-all -Wno-pedantic"
+        ;;
     *)
         echo "This compiler is not supported by this script. Choose another one."
         exit 1

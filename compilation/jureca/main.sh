@@ -17,3 +17,5 @@ cd "$sourcedir"
 source "$basedir/setup.sh"
 
 source "$basedir/qmp.sh"
+source "$basedir/libxml2.sh"
+source "$basedir/qdpxx.sh"
