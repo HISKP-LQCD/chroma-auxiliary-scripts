@@ -53,8 +53,8 @@ print-fancy-heading() {
 
 autoreconf-if-needed() {
     if ! [[ -f configure ]]; then
-        automake --add-missing
         autoreconf -f
+        automake --add-missing
     fi
 }
 
