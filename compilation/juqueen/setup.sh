@@ -59,7 +59,7 @@ autoreconf-if-needed() {
 }
 
 # Basic flags that are used for every single project compiled.
-prefix="$HOME/local"
+prefix="$HOME/local-juqueen"
 
 compiler=${COMPILER-clang}
 

@@ -22,18 +22,15 @@ set -x
 
 basedir=$(pwd)
 
-cd $HOME/Sources
+mkdir -p $HOME/Sources-juqueen
+cd $HOME/Sources-juqueen
 
 source $basedir/setup.sh
 
 source $basedir/libxml2.sh
 source $basedir/gmp.sh
-source $basedir/bagel-1.sh
-#source $basedir/bfm-3.sh
-source $basedir/bagel_wilson_dslash-1.sh
 source $basedir/qmp.sh
 source $basedir/qdpxx.sh
-source $basedir/bagel_qdp.sh
 source $basedir/chroma.sh
 
 echo "This took $SECONDS seconds."
