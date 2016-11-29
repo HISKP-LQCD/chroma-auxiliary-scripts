@@ -6,9 +6,9 @@ pushd libxml2
 cflags="$base_cflags"
 cxxflags="$base_cxxflags"
 if ! [[ -f configure ]]; then
-    #pushd m4
-    #ln -fs /usr/share/aclocal/pkg.m4 .
-    #popd
+    pushd m4
+    ln -fs /usr/share/aclocal/pkg.m4 .
+    popd
     NOCONFIGURE=yes ./autogen.sh
 fi
 if ! [[ -f Makefile ]]; then

@@ -1,5 +1,9 @@
 # Load the appropriate modules and output the present versions.
+set +x
+module load GCCcore/.5.4.0
+module load Autotools
 module list
+set -x
 
 # Clones a git repository if the directory does not exist. It does not call
 # `git pull`.
@@ -65,8 +69,11 @@ compiler=${COMPILER-icc}
 
 case $compiler in
     icc)
+        set +x
         module load Intel/2017.0.098-GCC-5.4.0
         module load IntelMPI/2017.0.098
+        module list
+        set -x
         cc_name=mpiicc
         cxx_name=mpiicpc
         color_flags=""
@@ -76,8 +83,11 @@ case $compiler in
         disable_warnings_flags="-Wno-all -Wno-pedantic"
         ;;
     gcc)
+        set +x
         module load GCC
         module load ParaStationMPI
+        module list
+        set -x
         cc_name=mpicc
         cxx_name=mpic++
         color_flags="-fdiagnostics-color=auto"

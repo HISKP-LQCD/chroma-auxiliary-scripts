@@ -13,10 +13,10 @@ if ! [[ -f Makefile ]]; then
         --enable-parallel-io \
         --enable-precision=double \
         --enable-qdp-alignment=128 \
+        --with-libxml2="$prefix/bin/xml2-config" \
         --with-qmp="$prefix" \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
 popd
 
-        #--with-libxml2="$prefix/bin/xml2-config" \
