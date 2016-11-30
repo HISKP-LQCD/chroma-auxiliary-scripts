@@ -2,10 +2,10 @@ repo=qphix
 
 print-fancy-heading $repo
 
-clone-if-needed https://github.com/JeffersonLab/qphix.git $repo master
+clone-if-needed https://github.com/martin-ueding/qphix.git $repo master
 
 pushd $repo
-extra_common="-xAVX -qopt-report -qopt-report-phase=vec -Drestrict=__restrict__"
+extra_common="-xAVX -qopt-report -qopt-report-phase=vec -restrict"
 cflags="$base_cflags $openmp_flags $extra_common"
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $extra_common"
 autoreconf-if-needed
@@ -17,7 +17,7 @@ if ! [[ -f Makefile ]]; then
     $sourcedir/$repo/configure $base_configure \
         --disable-testing \
         --enable-proc=AVX \
-        --enable-soalen=8 \
+        --enable-soalen=4 \
         --enable-cean \
         --enable-clover \
         --enable-openmp \
