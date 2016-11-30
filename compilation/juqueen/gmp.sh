@@ -1,14 +1,19 @@
-print-fancy-heading gmp
+repo=gmp-6.1.1
 
-if ! [[ -d gmp-6.1.1 ]]; then
-    wget https://gmplib.org/download/gmp/gmp-6.1.1.tar.xz
-    tar -xf gmp-6.1.1.tar.xz
+print-fancy-heading $repo
+
+if ! [[ -d $repo ]]; then
+    wget https://gmplib.org/download/gmp/${repo}.tar.xz
+    tar -xf ${repo}.tar.xz
 fi
 
-pushd gmp-6.1.1
+pushd $repo
 cflags="$base_cflags"
 cxxflags="$base_cxxflags"
 autoreconf-if-needed
+
+mkdir -p "$build/$repo"
+pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         CFLAGS="$cflags"

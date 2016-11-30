@@ -5,18 +5,23 @@ print-fancy-heading $repo
 clone-if-needed https://github.com/JeffersonLab/qphix.git $repo master
 
 pushd $repo
-cflags="$base_cflags $openmp_flags"
-cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
+extra_common="-xAVX -qopt-report -qopt-report-phase=vec -Drestrict=__restrict__"
+cflags="$base_cflags $openmp_flags $extra_common"
+cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $extra_common"
 autoreconf-if-needed
+popd
 
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
-    ./configure $base_configure \
-        --disable-mm-malloc \
+    $sourcedir/$repo/configure $base_configure \
         --disable-testing \
+        --enable-proc=AVX \
+        --enable-soalen=8 \
+        --enable-cean \
         --enable-clover \
         --enable-openmp \
+        --enable-mm-malloc \
         --enable-parallel-arch=parscalar \
         --with-qdp++="$prefix" \
         --with-qdp="$prefix" \

@@ -21,9 +21,10 @@ set -u
 set -x
 
 basedir=$(pwd)
+sourcedir=$HOME/Sources
 
-mkdir -p $HOME/Sources-juqueen
-cd $HOME/Sources-juqueen
+mkdir -p $sourcedir
+cd $sourcedir
 
 source $basedir/setup.sh
 

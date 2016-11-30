@@ -8,6 +8,7 @@ pushd $repo
 cflags="$base_cflags"
 cxxflags="$base_cxxflags"
 if ! [[ -f configure ]]; then
+    mkdir -p m4
     pushd m4
     ln -fs /usr/share/aclocal/pkg.m4 .
     popd
@@ -18,7 +19,7 @@ popd
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
-    ./configure $base_configure \
+    $sourcedir/$repo/configure $base_configure \
         --without-zlib \
         --without-python \
         --without-readline \
