@@ -56,6 +56,7 @@ print-fancy-heading() {
 
 autoreconf-if-needed() {
     if ! [[ -f configure ]]; then
+        aclocal
         autoreconf -f
         automake --add-missing
     fi
@@ -64,6 +65,9 @@ autoreconf-if-needed() {
 # Basic flags that are used for every single project compiled.
 prefix="$HOME/local-jureca"
 mkdir -p "$prefix"
+
+build="$HOME/build-jureca"
+mkdir -p "$build"
 
 compiler=${COMPILER-icc}
 

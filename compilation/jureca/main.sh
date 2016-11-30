@@ -9,7 +9,7 @@ set -u
 set -x
 
 basedir="$(pwd)"
-sourcedir="$HOME/Sources-JURECA"
+sourcedir="$HOME/Sources"
 
 mkdir -p "$sourcedir"
 cd "$sourcedir"
@@ -19,4 +19,5 @@ source "$basedir/setup.sh"
 source "$basedir/qmp.sh"
 source "$basedir/libxml2.sh"
 source "$basedir/qdpxx.sh"
+source "$basedir/qphix.sh"
 source "$basedir/chroma.sh"

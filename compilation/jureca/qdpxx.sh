@@ -1,11 +1,17 @@
-print-fancy-heading qdpxx
+repo=qdpxx
 
-clone-if-needed https://github.com/martin-ueding/qdpxx.git qdpxx martins-fedora24-build
+print-fancy-heading $repo
 
-pushd qdpxx
+clone-if-needed https://github.com/martin-ueding/qdpxx.git $repo martins-fedora24-build
+
+pushd $repo
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
 autoreconf-if-needed
+popd
+
+mkdir -p "$build/$repo"
+pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         --enable-openmp \
