@@ -16,7 +16,7 @@ popd
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
-    ./configure $base_configure \
+    $sourcedir/$repo/configure $base_configure \
         CFLAGS="$cflags"
 fi
 make-make-install

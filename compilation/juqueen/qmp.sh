@@ -13,7 +13,7 @@ popd
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
-    ./configure $base_configure \
+    $sourcedir/$repo/configure $base_configure \
         --enable-bgspi \
         --enable-bgq \
         --with-qmp-comms-type=MPI \

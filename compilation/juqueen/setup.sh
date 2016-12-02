@@ -60,6 +60,10 @@ autoreconf-if-needed() {
 
 # Basic flags that are used for every single project compiled.
 prefix="$HOME/local-juqueen"
+mkdir -p "$prefix"
+
+build="$HOME/build-juqueen"
+mkdir -p "$build"
 
 compiler=${COMPILER-clang}
 
