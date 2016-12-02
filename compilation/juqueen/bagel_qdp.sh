@@ -6,6 +6,10 @@ pushd bagel_qdp
 cflags="$base_cflags"
 cxxflags="$base_cxxflags"
 autoreconf-if-needed
+popd
+
+mkdir -p "$build/$repo"
+pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         --enable-target-cpu=bgl \

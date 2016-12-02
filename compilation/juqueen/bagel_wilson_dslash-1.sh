@@ -8,6 +8,10 @@ pushd bagel_wilson_dslash
 cflags="$base_cflags"
 cxxflags="$base_cxxflags $cxx11_flags"
 autoreconf-if-needed
+popd
+
+mkdir -p "$build/$repo"
+pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
     CC=$cc CXX=$cxx ./configure $base_configure \
         --enable-comms=qmp \

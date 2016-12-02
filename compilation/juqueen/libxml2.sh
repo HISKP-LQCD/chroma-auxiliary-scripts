@@ -14,6 +14,7 @@ if ! [[ -f configure ]]; then
     popd
     NOCONFIGURE=yes ./autogen.sh
 fi
+popd
 
 mkdir -p "$build/$repo"
 pushd "$build/$repo"

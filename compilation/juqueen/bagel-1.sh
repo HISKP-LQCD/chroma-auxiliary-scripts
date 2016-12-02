@@ -6,6 +6,10 @@ pushd bagel-1.4.0
 cflags="$base_cflags"
 cxxflags="$base_cxxflags"
 autoreconf-if-needed
+popd
+
+mkdir -p "$build/$repo"
+pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         --enable-itype=uint64_t --enable-isize=8 --enable-ifmt=%lx \

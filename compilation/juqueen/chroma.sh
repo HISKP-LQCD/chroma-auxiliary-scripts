@@ -8,6 +8,7 @@ pushd $repo
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags"
 autoreconf-if-needed
+popd
 
 mkdir -p "$build/$repo"
 pushd "$build/$repo"

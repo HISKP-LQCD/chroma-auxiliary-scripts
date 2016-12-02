@@ -32,6 +32,7 @@ source $basedir/libxml2.sh
 source $basedir/gmp.sh
 source $basedir/qmp.sh
 source $basedir/qdpxx.sh
+source $basedir/qphix.sh
 source $basedir/chroma.sh
 
 echo "This took $SECONDS seconds."

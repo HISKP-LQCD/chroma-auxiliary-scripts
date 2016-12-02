@@ -16,6 +16,10 @@ extra_common="-I$GSL_INCLUDE -I$HOME/local/include -I$HOME/local/include/libxml2
 cflags="$base_cflags $extra_common $openmp_flags"
 cxxflags="$base_cxxflags $extra_common $openmp_flags $cxx11_flags"
 autoreconf-if-needed
+popd
+
+mkdir -p "$build/$repo"
+pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
     ./configure $base_configure \
         --enable-comms=QMP \

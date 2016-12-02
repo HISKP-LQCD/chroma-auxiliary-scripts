@@ -11,6 +11,7 @@ pushd $repo
 cflags="$base_cflags"
 cxxflags="$base_cxxflags"
 autoreconf-if-needed
+popd
 
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
