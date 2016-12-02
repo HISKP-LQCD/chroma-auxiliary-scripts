@@ -53,8 +53,11 @@ print-fancy-heading() {
 
 autoreconf-if-needed() {
     if ! [[ -f configure ]]; then
-        autoreconf -f
-        automake --add-missing
+        if ! autoreconf -f
+        then
+            automake --add-missing
+            autoreconf -f
+        fi
     fi
 }
 
@@ -64,6 +67,8 @@ mkdir -p "$prefix"
 
 build="$HOME/build-juqueen"
 mkdir -p "$build"
+
+PATH=$prefix/bin:$PATH
 
 compiler=${COMPILER-clang}
 
