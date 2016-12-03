@@ -80,7 +80,9 @@ case $compiler in
         openmp_flags="-qsmp=omp -qnosave"
         base_flags="-qarch=qp -O2"
         cxx11_flags="-qlanglvl=extended0x"
+        c99_flags=""
         disable_warnings_flags=""
+        spi_configure_flags="--enable-bgspi --enable-bgq"
         ;;
     gcc-4.9)
         module load gcc/4.9.3
@@ -90,7 +92,9 @@ case $compiler in
         openmp_flags="-fopenmp"
         base_flags="-O2 -finline-limit=50000 -Wall -Wpedantic -fmax-errors=1 $color_flags"
         cxx11_flags="--std=c++11"
+        c99_flags="--std=gnu99"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
+        spi_configure_flags=""
         ;;
     gcc-4.4)
         cc_name=mpigcc
@@ -98,7 +102,9 @@ case $compiler in
         openmp_flags="-fopenmp"
         base_flags="-O2 -finline-limit=50000 -Wall -pedantic"
         cxx11_flags=""
+        c99_flags="--std=gnu99"
         disable_warnings_flags=""
+        spi_configure_flags=""
         ;;
     clang)
         module load clang/3.7.r236977
@@ -107,7 +113,9 @@ case $compiler in
         openmp_flags="-fopenmp"
         base_flags="-O2 -Wall -Wpedantic -ferror-limit=1"
         cxx11_flags="--std=c++11"
+        c99_flags=""
         disable_warnings_flags="-Wno-all -Wno-pedantic"
+        spi_configure_flags="--enable-bgspi --enable-bgq"
         ;;
     *)
         echo "This compiler is not supported by this script. Choose another one."

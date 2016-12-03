@@ -23,7 +23,6 @@ if ! [[ -f Makefile ]]; then
         --enable-openmp \
         --enable-mm-malloc \
         --enable-parallel-arch=parscalar \
-        --with-qdp++="$prefix" \
         --with-qdp="$prefix" \
         --with-qmp="$prefix" \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"

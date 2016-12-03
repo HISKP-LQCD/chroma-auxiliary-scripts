@@ -14,7 +14,8 @@ mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
     $sourcedir/$repo/configure $base_configure \
-        --disable-mm-malloc \
+        --enable-mm-malloc \
+        --enable-proc=NONE \
         --disable-testing \
         --enable-clover \
         --enable-openmp \
