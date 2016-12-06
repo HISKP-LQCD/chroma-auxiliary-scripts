@@ -69,6 +69,8 @@ mkdir -p "$prefix"
 build="$HOME/build-jureca"
 mkdir -p "$build"
 
+PATH=$prefix/bin:$PATH
+
 compiler=${COMPILER-icc}
 
 case $compiler in

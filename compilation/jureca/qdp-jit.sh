@@ -2,6 +2,10 @@ repo=qdp-jit
 
 print-fancy-heading $repo
 
+set +x
+module load CUDA
+set -x
+
 clone-if-needed https://github.com/martin-ueding/qdp-jit $repo master
 
 pushd $repo
@@ -21,7 +25,6 @@ if ! [[ -f Makefile ]]; then
         --with-libxml2="$prefix/bin/xml2-config" \
         --with-qmp="$prefix" \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
-    exit
 fi
 make-make-install
 popd
