@@ -10,7 +10,7 @@ clone-if-needed https://github.com/martin-ueding/qdp-jit $repo master
 
 pushd $repo
 cflags="$base_cflags $openmp_flags"
-cxxflags="$base_cxxflags $openmp_flags"
+cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
 autoreconf-if-needed
 popd
 
