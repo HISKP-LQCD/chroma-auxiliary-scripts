@@ -83,6 +83,7 @@ case $compiler in
         c99_flags=""
         disable_warnings_flags=""
         spi_configure_flags="--enable-bgspi --enable-bgq"
+        restrict_flags=""
         ;;
     gcc-4.9)
         module load gcc/4.9.3
@@ -95,6 +96,7 @@ case $compiler in
         c99_flags="--std=gnu99"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
         spi_configure_flags=""
+        restrict_flags="-Drestrict=__restrict__"
         ;;
     gcc-4.4)
         cc_name=mpigcc
@@ -105,6 +107,7 @@ case $compiler in
         c99_flags="--std=gnu99"
         disable_warnings_flags=""
         spi_configure_flags=""
+        restrict_flags="-Drestrict=__restrict__"
         ;;
     clang)
         module load clang/3.7.r236977
@@ -116,6 +119,7 @@ case $compiler in
         c99_flags=""
         disable_warnings_flags="-Wno-all -Wno-pedantic"
         spi_configure_flags="--enable-bgspi --enable-bgq"
+        restrict_flags=""
         ;;
     *)
         echo "This compiler is not supported by this script. Choose another one."

@@ -8,8 +8,8 @@ if ! [[ -d $repo ]]; then
 fi
 
 pushd $repo
-cflags="$base_cflags"
-cxxflags="$base_cxxflags"
+cflags="$base_cflags $restrict_flags $c99_flags"
+cxxflags="$base_cxxflags $restrict_flags $c99_flags"
 autoreconf-if-needed
 popd
 
@@ -17,7 +17,7 @@ mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
     $sourcedir/$repo/configure $base_configure \
-        CFLAGS="$cflags"
+        CFLAGS="$cflags" CC_FOR_BUILD="$cc"
 fi
 make-make-install
 popd
