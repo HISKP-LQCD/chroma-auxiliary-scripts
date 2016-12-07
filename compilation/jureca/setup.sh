@@ -84,7 +84,7 @@ case $compiler in
         cxx_name=mpiicpc
         color_flags=""
         openmp_flags="-fopenmp"
-        base_flags="-O2 -Wall -H"
+        base_flags="-O2 -Wall"
         cxx11_flags="--std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
         ;;
@@ -98,7 +98,7 @@ case $compiler in
         cxx_name=mpic++
         color_flags="-fdiagnostics-color=auto"
         openmp_flags="-fopenmp"
-        base_flags="-O2 -finline-limit=50000 -Wall -Wpedantic -fmax-errors=1 $color_flags -H"
+        base_flags="-O2 -finline-limit=50000 -Wall -Wpedantic -fmax-errors=1 $color_flags"
         cxx11_flags="--std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
         ;;
