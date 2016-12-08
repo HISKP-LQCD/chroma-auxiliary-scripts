@@ -140,7 +140,6 @@
             <Mass>-0.1265</Mass>
             <clovCoeff>1.0</clovCoeff>
           </CloverParams>
-          <!-- FIXME This might not what we want since we have 1 1 1 -1 style conditions. -->
           <AntiPeriodicT>true</AntiPeriodicT>
         </InvertParam>
         <FermionAction>
@@ -209,9 +208,15 @@
           </FermionAction>
           <ActionApprox>
             <InvertParam>
-              <invType>CG_INVERTER</invType>
-              <RsdCG>1.0e-12</RsdCG>
-              <MaxCG>1000</MaxCG>
+              <invType>QPHIX_CLOVER_INVERTER</invType>
+              <SolverType>BICGSTAB</SolverType>
+              <MaxIter>1000</MaxIter>
+              <RsdTarget>1.0e-7</RsdTarget>
+              <CloverParams>
+                <Mass>-0.057</Mass>
+                <clovCoeff>1.0</clovCoeff>
+              </CloverParams>
+              <AntiPeriodicT>true</AntiPeriodicT>
             </InvertParam>
             <RationalApprox>
               <ratApproxType>READ_COEFFS</ratApproxType>
@@ -229,9 +234,15 @@
           </ActionApprox>
           <ForceApprox>
             <InvertParam>
-              <invType>CG_INVERTER</invType>
-              <RsdCG>1e-7 1e-7 1e-7 1e-8 1e-8 1e-8 1e-9 1e-9 1e-9 1e-9 1e-10 1e-10 1e-10 1e-10</RsdCG>
-              <MaxCG>5000</MaxCG>
+              <invType>QPHIX_CLOVER_INVERTER</invType>
+              <SolverType>BICGSTAB</SolverType>
+              <MaxIter>1000</MaxIter>
+              <RsdTarget>1.0e-7</RsdTarget>
+              <CloverParams>
+                <Mass>-0.057</Mass>
+                <clovCoeff>1.0</clovCoeff>
+              </CloverParams>
+              <AntiPeriodicT>true</AntiPeriodicT>
             </InvertParam>
             <RationalApprox>
               <ratApproxType>READ_COEFFS</ratApproxType>
