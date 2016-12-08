@@ -1,0 +1,310 @@
+<?xml version="1.0"?>
+<Params>
+  <MCControl><!--{{{-->
+
+    <Cfg>
+      <!-- TODO What type of configuration do we want to start with, `UNIT` (cold) or `DISORDERED` (hot) or `WEAK_FIELD` (no idea) perhaps? -->
+      <cfg_type>DISORDERED</cfg_type>
+      <cfg_file>DUMMY</cfg_file>
+    </Cfg>
+
+    <RNG>
+      <Seed>
+        <!-- TODO Do we want any special seeds here? -->
+        <elem>11</elem>
+        <elem>0 </elem>
+        <elem>0 </elem>
+        <elem>0 </elem>
+      </Seed>
+    </RNG>
+
+    <!-- TODO How many trajectories do we want? -->
+    <StartUpdateNum>0</StartUpdateNum>
+    <NWarmUpUpdates>0</NWarmUpUpdates>
+    <NProductionUpdates>100</NProductionUpdates>
+    <NUpdatesThisRun>100</NUpdatesThisRun>
+    <SaveInterval>1</SaveInterval>
+
+    <!-- This probably generates a single LIME file for everything. -->
+    <SavePrefix>wilson-clover</SavePrefix>
+    <SaveVolfmt>SINGLEFILE</SaveVolfmt>
+
+    <!-- TODO Do we want such an inline measurement? In the tutorial this is used to show the thermalization from the cold and hot start. -->
+    <InlineMeasurements>
+      <elem>
+        <Name>POLYAKOV_LOOP</Name>
+        <Frequency>1</Frequency>
+        <Param>
+          <version>2</version>
+        </Param>
+        <NamedObject>
+          <gauge_id>default_gauge_field</gauge_id>
+        </NamedObject>
+      </elem>
+    </InlineMeasurements>
+  </MCControl><!--}}}-->
+
+  <HMCTrj>
+    <Monomials>
+      <!-- (gauge) Gauge {{{ -->
+      <elem>
+        <!-- Tree level Symanzik improved gauge, here it is called Lüscher-Weiß. The β is set to the value from the paper. -->
+        <Name>GAUGE_MONOMIAL</Name>
+        <GaugeAction>
+          <Name>LW_TREE_GAUGEACT</Name>
+          <beta>3.3</beta>
+          <u0>0.832605301399891</u0>
+          <GaugeBC>
+            <Name>PERIODIC_GAUGEBC</Name>
+          </GaugeBC>
+        </GaugeAction>
+        <NamedObject>
+          <monomial_id>gauge</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+
+      <!-- (up_down_hasenbusch_1) Wilson + clover: up, down {{{ -->
+      <elem>
+        <Name>TWO_FLAVOR_EOPREC_CONSTDET_RATIO_CONV_CONV_FERM_MONOMIAL</Name>
+        <Action>
+          <InvertParam>
+            <invType>CG_INVERTER</invType>
+            <RsdCG>1.0e-12</RsdCG>
+            <MaxCG>1000</MaxCG>
+          </InvertParam>
+          <FermionAction>
+            <FermAct>CLOVER</FermAct>
+            <Mass>-0.1265</Mass>
+            <clovCoeff>1.0</clovCoeff>
+            <FermState>
+              <Name>STOUT_FERM_STATE</Name>
+              <rho>1.1</rho>
+              <n_smear>6</n_smear>
+              <FermionBC>
+                <FermBC>PERIODIC_FERMBC</FermBC>
+                <boundary>1 1 1 -1</boundary>
+              </FermionBC>
+            </FermState>
+          </FermionAction>
+        </Action>
+        <PrecAction>
+          <InvertParam>
+            <invType>CG_INVERTER</invType>
+            <RsdCG>1.0e-12</RsdCG>
+            <MaxCG>1000</MaxCG>
+          </InvertParam>
+          <FermionAction>
+            <FermAct>CLOVER</FermAct>
+            <Mass>-0.057</Mass>
+            <clovCoeff>1.0</clovCoeff>
+            <FermState>
+              <Name>STOUT_FERM_STATE</Name>
+              <rho>1.1</rho>
+              <n_smear>6</n_smear>
+              <FermionBC>
+                <FermBC>PERIODIC_FERMBC</FermBC>
+                <boundary>1 1 1 -1</boundary>
+              </FermionBC>
+            </FermState>
+          </FermionAction>
+        </PrecAction>
+        <ChronologicalPredictor>
+          <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
+        </ChronologicalPredictor>
+        <NamedObject>
+          <monomial_id>up_down_hasenbusch_1</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+
+      <!-- (up_down_hasenbusch_last) Wilson + clover: up, down {{{ -->
+      <elem>
+        <Name>TWO_FLAVOR_EOPREC_CONSTDET_FERM_MONOMIAL</Name>
+        <InvertParam>
+          <invType>CG_INVERTER</invType>
+          <RsdCG>1.0e-12</RsdCG>
+          <MaxCG>1000</MaxCG>
+        </InvertParam>
+        <FermionAction>
+          <FermAct>CLOVER</FermAct>
+          <Mass>-0.057</Mass>
+          <clovCoeff>1.0</clovCoeff>
+          <FermState>
+            <Name>STOUT_FERM_STATE</Name>
+            <rho>1.1</rho>
+            <n_smear>6</n_smear>
+            <FermionBC>
+              <FermBC>PERIODIC_FERMBC</FermBC>
+              <boundary>1 1 1 -1</boundary>
+            </FermionBC>
+          </FermState>
+        </FermionAction>
+        <ChronologicalPredictor>
+          <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
+        </ChronologicalPredictor>
+        <NamedObject>
+          <monomial_id>up_down_hasenbusch_last</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+
+      <!-- (up_down_clover) Clover even-even: up, down {{{ -->
+      <elem>
+        <Name>N_FLAVOR_LOGDET_EVEN_EVEN_FERM_MONOMIAL</Name>
+        <FermionAction>
+          <FermAct>CLOVER</FermAct>
+          <Mass>-0.1265</Mass>
+          <clovCoeff>1.0</clovCoeff>
+          <FermState>
+            <Name>STOUT_FERM_STATE</Name>
+            <rho>1.1</rho>
+            <n_smear>6</n_smear>
+            <FermionBC>
+              <FermBC>PERIODIC_FERMBC</FermBC>
+              <boundary>1 1 1 -1</boundary>
+            </FermionBC>
+          </FermState>
+        </FermionAction>
+        <num_flavors>2</num_flavors>
+        <NamedObject>
+          <monomial_id>up_down_clover</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+
+      <!-- (strange) Wilson + clover: strange {{{ -->
+      <elem>
+        <Name>ONE_FLAVOR_EOPREC_CONSTDET_FERM_RAT_MONOMIAL</Name>
+        <num_pf>1</num_pf>
+        <Action>
+          <FermionAction>
+            <FermAct>CLOVER</FermAct>
+            <Mass>-0.057</Mass>
+            <clovCoeff>1.0</clovCoeff>
+            <FermState>
+              <Name>STOUT_FERM_STATE</Name>
+              <rho>1.1</rho>
+              <n_smear>6</n_smear>
+              <FermionBC>
+                <FermBC>PERIODIC_FERMBC</FermBC>
+                <boundary>1 1 1 -1</boundary>
+              </FermionBC>
+            </FermState>
+          </FermionAction>
+          <ActionApprox>
+            <InvertParam>
+              <invType>CG_INVERTER</invType>
+              <RsdCG>1.0e-12</RsdCG>
+              <MaxCG>1000</MaxCG>
+            </InvertParam>
+            <RationalApprox>
+              <ratApproxType>READ_COEFFS</ratApproxType>
+              <PFECoeffs>
+                <norm>0.1555998230003145</norm>
+                <res>0.000520383284200624 0.00102660572124056 0.00181178793402857 0.00321671030885498 0.00577691086696587 0.01044815796682609571783 1.78771947718812 5.1998544047142 33.2821966055558</res>
+                <pole>6.64546366309794e-05 0.000487449195727835 0.00157062032741528 0.00404382974795785 0.00956902321293471 0.02186064158220539221 16.3751974576828 48.6939394291419 253.394153115071</pole>
+              </PFECoeffs>
+              <IPFECoeffs>
+                <norm>6.42674252912215</norm>
+                <res>-7.29056568824904e-06 -3.08449297938295e-05 -9.37710341257919e-05 -0.000264162081194322 -0.000727076084674794 -0.087366185888659 -2.76674191920454 -10.330167418357 -60.7697414728541 -1657.35364282683</res>
+                <pole>0.000130231892071377 0.000677702407873996 0.00201524287479766 0.00504156833792643 0.0117904629620992 0.02679983758094845985 21.0108066373413 67.6993629063764 496.579346046959</pole>
+              </IPFECoeffs>
+            </RationalApprox>
+          </ActionApprox>
+          <ForceApprox>
+            <InvertParam>
+              <invType>CG_INVERTER</invType>
+              <RsdCG>1e-7 1e-7 1e-7 1e-8 1e-8 1e-8 1e-9 1e-9 1e-9 1e-9 1e-10 1e-10 1e-10 1e-10</RsdCG>
+              <MaxCG>5000</MaxCG>
+            </InvertParam>
+            <RationalApprox>
+              <ratApproxType>READ_COEFFS</ratApproxType>
+              <PFECoeffs>
+                <norm>0.02517732603611377</norm>
+                <res>0.00938447081670725 0.0113556356385765 0.0157122457753289 0.0233704650580646 0.0359432248979228 0.056088654271315398477 8.30625906187251</res>
+                <pole>5.25088256299576e-05 0.000541070967033193 0.00195024255755797 0.00552632726119316 0.0144330242366399 0.03655571873768969 149.277768177754</pole>
+              </PFECoeffs>
+              <IPFECoeffs>
+                <norm>39.7182766178435</norm>
+                <res>-2.23452961610184e-06 -1.42439478447941e-05 -6.35310799261578e-05 -0.00025967481522029 -0.00103247483279225 -0.0040755357 -232.527272190937 -20404.0362904484</res>
+                <pole>0.000221064398288062 0.00107974589695072 0.00333542889962994 0.00898331702448543 0.0230214209006101 0.057886929220349853 628.465778925603</pole>
+              </IPFECoeffs>
+            </RationalApprox>
+          </ForceApprox>
+        </Action>
+        <ChronologicalPredictor>
+          <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
+        </ChronologicalPredictor>
+        <NamedObject>
+          <monomial_id>strange</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+
+      <!-- (strange_clover) Clover even-even: strange {{{ -->
+      <elem>
+        <Name>N_FLAVOR_LOGDET_EVEN_EVEN_FERM_MONOMIAL</Name>
+        <FermionAction>
+          <FermAct>CLOVER</FermAct>
+          <Mass>-0.057</Mass>
+          <clovCoeff>1.0</clovCoeff>
+          <FermState>
+            <Name>STOUT_FERM_STATE</Name>
+            <rho>1.1</rho>
+            <n_smear>6</n_smear>
+            <FermionBC>
+              <FermBC>PERIODIC_FERMBC</FermBC>
+              <boundary>1 1 1 -1</boundary>
+            </FermionBC>
+          </FermState>
+        </FermionAction>
+        <num_flavors>1</num_flavors>
+        <NamedObject>
+          <monomial_id>strange_clover</monomial_id>
+        </NamedObject>
+      </elem><!--}}}-->
+    </Monomials>
+
+    <Hamiltonian><!--{{{-->
+      <monomial_ids>
+        <elem>gauge</elem>
+        <elem>strange</elem>
+        <elem>strange_clover</elem>
+        <elem>up_down_hasenbusch_last</elem>
+        <elem>up_down_clover</elem>
+        <elem>up_down_hasenbusch_1</elem>
+        <!--
+        -->
+      </monomial_ids>
+    </Hamiltonian><!--}}}-->
+
+    <MDIntegrator><!--{{{-->
+      <tau0>0.5</tau0>
+      <Integrator>
+        <Name>LCM_STS_MIN_NORM_2</Name>
+        <n_steps>25</n_steps>
+        <monomial_ids>
+          <elem>gauge</elem>
+          <elem>strange</elem>
+          <elem>strange_clover</elem>
+          <elem>up_down_hasenbusch_last</elem>
+          <elem>up_down_clover</elem>
+          <elem>up_down_hasenbusch_1</elem>
+          <!--
+          -->
+        </monomial_ids>
+        <!--
+        <SubIntegrator>
+          <Name>LCM_STS_MIN_NORM_2</Name>
+          <n_steps>2</n_steps>
+          <monomial_ids>
+          </monomial_ids>
+        </SubIntegrator>
+        -->
+      </Integrator>
+    </MDIntegrator><!--}}}-->
+
+    <!-- <nrow>24 24 24 64</nrow> -->
+    <nrow>16 16 16 32</nrow>
+
+  </HMCTrj>
+
+</Params>
+
+<!-- vim: set foldcolumn=1 foldlevel=0 foldmethod=marker shiftwidth=2 expandtab : -->

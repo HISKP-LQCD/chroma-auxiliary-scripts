@@ -6,7 +6,7 @@ set -e
 set -u
 set -x
 
-hmc=../playground/chroma/mainprogs/main/hmc
+hmc=hmc
 
 shopt -s nullglob 
 rm -f XMLDAT XMLLOG *.lime *_restart_*.xml
