@@ -76,6 +76,8 @@
               <Mass>-0.1265</Mass>
               <clovCoeff>1.0</clovCoeff>
             </CloverParams>
+            <!-- FIXME This might not what we want since we have 1 1 1 -1 style conditions. -->
+            <AntiPeriodicT>true</AntiPeriodicT>
           </InvertParam>
           <FermionAction>
             <FermAct>CLOVER</FermAct>
