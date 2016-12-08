@@ -307,28 +307,30 @@
     </Hamiltonian><!--}}}-->
 
     <MDIntegrator><!--{{{-->
-      <tau0>0.5</tau0>
+      <tau0>1.0</tau0>
       <Integrator>
         <Name>LCM_STS_MIN_NORM_2</Name>
-        <n_steps>25</n_steps>
+        <n_steps>10</n_steps>
         <monomial_ids>
-          <elem>gauge</elem>
-          <elem>strange</elem>
           <elem>strange_clover</elem>
-          <elem>up_down_hasenbusch_last</elem>
           <elem>up_down_clover</elem>
           <elem>up_down_hasenbusch_1</elem>
-          <!--
-          -->
         </monomial_ids>
-        <!--
         <SubIntegrator>
           <Name>LCM_STS_MIN_NORM_2</Name>
           <n_steps>2</n_steps>
           <monomial_ids>
+            <elem>up_down_hasenbusch_last</elem>
+            <elem>strange</elem>
           </monomial_ids>
+          <SubIntegrator>
+            <Name>LCM_STS_MIN_NORM_2</Name>
+            <n_steps>2</n_steps>
+            <monomial_ids>
+              <elem>gauge</elem>
+            </monomial_ids>
+          </SubIntegrator>
         </SubIntegrator>
-        -->
       </Integrator>
     </MDIntegrator><!--}}}-->
 
