@@ -24,6 +24,7 @@ if ! [[ -f Makefile ]]; then
         --enable-precision=double \
         --enable-qdp-alignment=128 \
         --enable-sse2 \
+        --enable-qphix-solver-arch=avx \
         --with-gmp="$EBROOTGMP" \
         --with-libxml2="$prefix/bin/xml2-config" \
         --with-qdp="$prefix" \

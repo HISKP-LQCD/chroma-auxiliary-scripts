@@ -8,6 +8,8 @@ set -e
 set -u
 set -x
 
+export LC_ALL=C
+
 basedir="$(pwd)"
 sourcedir="$HOME/Sources"
 
@@ -19,6 +21,5 @@ source "$basedir/setup.sh"
 source "$basedir/qmp.sh"
 source "$basedir/libxml2.sh"
 source "$basedir/qdpxx.sh"
-source "$basedir/qdp-jit.sh"
 source "$basedir/qphix.sh"
 source "$basedir/chroma.sh"

@@ -52,6 +52,9 @@ print-fancy-heading() {
     echo "# $*"
     echo "######################################################################"
     set -x
+    pushd "$sourcedir/$repo"
+    git branch
+    popd
 }
 
 autoreconf-if-needed() {
@@ -63,14 +66,6 @@ autoreconf-if-needed() {
 }
 
 # Basic flags that are used for every single project compiled.
-prefix="$HOME/local-jureca"
-mkdir -p "$prefix"
-
-build="$HOME/build-jureca"
-mkdir -p "$build"
-
-PATH=$prefix/bin:$PATH
-
 compiler=${COMPILER-icc}
 
 case $compiler in
@@ -84,9 +79,11 @@ case $compiler in
         cxx_name=mpiicpc
         color_flags=""
         openmp_flags="-fopenmp"
-        base_flags="-O2 -Wall"
+        base_flags="-O2"
         cxx11_flags="--std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
+        qphix_flags="-xAVX -qopt-report -qopt-report-phase=vec -restrict"
+        qphix_configure="--enable-cean"
         ;;
     gcc)
         set +x
@@ -98,15 +95,26 @@ case $compiler in
         cxx_name=mpic++
         color_flags="-fdiagnostics-color=auto"
         openmp_flags="-fopenmp"
-        base_flags="-O2 -finline-limit=50000 -Wall -Wpedantic -fmax-errors=1 $color_flags"
+        base_flags="-O2 -finline-limit=50000 -fmax-errors=1 $color_flags"
         cxx11_flags="--std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
+        qphix_flags="-Drestrict=__restrict__ -mavx2"
+        qphix_configure=""
         ;;
     *)
         echo "This compiler is not supported by this script. Choose another one."
         exit 1
         ;;
 esac
+
+prefix="$HOME/jureca-local-$compiler"
+mkdir -p "$prefix"
+
+build="$HOME/jureca-build-$compiler"
+mkdir -p "$build"
+
+PATH=$prefix/bin:$PATH
+
 
 cc=$(which $cc_name)
 cxx=$(which $cxx_name)
