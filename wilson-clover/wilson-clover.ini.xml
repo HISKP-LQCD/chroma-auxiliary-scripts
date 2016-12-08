@@ -44,7 +44,8 @@
         <Name>QIO_WRITE_NAMED_OBJECT</Name>
         <Frequency>1</Frequency>
         <NamedObject>
-          <gauge_id>default_gauge_field</gauge_id>
+          <object_id>default_gauge_field</object_id>
+          <object_type>Multi1dLatticeColorMatrix</object_type>
         </NamedObject>
         <File>
           <file_prefix>smeared-cfg</file_prefix>
