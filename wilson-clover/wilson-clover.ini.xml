@@ -29,7 +29,6 @@
     <SavePrefix>wilson-clover</SavePrefix>
     <SaveVolfmt>SINGLEFILE</SaveVolfmt>
 
-    <!-- TODO Do we want such an inline measurement? In the tutorial this is used to show the thermalization from the cold and hot start. -->
     <InlineMeasurements>
       <elem>
         <Name>POLYAKOV_LOOP</Name>
@@ -40,6 +39,17 @@
         <NamedObject>
           <gauge_id>default_gauge_field</gauge_id>
         </NamedObject>
+      </elem>
+      <elem>
+        <Name>QIO_WRITE_NAMED_OBJECT</Name>
+        <Frequency>1</Frequency>
+        <NamedObject>
+          <gauge_id>default_gauge_field</gauge_id>
+        </NamedObject>
+        <File>
+          <file_prefix>smeared-cfg</file_prefix>
+          <file_volfmt>SINGLEFILE</file_volfmt>
+        </File>
       </elem>
     </InlineMeasurements>
   </MCControl><!--}}}-->
