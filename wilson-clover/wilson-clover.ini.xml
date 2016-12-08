@@ -44,7 +44,7 @@
         <Name>QIO_WRITE_NAMED_OBJECT</Name>
         <Frequency>1</Frequency>
         <NamedObject>
-          <object_id>default_gauge_field</object_id>
+          <object_id>smeared_state</object_id>
           <object_type>Multi1dLatticeColorMatrix</object_type>
         </NamedObject>
         <File>
@@ -165,6 +165,9 @@
               <FermBC>PERIODIC_FERMBC</FermBC>
               <boundary>1 1 1 -1</boundary>
             </FermionBC>
+            <NamedObject>
+              <smeared_prop_id>smeared_state</smeared_prop_id>
+            </NamedObject>
           </FermState>
         </FermionAction>
         <ChronologicalPredictor>
