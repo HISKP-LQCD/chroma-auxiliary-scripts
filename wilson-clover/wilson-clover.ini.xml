@@ -48,8 +48,8 @@
           <object_type>Multi1dLatticeColorMatrix</object_type>
         </NamedObject>
         <File>
-          <file_prefix>smeared-cfg</file_prefix>
-          <file_volfmt>SINGLEFILE</file_volfmt>
+          <file_name>smeared.cfg</file_name>
+          <file_volfmt>MULTIFILE</file_volfmt>
         </File>
       </elem>
     </InlineMeasurements>
