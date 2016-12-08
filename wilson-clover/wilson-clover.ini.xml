@@ -208,8 +208,9 @@
           </FermionAction>
           <ActionApprox>
             <InvertParam>
-              <invType>QPHIX_CLOVER_INVERTER</invType>
+              <invType>QPHIX_CLOVER_MULTI_SHIFT_INVERTER</invType>
               <SolverType>BICGSTAB</SolverType>
+              <MaxShifts>16</MaxShifts>
               <MaxIter>1000</MaxIter>
               <RsdTarget>1.0e-7</RsdTarget>
               <CloverParams>
@@ -234,8 +235,9 @@
           </ActionApprox>
           <ForceApprox>
             <InvertParam>
-              <invType>QPHIX_CLOVER_INVERTER</invType>
+              <invType>QPHIX_CLOVER_MULTI_SHIFT_INVERTER</invType>
               <SolverType>BICGSTAB</SolverType>
+              <MaxShifts>14</MaxShifts>
               <MaxIter>1000</MaxIter>
               <RsdTarget>1.0e-7</RsdTarget>
               <CloverParams>
