@@ -26,7 +26,7 @@
     <SaveInterval>1</SaveInterval>
 
     <!-- This probably generates a single LIME file for everything. -->
-    <SavePrefix>testrun</SavePrefix>
+    <SavePrefix>wilson-clover</SavePrefix>
     <SaveVolfmt>SINGLEFILE</SaveVolfmt>
 
     <!-- TODO Do we want such an inline measurement? In the tutorial this is used to show the thermalization from the cold and hot start. -->
@@ -68,7 +68,7 @@
         <Name>TWO_FLAVOR_EOPREC_CONSTDET_RATIO_CONV_CONV_FERM_MONOMIAL</Name>
         <Action>
           <InvertParam>
-            <invType>QPHIX_CLOVER_INVERTER</invType>
+            <invType>CG_INVERTER</invType>
             <RsdCG>1.0e-12</RsdCG>
             <MaxCG>1000</MaxCG>
           </InvertParam>
@@ -89,7 +89,7 @@
         </Action>
         <PrecAction>
           <InvertParam>
-            <invType>QPHIX_CLOVER_INVERTER</invType>
+            <invType>CG_INVERTER</invType>
             <RsdCG>1.0e-12</RsdCG>
             <MaxCG>1000</MaxCG>
           </InvertParam>
@@ -120,7 +120,7 @@
       <elem>
         <Name>TWO_FLAVOR_EOPREC_CONSTDET_FERM_MONOMIAL</Name>
         <InvertParam>
-          <invType>QPHIX_CLOVER_INVERTER</invType>
+          <invType>CG_INVERTER</invType>
           <RsdCG>1.0e-12</RsdCG>
           <MaxCG>1000</MaxCG>
         </InvertParam>
@@ -190,7 +190,7 @@
           </FermionAction>
           <ActionApprox>
             <InvertParam>
-              <invType>QPHIX_CLOVER_INVERTER</invType>
+              <invType>CG_INVERTER</invType>
               <RsdCG>1.0e-12</RsdCG>
               <MaxCG>1000</MaxCG>
             </InvertParam>
@@ -205,7 +205,7 @@
           </ActionApprox>
           <ForceApprox>
             <InvertParam>
-              <invType>QPHIX_CLOVER_INVERTER</invType>
+              <invType>CG_INVERTER</invType>
               <RsdCG>1e-7 1e-7 1e-7 1e-8 1e-8 1e-8 1e-9 1e-9 1e-9 1e-9 1e-10 1e-10 1e-10 1e-10</RsdCG>
               <MaxCG>5000</MaxCG>
             </InvertParam>
