@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 
+{# Jinja 2 (http://jinja.pocoo.org/) macros and variables. [[[ -#}
 {% macro smear() -%}
 <FermState>
   <Name>STOUT_FERM_STATE</Name>
@@ -13,6 +14,7 @@
 {%- endmacro -%}
 
 {% set clovCoeff = 1.0 %}
+{# ]]] -#}
 
 <Params>
   <MCControl><!--[[[-->
