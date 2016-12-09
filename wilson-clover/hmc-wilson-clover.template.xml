@@ -1,6 +1,19 @@
 <?xml version="1.0"?>
-{% macro smear() %}
-{% endmacro %}
+
+{% macro smear() -%}
+<FermState>
+  <Name>STOUT_FERM_STATE</Name>
+  <rho>1.1</rho>
+  <n_smear>6</n_smear>
+  <FermionBC>
+    <FermBC>PERIODIC_FERMBC</FermBC>
+    <boundary>1 1 1 -1</boundary>
+  </FermionBC>
+</FermState>
+{%- endmacro -%}
+
+{% set clovCoeff = 1.0 %}
+
 <Params>
   <MCControl><!--[[[-->
 
@@ -73,23 +86,15 @@
             <RsdTarget>1.0e-7</RsdTarget>
             <CloverParams>
               <Mass>-0.1265</Mass>
-              <clovCoeff>1.0</clovCoeff>
+              <clovCoeff>{{ clovCoeff }}</clovCoeff>
             </CloverParams>
             <AntiPeriodicT>true</AntiPeriodicT>
           </InvertParam>
           <FermionAction>
             <FermAct>CLOVER</FermAct>
             <Mass>-0.1265</Mass>
-            <clovCoeff>1.0</clovCoeff>
-            <FermState>
-              <Name>STOUT_FERM_STATE</Name>
-              <rho>1.1</rho>
-              <n_smear>6</n_smear>
-              <FermionBC>
-                <FermBC>PERIODIC_FERMBC</FermBC>
-                <boundary>1 1 1 -1</boundary>
-              </FermionBC>
-            </FermState>
+            <clovCoeff>{{ clovCoeff }}</clovCoeff>
+            {{ smear() }}
           </FermionAction>
         </Action>
         <PrecAction>
@@ -100,23 +105,15 @@
             <RsdTarget>1.0e-7</RsdTarget>
             <CloverParams>
               <Mass>-0.057</Mass>
-              <clovCoeff>1.0</clovCoeff>
+              <clovCoeff>{{ clovCoeff }}</clovCoeff>
             </CloverParams>
             <AntiPeriodicT>true</AntiPeriodicT>
           </InvertParam>
           <FermionAction>
             <FermAct>CLOVER</FermAct>
             <Mass>-0.057</Mass>
-            <clovCoeff>1.0</clovCoeff>
-            <FermState>
-              <Name>STOUT_FERM_STATE</Name>
-              <rho>1.1</rho>
-              <n_smear>6</n_smear>
-              <FermionBC>
-                <FermBC>PERIODIC_FERMBC</FermBC>
-                <boundary>1 1 1 -1</boundary>
-              </FermionBC>
-            </FermState>
+            <clovCoeff>{{ clovCoeff }}</clovCoeff>
+            {{ smear() }}
           </FermionAction>
         </PrecAction>
         <ChronologicalPredictor>
@@ -137,23 +134,15 @@
           <RsdTarget>1.0e-7</RsdTarget>
           <CloverParams>
             <Mass>-0.1265</Mass>
-            <clovCoeff>1.0</clovCoeff>
+            <clovCoeff>{{ clovCoeff }}</clovCoeff>
           </CloverParams>
           <AntiPeriodicT>true</AntiPeriodicT>
         </InvertParam>
         <FermionAction>
           <FermAct>CLOVER</FermAct>
           <Mass>-0.057</Mass>
-          <clovCoeff>1.0</clovCoeff>
-          <FermState>
-            <Name>STOUT_FERM_STATE</Name>
-            <rho>1.1</rho>
-            <n_smear>6</n_smear>
-            <FermionBC>
-              <FermBC>PERIODIC_FERMBC</FermBC>
-              <boundary>1 1 1 -1</boundary>
-            </FermionBC>
-          </FermState>
+          <clovCoeff>{{ clovCoeff }}</clovCoeff>
+          {{ smear() }}
         </FermionAction>
         <ChronologicalPredictor>
           <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
@@ -169,16 +158,8 @@
         <FermionAction>
           <FermAct>CLOVER</FermAct>
           <Mass>-0.1265</Mass>
-          <clovCoeff>1.0</clovCoeff>
-          <FermState>
-            <Name>STOUT_FERM_STATE</Name>
-            <rho>1.1</rho>
-            <n_smear>6</n_smear>
-            <FermionBC>
-              <FermBC>PERIODIC_FERMBC</FermBC>
-              <boundary>1 1 1 -1</boundary>
-            </FermionBC>
-          </FermState>
+          <clovCoeff>{{ clovCoeff }}</clovCoeff>
+          {{ smear() }}
         </FermionAction>
         <num_flavors>2</num_flavors>
         <NamedObject>
@@ -194,16 +175,8 @@
           <FermionAction>
             <FermAct>CLOVER</FermAct>
             <Mass>-0.057</Mass>
-            <clovCoeff>1.0</clovCoeff>
-            <FermState>
-              <Name>STOUT_FERM_STATE</Name>
-              <rho>1.1</rho>
-              <n_smear>6</n_smear>
-              <FermionBC>
-                <FermBC>PERIODIC_FERMBC</FermBC>
-                <boundary>1 1 1 -1</boundary>
-              </FermionBC>
-            </FermState>
+            <clovCoeff>{{ clovCoeff }}</clovCoeff>
+            {{ smear() }}
           </FermionAction>
           <ActionApprox>
             <InvertParam>
@@ -214,7 +187,7 @@
               <RsdTarget>1.0e-7</RsdTarget>
               <CloverParams>
                 <Mass>-0.057</Mass>
-                <clovCoeff>1.0</clovCoeff>
+                <clovCoeff>{{ clovCoeff }}</clovCoeff>
               </CloverParams>
               <AntiPeriodicT>true</AntiPeriodicT>
             </InvertParam>
@@ -241,7 +214,7 @@
               <RsdTarget>1.0e-7</RsdTarget>
               <CloverParams>
                 <Mass>-0.057</Mass>
-                <clovCoeff>1.0</clovCoeff>
+                <clovCoeff>{{ clovCoeff }}</clovCoeff>
               </CloverParams>
               <AntiPeriodicT>true</AntiPeriodicT>
             </InvertParam>
@@ -274,16 +247,8 @@
         <FermionAction>
           <FermAct>CLOVER</FermAct>
           <Mass>-0.057</Mass>
-          <clovCoeff>1.0</clovCoeff>
-          <FermState>
-            <Name>STOUT_FERM_STATE</Name>
-            <rho>1.1</rho>
-            <n_smear>6</n_smear>
-            <FermionBC>
-              <FermBC>PERIODIC_FERMBC</FermBC>
-              <boundary>1 1 1 -1</boundary>
-            </FermionBC>
-          </FermState>
+          <clovCoeff>{{ clovCoeff }}</clovCoeff>
+          {{ smear() }}
         </FermionAction>
         <num_flavors>1</num_flavors>
         <NamedObject>
