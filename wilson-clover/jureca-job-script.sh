@@ -6,6 +6,7 @@
 #SBATCH --partition=batch
 #SBATCH --cpus-per-task=24
 #SBATCH --mail-type=ALL
+#SBATCH --mail-user=ueding@hiskp.uni-bonn.de
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 export KMP_AFFINITY=scatter,0
