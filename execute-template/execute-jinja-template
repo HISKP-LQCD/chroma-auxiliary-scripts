@@ -14,10 +14,10 @@ def main():
     options = _parse_args()
 
     if options.destination is None:
-        template_filename = option.template + '.template.xml'
-        destination_filename = option.template + '.ini.xml'
+        template_filename = options.template + '.template.xml'
+        destination_filename = options.template + '.ini.xml'
     else:
-        template_filename = option.template
+        template_filename = options.template
         desitnation_filename = options.destination
 
     if options.json is None:
@@ -28,9 +28,6 @@ def main():
 
 
     env = jinja2.Environment(
-        "%<", ">%",
-        "<<", ">>",
-        "[§", "§]",
         loader=jinja2.FileSystemLoader(".")
     )
     template = env.get_template(template_filename)
