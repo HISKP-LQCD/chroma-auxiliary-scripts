@@ -40,34 +40,6 @@
           <gauge_id>default_gauge_field</gauge_id>
         </NamedObject>
       </elem>
-      <elem>
-        <Name>LINK_SMEAR</Name>
-        <Param>
-          <LinkSmearingType>STOUT_FERM_STATE</LinkSmearingType>
-          <rho>1.1</rho>
-          <n_smear>6</n_smear>
-          <FermionBC>
-            <FermBC>PERIODIC_FERMBC</FermBC>
-            <boundary>1 1 1 -1</boundary>
-          </FermionBC>
-        </Param>
-        <NamedObject>
-          <gauge_id>default_gauge_field</gauge_id>
-          <linksmear_id>smeared_state</linksmear_id>
-        </NamedObject>
-      </elem>
-      <elem>
-        <Name>QIO_WRITE_NAMED_OBJECT</Name>
-        <Frequency>1</Frequency>
-        <NamedObject>
-          <object_id>smeared_state</object_id>
-          <object_type>Multi1dLatticeColorMatrix</object_type>
-        </NamedObject>
-        <File>
-          <file_name>smeared.cfg</file_name>
-          <file_volfmt>SINGLEFILE</file_volfmt>
-        </File>
-      </elem>
     </InlineMeasurements>
   </MCControl><!--]]]-->
 
