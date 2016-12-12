@@ -121,8 +121,8 @@
 
     <StartUpdateNum>0</StartUpdateNum>
     <NWarmUpUpdates>0</NWarmUpUpdates>
-    <NProductionUpdates>100</NProductionUpdates>
-    <NUpdatesThisRun>100</NUpdatesThisRun>
+    <NProductionUpdates>10000</NProductionUpdates>
+    <NUpdatesThisRun>12</NUpdatesThisRun>
     <SaveInterval>1</SaveInterval>
 
     <SavePrefix>wilson-clover</SavePrefix>
