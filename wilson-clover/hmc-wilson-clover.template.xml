@@ -18,7 +18,7 @@
 </FermState>
 {%- endmacro -%}
 
-{% macro hasenbusch(mass_numerator, mass_denominator, monomial_id) %}
+{% macro hasenbusch_monomial(mass_numerator, mass_denominator, monomial_id) %}
 <elem>
   <Name>TWO_FLAVOR_EOPREC_CONSTDET_RATIO_CONV_CONV_FERM_MONOMIAL</Name>
   <Action>
@@ -132,7 +132,7 @@
       </elem><!--]]]-->
 
       <!-- (up_down_hasenbusch_1) Wilson + clover: up, down -->
-      {{ hasenbusch(mass_light, mass_strange, 'up_down_hasenbusch_1') }}
+      {{ hasenbusch_monomial(mass_light, mass_strange, 'up_down_hasenbusch_1') }}
 
       <!-- (up_down_hasenbusch_last) Wilson + clover: up, down [[[ -->
       <elem>
