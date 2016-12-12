@@ -166,7 +166,6 @@
 
       {{ hasenbusch_single_monomial(mass_strange, 'up_down_hasenbusch_last') }}
 
-
       <!-- (up_down_clover) Clover even-even: up, down [[[ -->
       <elem>
         <Name>N_FLAVOR_LOGDET_EVEN_EVEN_FERM_MONOMIAL</Name>
