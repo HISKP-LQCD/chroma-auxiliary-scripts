@@ -16,6 +16,13 @@ nodes_pattern = re.compile(r'total number of nodes = (\d+)')
 jobid_pattern = re.compile(r'\D(\d{6})\D')
 subgrid_volume_pattern = re.compile(r'subgrid volume = (\d+)')
 
+patterns = {
+    'invcg2': re.compile(r'QDP:FlopCount:invcg2 Total performance:  [\d.]+ Mflops = ([\d.]+) Gflops = [\d.]+ Tflops'),
+    'minvcg': re.compile(r'QDP:FlopCount:minvcg Total performance:  [\d.]+ Mflops = ([\d.]+) Gflops = [\d.]+ Tflops'),
+    'QPhiX Multi Shift CG': re.compile(r'QPHIX_CLOVER_MULTI_SHIFT_CG_MDAGM_SOLVER: .* Performance=([\d.]+) GFLOPS'),
+    'QPhiX BICGSTAB': re.compile(r'QPHIX_CLOVER_BICGSTAB_SOLVER: .* Performance=([\d.]+) GFLOPS'),
+}
+
 
 def dandify_axes(ax):
     ax.grid(True)
@@ -53,20 +60,32 @@ def main():
                 if m:
                     subgrid_volume = int(m.group(1))
 
-                m = perf_pattern.search(line)
-                if m:
-                    task = m.group(1)
-                    if task == 'invcg2':
-                        gflops = float(m.group(3))
-                        gflops_dist.append(gflops)
+                for solver, pattern in patterns.items():
+                    m = pattern.search(line)
+                    if m:
+                        gflops = float(m.group(1))
 
-        if len(gflops_dist) > 0:
-            gflops_val = np.mean(gflops_dist)
-            gflops_err = np.std(gflops_dist)
+                        name = '{} @ {}'.format(solver, nodes)
+                        if not name in perf:
+                            perf[name] = []
+                        perf[name].append(gflops / nodes)
 
-            print('Nodes:', nodes)
-            print('Subgrid Volume:', subgrid_volume)
-            print('Gflops: {} +- {}'.format(gflops_val, gflops_err))
+        
+    ll = reversed(sorted(perf.items(), key=lambda x: x[0].lower()))
+    keys, values = zip(*ll)
+
+    fig = pl.figure(figsize=(10, 6))
+    ax = fig.add_subplot(1, 1, 1)
+    ax.boxplot(values, labels=keys, vert=False, whis='range')
+    xmin, xmax = ax.get_xlim()
+    ax.set_xlim(0, xmax)
+    ax.set_xlabel('GFLOPS per Node')
+    ax.set_ylabel('Solver @ Number of Nodes')
+    ax.set_title('USQCD Chroma/hmc Solver Performance on JURECA')
+    dandify_axes(ax)
+    dandify_figure(fig)
+    pl.savefig('boxplot.pdf')
+    pl.savefig('boxplot.png')
 
 
 def _parse_args():
