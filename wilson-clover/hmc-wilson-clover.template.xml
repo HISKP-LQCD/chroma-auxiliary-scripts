@@ -290,8 +290,6 @@
         <Name>LCM_STS_MIN_NORM_2</Name>
         <n_steps>10</n_steps>
         <monomial_ids>
-          <elem>strange_clover</elem>
-          <elem>up_down_clover</elem>
           <elem>up_down_hasenbusch_1</elem>
         </monomial_ids>
         <SubIntegrator>
@@ -299,6 +297,8 @@
           <n_steps>2</n_steps>
           <monomial_ids>
             <elem>up_down_hasenbusch_last</elem>
+            <elem>strange_clover</elem>
+            <elem>up_down_clover</elem>
             <elem>strange</elem>
           </monomial_ids>
           <SubIntegrator>
