@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 {# Jinja 2 (http://jinja.pocoo.org/) macros and variables. [[[ -#}
+
 {% macro smear() -%}
 <FermState>
   <Name>STOUT_FERM_STATE</Name>
@@ -14,6 +15,9 @@
 {%- endmacro -%}
 
 {% set clovCoeff = 1.0 %}
+{% set mass_light = -0.1265 %}
+{% set mass_strange = -0.057 %}
+
 {# ]]] -#}
 
 <Params>
@@ -87,14 +91,14 @@
             <MaxIter>1000</MaxIter>
             <RsdTarget>1.0e-7</RsdTarget>
             <CloverParams>
-              <Mass>-0.1265</Mass>
+              <Mass>{{ mass_light }}</Mass>
               <clovCoeff>{{ clovCoeff }}</clovCoeff>
             </CloverParams>
             <AntiPeriodicT>true</AntiPeriodicT>
           </InvertParam>
           <FermionAction>
             <FermAct>CLOVER</FermAct>
-            <Mass>-0.1265</Mass>
+            <Mass>{{ mass_light }}</Mass>
             <clovCoeff>{{ clovCoeff }}</clovCoeff>
             {{ smear() }}
           </FermionAction>
@@ -106,14 +110,14 @@
             <MaxIter>1000</MaxIter>
             <RsdTarget>1.0e-7</RsdTarget>
             <CloverParams>
-              <Mass>-0.057</Mass>
+              <Mass>{{ mass_strange }}</Mass>
               <clovCoeff>{{ clovCoeff }}</clovCoeff>
             </CloverParams>
             <AntiPeriodicT>true</AntiPeriodicT>
           </InvertParam>
           <FermionAction>
             <FermAct>CLOVER</FermAct>
-            <Mass>-0.057</Mass>
+            <Mass>{{ mass_strange }}</Mass>
             <clovCoeff>{{ clovCoeff }}</clovCoeff>
             {{ smear() }}
           </FermionAction>
@@ -135,14 +139,14 @@
           <MaxIter>1000</MaxIter>
           <RsdTarget>1.0e-7</RsdTarget>
           <CloverParams>
-            <Mass>-0.1265</Mass>
+            <Mass>{{ mass_strange }}</Mass>
             <clovCoeff>{{ clovCoeff }}</clovCoeff>
           </CloverParams>
           <AntiPeriodicT>true</AntiPeriodicT>
         </InvertParam>
         <FermionAction>
           <FermAct>CLOVER</FermAct>
-          <Mass>-0.057</Mass>
+          <Mass>{{ mass_strange }}</Mass>
           <clovCoeff>{{ clovCoeff }}</clovCoeff>
           {{ smear() }}
         </FermionAction>
@@ -159,7 +163,7 @@
         <Name>N_FLAVOR_LOGDET_EVEN_EVEN_FERM_MONOMIAL</Name>
         <FermionAction>
           <FermAct>CLOVER</FermAct>
-          <Mass>-0.1265</Mass>
+          <Mass>{{ mass_light }}</Mass>
           <clovCoeff>{{ clovCoeff }}</clovCoeff>
           {{ smear() }}
         </FermionAction>
@@ -176,7 +180,7 @@
         <Action>
           <FermionAction>
             <FermAct>CLOVER</FermAct>
-            <Mass>-0.057</Mass>
+            <Mass>{{ mass_strange }}</Mass>
             <clovCoeff>{{ clovCoeff }}</clovCoeff>
             {{ smear() }}
           </FermionAction>
@@ -188,7 +192,7 @@
               <MaxIter>1000</MaxIter>
               <RsdTarget>1.0e-7</RsdTarget>
               <CloverParams>
-                <Mass>-0.057</Mass>
+                <Mass>{{ mass_strange }}</Mass>
                 <clovCoeff>{{ clovCoeff }}</clovCoeff>
               </CloverParams>
               <AntiPeriodicT>true</AntiPeriodicT>
@@ -215,7 +219,7 @@
               <MaxIter>1000</MaxIter>
               <RsdTarget>1.0e-7</RsdTarget>
               <CloverParams>
-                <Mass>-0.057</Mass>
+                <Mass>{{ mass_strange }}</Mass>
                 <clovCoeff>{{ clovCoeff }}</clovCoeff>
               </CloverParams>
               <AntiPeriodicT>true</AntiPeriodicT>
@@ -248,7 +252,7 @@
         <Name>N_FLAVOR_LOGDET_EVEN_EVEN_FERM_MONOMIAL</Name>
         <FermionAction>
           <FermAct>CLOVER</FermAct>
-          <Mass>-0.057</Mass>
+          <Mass>{{ mass_strange }}</Mass>
           <clovCoeff>{{ clovCoeff }}</clovCoeff>
           {{ smear() }}
         </FermionAction>
