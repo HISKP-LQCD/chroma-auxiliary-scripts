@@ -6,6 +6,7 @@
 import argparse
 import json
 import math
+import subprocess
 
 import jinja2
 
@@ -35,6 +36,7 @@ def main():
     # Rendering LaTeX document with values.
     with open(destination_filename, "w") as f:
         f.write(template.render(**template_args))
+    subprocess.check_call(['vim', '-c', 'norm gg=G', '-c', 'wq', destination_filename])
 
 
 def _parse_args():
