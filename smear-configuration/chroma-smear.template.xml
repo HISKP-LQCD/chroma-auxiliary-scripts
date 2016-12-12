@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<chroma>
+    <Cfg>
+        <cfg_type>ILDG</cfg_type>
+        <cfg_file>{{ config_in_file }}</cfg_file>
+    </Cfg>
+
+    <Param>
+        <InlineMeasurements>
+            <elem>
+                <name>SMEAR</name>
+                <Frequency>1</Frequency>
+                <Param>
+                </Param>
+
+                <NamedObject>
+                    <gauge_id>default_gauge_field</gauge_id>
+                </NamedObject>
+
+                <xml_file>{{ xml_out_file }}</xml_file>
+            </elem>
+            <elem>
+                <Name>QIO_WRITE_NAMED_OBJECT</Name>
+                <Frequency>1</Frequency>
+                <NamedObject>
+                    <object_id>default_gauge_field</object_id>
+                    <object_type>Multi1dLatticeColorMatrixD</object_type>
+                </NamedObject>
+                <File>
+                    <file_name>{{ config_out_file }}</file_name>
+                    <file_volfmt>SINGLEFILE</file_volfmt>
+                </File>
+            </elem>
+        </InlineMeasurements>
+    </Param>
+
+</chroma>
