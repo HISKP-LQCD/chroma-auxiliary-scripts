@@ -2,7 +2,7 @@
 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=03:00:00
+#SBATCH --time=06:00:00
 #SBATCH --partition=batch
 #SBATCH --cpus-per-task=24
 #SBATCH --mail-type=ALL
