@@ -18,7 +18,7 @@
 </FermState>
 {%- endmacro -%}
 
-{%- macro hasenbusch_monomial(mass_numerator, mass_denominator, monomial_id) -%}
+{%- macro hasenbusch_det_ratio(mass_numerator, mass_denominator, monomial_id) -%}
 <!-- ({{ monomial_id }}) {{ mass_numerator }} / {{ mass_denominator }} [[[ -->
 <elem>
   <Name>TWO_FLAVOR_EOPREC_CONSTDET_RATIO_CONV_CONV_FERM_MONOMIAL</Name>
@@ -69,7 +69,7 @@
 </elem><!--]]]-->
 {%- endmacro -%}
 
-{%- macro hasenbusch_single_monomial(mass, monomial_id) -%}
+{%- macro hasenbusch_det(mass, monomial_id) -%}
 <!-- ({{ monomial_id }}) {{ mass }} [[[ -->
 <elem>
   <Name>TWO_FLAVOR_EOPREC_CONSTDET_FERM_MONOMIAL</Name>
@@ -105,7 +105,6 @@
   <MCControl><!--[[[-->
 
     <Cfg>
-      <!-- TODO What type of configuration do we want to start with, `UNIT` (cold) or `DISORDERED` (hot) or `WEAK_FIELD` (no idea) perhaps? -->
       <cfg_type>DISORDERED</cfg_type>
       <cfg_file>DUMMY</cfg_file>
     </Cfg>
@@ -162,11 +161,11 @@
         </NamedObject>
       </elem><!--]]]-->
 
-      {{ hasenbusch_monomial(mass_light, mass_strange, 'up_down_hasenbusch_1') }}
+      {{ hasenbusch_det_ratio(mass_light, mass_strange, 'light_det_ratio_1') }}
 
-      {{ hasenbusch_single_monomial(mass_strange, 'up_down_hasenbusch_last') }}
+      {{ hasenbusch_det(mass_strange, 'light_det') }}
 
-      <!-- (up_down_clover) Clover even-even: up, down [[[ -->
+      <!-- (light_log_det) log(det(T_ee)): up, down {{ mass_light }} [[[ -->
       <elem>
         <Name>N_FLAVOR_LOGDET_EVEN_EVEN_FERM_MONOMIAL</Name>
         <FermionAction>
@@ -177,11 +176,11 @@
         </FermionAction>
         <num_flavors>2</num_flavors>
         <NamedObject>
-          <monomial_id>up_down_clover</monomial_id>
+          <monomial_id>light_log_det</monomial_id>
         </NamedObject>
       </elem><!--]]]-->
 
-      <!-- (strange) Wilson + clover: strange [[[ -->
+      <!-- (strange_det) Wilson + clover: strange {{ mass_strange }} [[[ -->
       <elem>
         <Name>ONE_FLAVOR_EOPREC_CONSTDET_FERM_RAT_MONOMIAL</Name>
         <num_pf>1</num_pf>
@@ -251,11 +250,11 @@
           <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
         </ChronologicalPredictor>
         <NamedObject>
-          <monomial_id>strange</monomial_id>
+          <monomial_id>strange_det</monomial_id>
         </NamedObject>
       </elem><!--]]]-->
 
-      <!-- (strange_clover) Clover even-even: strange [[[ -->
+      <!-- (strange_log_det) log(det(T_ee)): strange {{ mass_strange }} [[[ -->
       <elem>
         <Name>N_FLAVOR_LOGDET_EVEN_EVEN_FERM_MONOMIAL</Name>
         <FermionAction>
@@ -266,7 +265,7 @@
         </FermionAction>
         <num_flavors>1</num_flavors>
         <NamedObject>
-          <monomial_id>strange_clover</monomial_id>
+          <monomial_id>strange_log_det</monomial_id>
         </NamedObject>
       </elem><!--]]]-->
     </Monomials>
@@ -274,11 +273,11 @@
     <Hamiltonian><!--[[[-->
       <monomial_ids>
         <elem>gauge</elem>
-        <elem>strange</elem>
-        <elem>strange_clover</elem>
-        <elem>up_down_hasenbusch_last</elem>
-        <elem>up_down_clover</elem>
-        <elem>up_down_hasenbusch_1</elem>
+        <elem>light_det</elem>
+        <elem>light_det_ratio_1</elem>
+        <elem>light_log_det</elem>
+        <elem>strange_det</elem>
+        <elem>strange_log_det</elem>
         <!--
         -->
       </monomial_ids>
@@ -290,16 +289,16 @@
         <Name>LCM_STS_MIN_NORM_2</Name>
         <n_steps>10</n_steps>
         <monomial_ids>
-          <elem>up_down_hasenbusch_1</elem>
+          <elem>light_det_ratio_1</elem>
         </monomial_ids>
         <SubIntegrator>
           <Name>LCM_STS_MIN_NORM_2</Name>
           <n_steps>2</n_steps>
           <monomial_ids>
-            <elem>up_down_hasenbusch_last</elem>
-            <elem>strange_clover</elem>
-            <elem>up_down_clover</elem>
-            <elem>strange</elem>
+            <elem>light_det</elem>
+            <elem>light_log_det</elem>
+            <elem>strange_det</elem>
+            <elem>strange_log_det</elem>
           </monomial_ids>
           <SubIntegrator>
             <Name>LCM_STS_MIN_NORM_2</Name>
