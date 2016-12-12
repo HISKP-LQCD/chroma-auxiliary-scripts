@@ -2,6 +2,10 @@
 
 {# Jinja 2 (http://jinja.pocoo.org/) macros and variables. [[[ -#}
 
+{% set clovCoeff = 1.0 %}
+{% set mass_light = -0.1265 %}
+{% set mass_strange = -0.057 %}
+
 {% macro smear() -%}
 <FermState>
   <Name>STOUT_FERM_STATE</Name>
@@ -14,9 +18,55 @@
 </FermState>
 {%- endmacro -%}
 
-{% set clovCoeff = 1.0 %}
-{% set mass_light = -0.1265 %}
-{% set mass_strange = -0.057 %}
+{% macro hasenbusch(mass_numerator, mass_denominator, monomial_id) %}
+<elem>
+  <Name>TWO_FLAVOR_EOPREC_CONSTDET_RATIO_CONV_CONV_FERM_MONOMIAL</Name>
+  <Action>
+    <InvertParam>
+      <invType>QPHIX_CLOVER_INVERTER</invType>
+      <SolverType>BICGSTAB</SolverType>
+      <MaxIter>1000</MaxIter>
+      <RsdTarget>1.0e-7</RsdTarget>
+      <CloverParams>
+        <Mass>{{ mass_numerator }}</Mass>
+        <clovCoeff>{{ clovCoeff }}</clovCoeff>
+      </CloverParams>
+      <AntiPeriodicT>true</AntiPeriodicT>
+    </InvertParam>
+    <FermionAction>
+      <FermAct>CLOVER</FermAct>
+      <Mass>{{ mass_numerator }}</Mass>
+      <clovCoeff>{{ clovCoeff }}</clovCoeff>
+      {{ smear() }}
+    </FermionAction>
+  </Action>
+  <PrecAction>
+    <InvertParam>
+      <invType>QPHIX_CLOVER_INVERTER</invType>
+      <SolverType>BICGSTAB</SolverType>
+      <MaxIter>1000</MaxIter>
+      <RsdTarget>1.0e-7</RsdTarget>
+      <CloverParams>
+        <Mass>{{ mass_denominator }}</Mass>
+        <clovCoeff>{{ clovCoeff }}</clovCoeff>
+      </CloverParams>
+      <AntiPeriodicT>true</AntiPeriodicT>
+    </InvertParam>
+    <FermionAction>
+      <FermAct>CLOVER</FermAct>
+      <Mass>{{ mass_denominator }}</Mass>
+      <clovCoeff>{{ clovCoeff }}</clovCoeff>
+      {{ smear() }}
+    </FermionAction>
+  </PrecAction>
+  <ChronologicalPredictor>
+    <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
+  </ChronologicalPredictor>
+  <NamedObject>
+    <monomial_id>{{ monomial_id }}</monomial_id>
+  </NamedObject>
+</elem>
+{% endmacro %}
 
 {# ]]] -#}
 
@@ -81,54 +131,8 @@
         </NamedObject>
       </elem><!--]]]-->
 
-      <!-- (up_down_hasenbusch_1) Wilson + clover: up, down [[[ -->
-      <elem>
-        <Name>TWO_FLAVOR_EOPREC_CONSTDET_RATIO_CONV_CONV_FERM_MONOMIAL</Name>
-        <Action>
-          <InvertParam>
-            <invType>QPHIX_CLOVER_INVERTER</invType>
-            <SolverType>BICGSTAB</SolverType>
-            <MaxIter>1000</MaxIter>
-            <RsdTarget>1.0e-7</RsdTarget>
-            <CloverParams>
-              <Mass>{{ mass_light }}</Mass>
-              <clovCoeff>{{ clovCoeff }}</clovCoeff>
-            </CloverParams>
-            <AntiPeriodicT>true</AntiPeriodicT>
-          </InvertParam>
-          <FermionAction>
-            <FermAct>CLOVER</FermAct>
-            <Mass>{{ mass_light }}</Mass>
-            <clovCoeff>{{ clovCoeff }}</clovCoeff>
-            {{ smear() }}
-          </FermionAction>
-        </Action>
-        <PrecAction>
-          <InvertParam>
-            <invType>QPHIX_CLOVER_INVERTER</invType>
-            <SolverType>BICGSTAB</SolverType>
-            <MaxIter>1000</MaxIter>
-            <RsdTarget>1.0e-7</RsdTarget>
-            <CloverParams>
-              <Mass>{{ mass_strange }}</Mass>
-              <clovCoeff>{{ clovCoeff }}</clovCoeff>
-            </CloverParams>
-            <AntiPeriodicT>true</AntiPeriodicT>
-          </InvertParam>
-          <FermionAction>
-            <FermAct>CLOVER</FermAct>
-            <Mass>{{ mass_strange }}</Mass>
-            <clovCoeff>{{ clovCoeff }}</clovCoeff>
-            {{ smear() }}
-          </FermionAction>
-        </PrecAction>
-        <ChronologicalPredictor>
-          <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
-        </ChronologicalPredictor>
-        <NamedObject>
-          <monomial_id>up_down_hasenbusch_1</monomial_id>
-        </NamedObject>
-      </elem><!--]]]-->
+      <!-- (up_down_hasenbusch_1) Wilson + clover: up, down -->
+      {{ hasenbusch(mass_light, mass_strange, 'up_down_hasenbusch_1') }}
 
       <!-- (up_down_hasenbusch_last) Wilson + clover: up, down [[[ -->
       <elem>
