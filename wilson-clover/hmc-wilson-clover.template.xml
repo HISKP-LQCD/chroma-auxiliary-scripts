@@ -293,7 +293,7 @@
         </monomial_ids>
         <SubIntegrator>
           <Name>LCM_STS_MIN_NORM_2</Name>
-          <n_steps>2</n_steps>
+          <n_steps>1</n_steps>
           <monomial_ids>
             <elem>light_det</elem>
             <elem>light_log_det</elem>
@@ -302,7 +302,7 @@
           </monomial_ids>
           <SubIntegrator>
             <Name>LCM_STS_MIN_NORM_2</Name>
-            <n_steps>2</n_steps>
+            <n_steps>1</n_steps>
             <monomial_ids>
               <elem>gauge</elem>
             </monomial_ids>
