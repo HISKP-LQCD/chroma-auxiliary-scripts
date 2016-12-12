@@ -2,11 +2,11 @@
 
 {# Jinja 2 (http://jinja.pocoo.org/) macros and variables. [[[ -#}
 
-{% set clovCoeff = 1.0 %}
-{% set mass_light = -0.1265 %}
-{% set mass_strange = -0.057 %}
+{% set clovCoeff = 1.0 -%}
+{% set mass_light = -0.1265 -%}
+{% set mass_strange = -0.057 -%}
 
-{% macro smear() -%}
+{%- macro smear() -%}
 <FermState>
   <Name>STOUT_FERM_STATE</Name>
   <rho>1.1</rho>
@@ -18,7 +18,8 @@
 </FermState>
 {%- endmacro -%}
 
-{% macro hasenbusch_monomial(mass_numerator, mass_denominator, monomial_id) %}
+{%- macro hasenbusch_monomial(mass_numerator, mass_denominator, monomial_id) -%}
+<!-- ({{ monomial_id }}) {{ mass_numerator }} / {{ mass_denominator }} [[[ -->
 <elem>
   <Name>TWO_FLAVOR_EOPREC_CONSTDET_RATIO_CONV_CONV_FERM_MONOMIAL</Name>
   <Action>
@@ -65,8 +66,38 @@
   <NamedObject>
     <monomial_id>{{ monomial_id }}</monomial_id>
   </NamedObject>
-</elem>
-{% endmacro %}
+</elem><!--]]]-->
+{%- endmacro -%}
+
+{%- macro hasenbusch_single_monomial(mass, monomial_id) -%}
+<!-- ({{ monomial_id }}) {{ mass }} [[[ -->
+<elem>
+  <Name>TWO_FLAVOR_EOPREC_CONSTDET_FERM_MONOMIAL</Name>
+  <InvertParam>
+    <invType>QPHIX_CLOVER_INVERTER</invType>
+    <SolverType>BICGSTAB</SolverType>
+    <MaxIter>1000</MaxIter>
+    <RsdTarget>1.0e-7</RsdTarget>
+    <CloverParams>
+      <Mass>{{ mass }}</Mass>
+      <clovCoeff>{{ clovCoeff }}</clovCoeff>
+    </CloverParams>
+    <AntiPeriodicT>true</AntiPeriodicT>
+  </InvertParam>
+  <FermionAction>
+    <FermAct>CLOVER</FermAct>
+    <Mass>{{ mass }}</Mass>
+    <clovCoeff>{{ clovCoeff }}</clovCoeff>
+    {{ smear() }}
+  </FermionAction>
+  <ChronologicalPredictor>
+    <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
+  </ChronologicalPredictor>
+  <NamedObject>
+    <monomial_id>{{ monomial_id }}</monomial_id>
+  </NamedObject>
+</elem><!--]]]-->
+{%- endmacro -%}
 
 {# ]]] -#}
 
@@ -131,36 +162,10 @@
         </NamedObject>
       </elem><!--]]]-->
 
-      <!-- (up_down_hasenbusch_1) Wilson + clover: up, down -->
       {{ hasenbusch_monomial(mass_light, mass_strange, 'up_down_hasenbusch_1') }}
 
-      <!-- (up_down_hasenbusch_last) Wilson + clover: up, down [[[ -->
-      <elem>
-        <Name>TWO_FLAVOR_EOPREC_CONSTDET_FERM_MONOMIAL</Name>
-        <InvertParam>
-          <invType>QPHIX_CLOVER_INVERTER</invType>
-          <SolverType>BICGSTAB</SolverType>
-          <MaxIter>1000</MaxIter>
-          <RsdTarget>1.0e-7</RsdTarget>
-          <CloverParams>
-            <Mass>{{ mass_strange }}</Mass>
-            <clovCoeff>{{ clovCoeff }}</clovCoeff>
-          </CloverParams>
-          <AntiPeriodicT>true</AntiPeriodicT>
-        </InvertParam>
-        <FermionAction>
-          <FermAct>CLOVER</FermAct>
-          <Mass>{{ mass_strange }}</Mass>
-          <clovCoeff>{{ clovCoeff }}</clovCoeff>
-          {{ smear() }}
-        </FermionAction>
-        <ChronologicalPredictor>
-          <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
-        </ChronologicalPredictor>
-        <NamedObject>
-          <monomial_id>up_down_hasenbusch_last</monomial_id>
-        </NamedObject>
-      </elem><!--]]]-->
+      {{ hasenbusch_single_monomial(mass_strange, 'up_down_hasenbusch_last') }}
+
 
       <!-- (up_down_clover) Clover even-even: up, down [[[ -->
       <elem>
