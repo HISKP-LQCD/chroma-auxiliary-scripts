@@ -1,5 +1,19 @@
 # XML to YAML
 
+Converts Chroma XML files to [YAML](http://yaml.org/) and back again.
+
+## Usage
+
+XML → YAML:
+
+    xml_to_yaml.py XML_FILE YAML_FILE
+
+YAML → XML
+
+    yaml_to_xml.py YAML_FILE XML_FILE
+
+## Example
+
 Chroma uses a subset of XML for its input and output files. There are just tags
 (`<elem>`), there are no attributes (`key="value"`). The head of an input file
 might look like this:
@@ -71,3 +85,41 @@ Params:
     - elem:
       - Name: GAUGE_MONOMIAL
 ```
+
+With the other script, this can be converted back:
+
+```xml
+<?xml version='1.0' encoding='utf-8'?>
+<Params>
+  <MCControl>
+    <Cfg>
+      <cfg_type>DISORDERED</cfg_type>
+      <cfg_file>DUMMY</cfg_file>
+    </Cfg>
+    <RNG>
+      <Seed>
+        <elem>11</elem>
+        <elem>0 </elem>
+        <elem>0 </elem>
+        <elem>0 </elem>
+      </Seed>
+    </RNG>
+    <StartUpdateNum>0</StartUpdateNum>
+    <NWarmUpUpdates>0</NWarmUpUpdates>
+    <NProductionUpdates>100</NProductionUpdates>
+    <NUpdatesThisRun>100</NUpdatesThisRun>
+    <SaveInterval>1</SaveInterval>
+    <SavePrefix>wilson-clover</SavePrefix>
+    <SaveVolfmt>SINGLEFILE</SaveVolfmt>
+    <InlineMeasurements>
+      <elem>
+        <Name>POLYAKOV_LOOP</Name>
+        <Frequency>1</Frequency>
+        <Param>
+          <version>2</version>
+        </Param>
+        <NamedObject>
+```
+
+The comments and blank lines are lost. Still one can now use either format to
+write or view the input/output files.
