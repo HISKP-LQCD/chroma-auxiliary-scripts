@@ -150,3 +150,14 @@ With the other script, this can be converted back:
 
 The comments and blank lines are lost. Still one can now use either format to
 write or view the input/output files.
+
+## Dependencies
+
+This needs:
+
+- Python 3
+- `python3-lxml` (Fedora package name)
+- `python3-PyYAML` (Fedora package name)
+
+The needed Python packages should also be installable with `pip3 install --user
+PACKAGE` as a user on any system.
