@@ -44,6 +44,24 @@ might look like this:
 
     <SavePrefix>wilson-clover</SavePrefix>
     <SaveVolfmt>SINGLEFILE</SaveVolfmt>
+    <InlineMeasurements>
+      <elem>
+        <Name>POLYAKOV_LOOP</Name>
+        <Frequency>1</Frequency>
+        <Param>
+          <version>2</version>
+        </Param>
+        <NamedObject>
+          <gauge_id>default_gauge_field</gauge_id>
+        </NamedObject>
+      </elem>
+    </InlineMeasurements>
+  </MCControl>
+
+  <HMCTrj>
+    <Monomials>
+      <elem>
+        <Name>GAUGE_MONOMIAL</Name>
 ```
 
 Every tag has its tag-name and a list of children. The leaves of the tree are
@@ -119,6 +137,15 @@ With the other script, this can be converted back:
           <version>2</version>
         </Param>
         <NamedObject>
+          <gauge_id>default_gauge_field</gauge_id>
+        </NamedObject>
+      </elem>
+    </InlineMeasurements>
+  </MCControl>
+  <HMCTrj>
+    <Monomials>
+      <elem>
+        <Name>GAUGE_MONOMIAL</Name>
 ```
 
 The comments and blank lines are lost. Still one can now use either format to
