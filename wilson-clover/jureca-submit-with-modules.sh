@@ -11,4 +11,4 @@ set -x
 module load Intel
 module load IntelMPI
 
-sbatch "$1"
+sbatch "$@"
