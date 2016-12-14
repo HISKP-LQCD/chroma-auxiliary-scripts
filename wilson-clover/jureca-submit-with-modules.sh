@@ -6,9 +6,12 @@
 
 set -e
 set -u
-set -x
 
 module load Intel
 module load IntelMPI
+
+module list
+
+set -x
 
 sbatch "$@"
