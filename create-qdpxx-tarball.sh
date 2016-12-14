@@ -10,6 +10,16 @@ set -x
 project="${PWD##*/}"
 version="$(git describe --tags)"
 
+version="${version/-/.}"
+version="${version/-/.}"
+version="${version/-/.}"
+version="${version/-/.}"
+version="${version/-/.}"
+version="${version/-/.}"
+version="${version/-/.}"
+version="${version/-/.}"
+version="${version/-/.}"
+
 p="$(pwd)"
 temp_archive="$p/tmp.tar"
 target_archive="$p/../$project-$version.tar"
@@ -28,3 +38,5 @@ do
     rm "$temp_archive"
     popd
 done
+
+gzip "$target_archive"
