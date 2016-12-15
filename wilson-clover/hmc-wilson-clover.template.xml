@@ -29,7 +29,7 @@
   <Action>
     <InvertParam>
       <invType>QPHIX_CLOVER_INVERTER</invType>
-      <SolverType>BICGSTAB</SolverType>
+      <SolverType>CG</SolverType>
       <MaxIter>1000</MaxIter>
       <RsdTarget>1.0e-7</RsdTarget>
       <CloverParams>
@@ -48,7 +48,7 @@
   <PrecAction>
     <InvertParam>
       <invType>QPHIX_CLOVER_INVERTER</invType>
-      <SolverType>BICGSTAB</SolverType>
+      <SolverType>CG</SolverType>
       <MaxIter>1000</MaxIter>
       <RsdTarget>1.0e-7</RsdTarget>
       <CloverParams>
@@ -79,7 +79,7 @@
   <Name>TWO_FLAVOR_EOPREC_CONSTDET_FERM_MONOMIAL</Name>
   <InvertParam>
     <invType>QPHIX_CLOVER_INVERTER</invType>
-    <SolverType>BICGSTAB</SolverType>
+    <SolverType>CG</SolverType>
     <MaxIter>1000</MaxIter>
     <RsdTarget>1.0e-7</RsdTarget>
     <CloverParams>
@@ -197,7 +197,7 @@
           <ActionApprox>
             <InvertParam>
               <invType>QPHIX_CLOVER_MULTI_SHIFT_INVERTER</invType>
-              <SolverType>BICGSTAB</SolverType>
+              <SolverType>CG</SolverType>
               <MaxShifts>16</MaxShifts>
               <MaxIter>1000</MaxIter>
               <RsdTarget>1.0e-7</RsdTarget>
@@ -224,7 +224,7 @@
           <ForceApprox>
             <InvertParam>
               <invType>QPHIX_CLOVER_MULTI_SHIFT_INVERTER</invType>
-              <SolverType>BICGSTAB</SolverType>
+              <SolverType>CG</SolverType>
               <MaxShifts>14</MaxShifts>
               <MaxIter>1000</MaxIter>
               <RsdTarget>1.0e-7</RsdTarget>
