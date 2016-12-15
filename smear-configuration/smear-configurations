@@ -18,13 +18,17 @@ def main():
     )
     template = env.get_template('chroma-smear.template.xml')
 
+    ini_files = []
+
     for gauge_config in options.gauge_config:
         print('Working on {} …'.format(gauge_config))
-        base, ext = os.path.splitext(gauge_config)
+        basename = os.path.basename(gauge_config)
+        dirname = os.path.dirname(gauge_config)
+        base, ext = os.path.splitext(basename)
 
         filename_smeared = '{}.stout6{}'.format(base, ext)
         filename_xml = '{}.stout6.xml'.format(base)
-        filename_chroma_input = '{}-smear.chroma-ini.xml'.format(base)
+        filename_chroma_input = '{}.stout6.chroma-ini.xml'.format(os.path.join(dirname, base))
 
         rendered = template.render(
             config_in_file=gauge_config,
@@ -32,8 +36,34 @@ def main():
             xml_out_file=filename_xml,
         )
 
+        print('Writing {} …'.format(filename_chroma_input))
         with open(filename_chroma_input, 'w') as f:
             f.write(rendered)
+
+        ini_files.append(filename_chroma_input)
+
+    print('Writing {} …'.format('smear-job.slurm.sh'))
+    with open(os.path.join(dirname, 'smear-job.slurm.sh'), 'w') as f:
+        f.write('''#!/bin/bash 
+
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --time=02:00:00
+#SBATCH --partition=devel
+#SBATCH --cpus-per-task=24
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ueding@hiskp.uni-bonn.de
+
+module load Intel
+module load IntelMPI
+
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+export KMP_AFFINITY=scatter,0
+
+''')
+
+        for ini_file in ini_files:
+            f.write('srun ~/jureca-local-icc/bin/chroma -i "{}" -by 8 -bz 8 -c 24 -sy 1 -sz 1 -pxy 1 -pxyz 0 -minct 2\n'.format(ini_file))
 
 
 
