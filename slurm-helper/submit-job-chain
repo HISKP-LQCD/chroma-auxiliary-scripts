@@ -24,8 +24,10 @@ def submit_job(jobscript, dependency=None):
 
     print('Running ', command)
     output = subprocess.check_output(command).decode().strip()
+    print(output)
 
     job_id = get_job_id(output)
+    print(job_id)
 
     return job_id
 
@@ -37,15 +39,15 @@ def main():
 
     for i in range(options.count):
         if len(job_ids) == 0:
-            if options.depend is not None:
-                prev = options.depend
-            else:
+            if options.depend is None:
                 prev = None
+            else:
+                prev = options.depend
         else:
             prev = job_ids[-1]
 
         job_id = submit_job(options.jobscript, prev)
-        job_ids.append(job_ids)
+        job_ids.append(job_id)
 
     print('\nSubmitted jobs:')
     print('\n'.join(job_ids))
