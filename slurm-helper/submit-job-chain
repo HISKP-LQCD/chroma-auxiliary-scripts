@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
@@ -58,10 +58,10 @@ def _parse_args():
     :return: Namespace with arguments.
     :rtype: Namespace
     '''
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('jobscript')
-    parser.add_argument('count', type=int)
-    parser.add_argument('--depend', type=int)
+    parser = argparse.ArgumentParser(description='Creates a job chain using SLURM.')
+    parser.add_argument('jobscript', help='Path to the job script to run. The script must automatically start where the previous job has left. This can for instance be done using `ls -rt` to find the latest restart file.')
+    parser.add_argument('count', type=int, help='Number of elements in the chain.')
+    parser.add_argument('--depend', type=int, help='Use this to let the first element in the chain to be created depend on another job. Use this to extend an existing chain or to add a production chain after a single testing run.')
     options = parser.parse_args()
 
     return options
