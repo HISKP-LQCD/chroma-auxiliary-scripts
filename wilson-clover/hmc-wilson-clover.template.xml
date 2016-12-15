@@ -6,15 +6,19 @@
 {% set mass_light = -0.1265 -%}
 {% set mass_strange = -0.057 -%}
 
+{%- macro boundary_conditions() -%}
+  <FermionBC>
+    <FermBC>PERIODIC_FERMBC</FermBC>
+    <boundary>1 1 1 -1</boundary>
+  </FermionBC>
+{%- endmacro -%}
+
 {%- macro smear() -%}
 <FermState>
   <Name>STOUT_FERM_STATE</Name>
   <rho>1.1</rho>
   <n_smear>6</n_smear>
-  <FermionBC>
-    <FermBC>PERIODIC_FERMBC</FermBC>
-    <boundary>1 1 1 -1</boundary>
-  </FermionBC>
+  {{ boundary_conditions() }}
 </FermState>
 {%- endmacro -%}
 
