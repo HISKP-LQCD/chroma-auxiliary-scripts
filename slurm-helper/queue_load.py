@@ -24,19 +24,18 @@ def get_occupied_nodes(line):
 def main():
     options = _parse_args()
 
-    lines = get_squeue_output()
-    parsed = map(get_squeue_output, lines)
-    running = filter(lambda x: x[1] == 'R', running)
+    lines = get_squeue_output()[1:]
+    parsed = map(get_occupied_nodes, lines)
+    running = filter(lambda x: x[1] == 'R', parsed)
 
     totals = {}
-    for partition, nodes in running:
+    for partition, state, nodes in running:
         if not partition in totals:
             totals[partition] = 0
         totals[partition] += nodes
 
-    print(totals)
-
-
+    for partition, nodes in sorted(totals.items()):
+        print('{:4d}: {}'.format(nodes, partition))
 
 
 def _parse_args():
