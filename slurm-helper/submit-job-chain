@@ -1,0 +1,71 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+
+import argparse
+import subprocess
+
+
+def get_job_id(output):
+    '''
+    >>> get_job_id('Submitted batch job 2730520')
+    '2730520'
+    '''
+    words = output.split()
+    return words[-1]
+
+
+def submit_job(jobscript, dependency=None):
+    command = ['sbatch']
+    if dependency is not None:
+        command.append('--dependency=afterok:{}'.format(dependency))
+    command.append(jobscript)
+
+    print('Running ', command)
+    output = subprocess.check_output(command).decode().strip()
+
+    job_id = get_job_id(output)
+
+    return job_id
+
+
+def main():
+    options = _parse_args()
+
+    job_ids = []
+
+    for i in range(options.count):
+        if len(job_ids) == 0:
+            if options.depend is not None:
+                prev = options.depend
+            else:
+                prev = None
+        else:
+            prev = job_ids[-1]
+
+        job_id = submit_job(options.jobscript, prev)
+        job_ids.append(job_ids)
+
+    print('\nSubmitted jobs:')
+    print('\n'.join(job_ids))
+
+
+def _parse_args():
+    '''
+    Parses the command line arguments.
+
+    :return: Namespace with arguments.
+    :rtype: Namespace
+    '''
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('jobscript')
+    parser.add_argument('count', type=int)
+    parser.add_argument('--depend', type=int)
+    options = parser.parse_args()
+
+    return options
+
+
+if __name__ == '__main__':
+    main()
