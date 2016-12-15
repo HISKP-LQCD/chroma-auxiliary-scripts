@@ -8,7 +8,7 @@
 
 {%- macro boundary_conditions() -%}
   <FermionBC>
-    <FermBC>PERIODIC_FERMBC</FermBC>
+    <FermBC>SIMPLE_FERMBC</FermBC>
     <boundary>1 1 1 -1</boundary>
   </FermionBC>
 {%- endmacro -%}
