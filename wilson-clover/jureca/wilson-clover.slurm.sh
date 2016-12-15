@@ -1,7 +1,7 @@
 #!/bin/bash -x
 # Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
 
-#SBATCH --nodes=1
+#SBATCH --nodes=8
 #SBATCH --ntasks-per-node=1
 #SBATCH --time=06:00:00
 #SBATCH --partition=batch
