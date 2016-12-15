@@ -9,6 +9,9 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ueding@hiskp.uni-bonn.de
 
+module load Intel
+module load IntelMPI
+
 # Get the restart XML file that has been changed last in this directory.
 last_restart=$(ls -rt | grep restart | grep xml | tail -n 1)
 
