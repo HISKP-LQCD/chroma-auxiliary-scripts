@@ -19,8 +19,9 @@ subgrid_volume_pattern = re.compile(r'subgrid volume = (\d+)')
 patterns = {
     'invcg2': re.compile(r'QDP:FlopCount:invcg2 Total performance:  [\d.]+ Mflops = ([\d.]+) Gflops = [\d.]+ Tflops'),
     'minvcg': re.compile(r'QDP:FlopCount:minvcg Total performance:  [\d.]+ Mflops = ([\d.]+) Gflops = [\d.]+ Tflops'),
-    'QPhiX Multi Shift CG': re.compile(r'QPHIX_CLOVER_MULTI_SHIFT_CG_MDAGM_SOLVER: .* Performance=([\d.]+) GFLOPS'),
-    'QPhiX BICGSTAB': re.compile(r'QPHIX_CLOVER_BICGSTAB_SOLVER: .* Performance=([\d.]+) GFLOPS'),
+    'QPhiX Clover M-Shift CG': re.compile(r'QPHIX_CLOVER_MULTI_SHIFT_CG_MDAGM_SOLVER: .* Performance=([\d.]+) GFLOPS'),
+    'QPhiX Clover BICGSTAB': re.compile(r'QPHIX_CLOVER_BICGSTAB_SOLVER: .* Performance=([\d.]+) GFLOPS'),
+    'QPhiX Clover CG': re.compile(r'QPHIX_CLOVER_CG_SOLVER: .* Performance=([\d.]+) GFLOPS'),
 }
 
 
@@ -42,6 +43,7 @@ def main():
     perf = {}
 
     for hmc_log in options.hmc_logs:
+        print('Processing {} …'.format(hmc_log))
         nodes = 0
         subgrid_volume = 0
         gflops_dist = []
@@ -65,7 +67,7 @@ def main():
                     if m:
                         gflops = float(m.group(1))
 
-                        name = '{} @ {}'.format(solver, nodes)
+                        name = '{} @ {:2d}'.format(solver, nodes)
                         if not name in perf:
                             perf[name] = []
                         perf[name].append(gflops / nodes)
@@ -76,16 +78,19 @@ def main():
 
     fig = pl.figure(figsize=(10, 6))
     ax = fig.add_subplot(1, 1, 1)
-    ax.boxplot(values, labels=keys, vert=False, whis='range')
+    twin = ax.twiny()
+    ax.boxplot(values, labels=keys, vert=False)
     xmin, xmax = ax.get_xlim()
     ax.set_xlim(0, xmax)
+    twin.set_xlim(0, xmax / (2.5 * 24))
     ax.set_xlabel('GFLOPS per Node')
+    twin.set_xlabel('FLOP per Clock per Real Core (24 per Node)')
     ax.set_ylabel('Solver @ Number of Nodes')
-    ax.set_title('USQCD Chroma/hmc Solver Performance on JURECA')
+    #ax.set_title('USQCD Chroma/hmc Solver Performance on JURECA')
     dandify_axes(ax)
     dandify_figure(fig)
-    pl.savefig('boxplot.pdf')
-    pl.savefig('boxplot.png')
+    pl.savefig('performance-flop_per_clock.pdf')
+    pl.savefig('performance-flop_per_clock.png')
 
 
 def _parse_args():
