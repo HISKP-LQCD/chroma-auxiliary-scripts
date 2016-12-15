@@ -1,1 +1,10 @@
+*.lime
+*.out
+analysis/*.pdf
+analysis/*.png
+evaluations.*
+smear-configuration/chroma-smear.ini.xml
 wilson-clover/hmc-wilson-clover.ini.xml
+XMLDAT
+XMLLOG
+
