@@ -1,0 +1,76 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+
+import argparse
+import collections
+import itertools
+import mailbox
+import pprint
+import re
+
+
+def main():
+    options = _parse_args()
+
+    path = '/home/mu/.thunderbird/vkuhjyty.default/ImapMail/imap.hiskp.uni-bonn.de/INBOX.sbd/SLURM'
+
+    pattern = re.compile(r'SLURM Job_id=(?P<job_id>\d+) Name=(?P<name>\S+) (?P<action>\w+), (?:Run time(?:\r\n)? (?P<run_time>\d{2}:\d{2}:\d{2}), (?P<status>\w+)(?:, ExitCode (?P<exit_code>\d+))?|Queued(?:\r\n)? time(?:\r\n)? (?P<queue_time>\d{2}:\d{2}:\d{2}))')
+
+    jobs = collections.defaultdict(list)
+
+    mbox = mailbox.mbox(path)
+
+    statuses = set()
+
+    for message in mbox:
+        subject = message['Subject']
+        m = pattern.match(subject)
+        if not m:
+            raise RuntimeError('No match:', repr(subject))
+
+        gd = m.groupdict()
+
+        job_id = gd['job_id']
+        statuses.add((gd['action'], gd['status']))
+
+        jobs[job_id].append(gd)
+
+    pp = pprint.PrettyPrinter()
+    pp.pprint(jobs)
+
+    for job_id, messages in sorted(jobs.items()):
+        finished = False
+        last = None
+        for message in messages:
+            if message['action'] in ('Ended', 'Failed'):
+                finished = True
+                last = message
+
+        if last is None and len(messages) == 1:
+            last = messages[0]
+
+        t = (last['action'], last['status'])
+
+        print(job_id, t[0], t[1])
+
+    print()
+    print(statuses)
+
+
+def _parse_args():
+    '''
+    Parses the command line arguments.
+
+    :return: Namespace with arguments.
+    :rtype: Namespace
+    '''
+    parser = argparse.ArgumentParser(description='')
+    options = parser.parse_args()
+
+    return options
+
+
+if __name__ == '__main__':
+    main()
