@@ -6,7 +6,7 @@ set -u
 
 mkdir $1
 pushd $1
-cp $HOME/Sources/chroma-auxiliary-scripts/wilson-clover/{hmc-wilson-clover.ini.xml} .
+cp $HOME/Sources/chroma-auxiliary-scripts/wilson-clover/hmc-wilson-clover.ini.xml .
 cp $HOME/Sources/chroma-auxiliary-scripts/wilson-clover/jureca/wilson-clover.slurm.sh $1.slurm.sh
 cp $HOME/jureca-local-icc/bin/hmc .
 popd
