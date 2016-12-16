@@ -127,8 +127,11 @@
     <NWarmUpUpdates>0</NWarmUpUpdates>
     <NProductionUpdates>10000</NProductionUpdates>
     <NUpdatesThisRun>12</NUpdatesThisRun>
-    <SaveInterval>1</SaveInterval>
 
+    <ReproCheckP>true</ReproCheckP>
+    <ReproCheckFrequency>1</ReproCheckFrequency>
+
+    <SaveInterval>1</SaveInterval>
     <SavePrefix>wilson-clover</SavePrefix>
     <SaveVolfmt>SINGLEFILE</SaveVolfmt>
 
