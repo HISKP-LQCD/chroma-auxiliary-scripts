@@ -1,0 +1,85 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+
+import argparse
+import collections
+import itertools
+import mailbox
+import pprint
+import re
+
+
+def merge_dicts(first, *others):
+    result = first.copy()
+    for other in others:
+        result.update(other)
+    return result
+
+
+def dict_filter_none(d):
+    return {k: v for k, v in d.items() if v is not None}
+
+
+def main():
+    options = _parse_args()
+
+    path = '/home/mu/.thunderbird/vkuhjyty.default/ImapMail/imap.hiskp.uni-bonn.de/INBOX.sbd/SLURM'
+
+    pattern = re.compile(r'SLURM Job_id=(?P<job_id>\d+) Name=(?P<name>\S+) (?P<action>\w+), (?:Run time(?:\r\n)? (?P<run_time>\d{2}:\d{2}:\d{2}), (?P<status>\w+)(?:, ExitCode (?P<exit_code>\d+))?|Queued(?:\r\n)? time(?:\r\n)? (?P<queue_time>\d{2}:\d{2}:\d{2}))')
+
+    jobs = collections.defaultdict(list)
+
+    mbox = mailbox.mbox(path)
+
+    statuses = set()
+
+    for message in mbox:
+        subject = message['Subject']
+        m = pattern.match(subject)
+        if not m:
+            raise RuntimeError('No match:', repr(subject))
+
+        gd = dict_filter_none(m.groupdict())
+
+        job_id = gd['job_id']
+
+        jobs[job_id].append(gd)
+
+    pp = pprint.PrettyPrinter()
+    #pp.pprint(jobs)
+
+    jobs_running = []
+
+    for job_id, messages in sorted(jobs.items()):
+        messages.sort(key=lambda x: x['action'])
+        d = merge_dicts(*messages)
+        print()
+        print(job_id)
+        pp.pprint(d)
+
+        if d['action'] == 'Began':
+            jobs_running.append(d)
+
+
+    print('Running:')
+    for job in jobs_running:
+        print(job['job_id'])
+
+
+def _parse_args():
+    '''
+    Parses the command line arguments.
+
+    :return: Namespace with arguments.
+    :rtype: Namespace
+    '''
+    parser = argparse.ArgumentParser(description='')
+    options = parser.parse_args()
+
+    return options
+
+
+if __name__ == '__main__':
+    main()
