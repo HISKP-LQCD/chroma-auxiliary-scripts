@@ -3,22 +3,20 @@
 
 set -e
 set -u
-set -x
 
 run="$PWD/${1%/}"
 dest="$2"
 basename="${run##*/}"
 dirname="${run%/*}"
 
-
-pushd "$run"
+pushd "$run" > /dev/null
 rm -f ./*.lime hmc core.*
-popd
+popd > /dev/null
 
-pushd "$dirname"
+pushd "$dirname" > /dev/null
 archive="$basename.tar.gz" 
 tar -czf "$archive" "$basename"
 mv "$archive" "$dest"
-popd
+popd > /dev/null
 
 rm -rf "$run"
