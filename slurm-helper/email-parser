@@ -11,6 +11,17 @@ import pprint
 import re
 
 
+def merge_dicts(first, *others):
+    result = first.copy()
+    for other in others:
+        result.update(other)
+    return result
+
+
+def dict_filter_none(d):
+    return {k: v for k, v in d.items() if v is not None}
+
+
 def main():
     options = _parse_args()
 
@@ -30,33 +41,31 @@ def main():
         if not m:
             raise RuntimeError('No match:', repr(subject))
 
-        gd = m.groupdict()
+        gd = dict_filter_none(m.groupdict())
 
         job_id = gd['job_id']
-        statuses.add((gd['action'], gd['status']))
 
         jobs[job_id].append(gd)
 
     pp = pprint.PrettyPrinter()
-    pp.pprint(jobs)
+    #pp.pprint(jobs)
+
+    jobs_running = []
 
     for job_id, messages in sorted(jobs.items()):
-        finished = False
-        last = None
-        for message in messages:
-            if message['action'] in ('Ended', 'Failed'):
-                finished = True
-                last = message
+        messages.sort(key=lambda x: x['action'])
+        d = merge_dicts(*messages)
+        print()
+        print(job_id)
+        pp.pprint(d)
 
-        if last is None and len(messages) == 1:
-            last = messages[0]
+        if d['action'] == 'Began':
+            jobs_running.append(d)
 
-        t = (last['action'], last['status'])
 
-        print(job_id, t[0], t[1])
-
-    print()
-    print(statuses)
+    print('Running:')
+    for job in jobs_running:
+        print(job['job_id'])
 
 
 def _parse_args():
