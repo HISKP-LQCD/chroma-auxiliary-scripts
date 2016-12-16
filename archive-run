@@ -1,0 +1,19 @@
+#!/bin/bash
+# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+
+set -e
+set -u
+set -x
+
+run="${1%/}"
+dest="$2"
+basename="${run##*/}"
+dirname="${run%/*}"
+
+rm "$run/"*.lime
+
+pushd "$dirname"
+archive="$basename.tar.gz" 
+tar -czf "$archive" "$basename"
+mv "$archive" "$dest"
+popd
