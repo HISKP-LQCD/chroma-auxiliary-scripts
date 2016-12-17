@@ -129,7 +129,7 @@
     <NProductionUpdates>10000</NProductionUpdates>
     <NUpdatesThisRun>12</NUpdatesThisRun>
 
-    <ReproCheckP>true</ReproCheckP>
+    <ReproCheckP>false</ReproCheckP>
     <ReproCheckFrequency>1</ReproCheckFrequency>
 
     <SaveInterval>1</SaveInterval>
