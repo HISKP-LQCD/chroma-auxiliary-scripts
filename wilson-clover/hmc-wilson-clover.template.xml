@@ -6,6 +6,9 @@
 {% set mass_light = '-0.0960' -%}
 {% set mass_strange = '-0.057' -%}
 {% set residual = '1e-10' -%}
+{% set beta = '3.3' -%}
+{% set l_xyz = 16 -%}
+{% set l_t = 32 -%}
 
 {%- macro boundary_conditions() -%}
   <FermionBC>
@@ -158,7 +161,7 @@
         <Name>GAUGE_MONOMIAL</Name>
         <GaugeAction>
           <Name>LW_TREE_GAUGEACT</Name>
-          <beta>3.3</beta>
+          <beta>{{ beta }}</beta>
           <u0>0.832605301399891</u0>
           <GaugeBC>
             <Name>PERIODIC_GAUGEBC</Name>
@@ -317,7 +320,7 @@
       </Integrator>
     </MDIntegrator><!--]]]-->
 
-    <nrow>16 16 16 32</nrow>
+    <nrow>{{ l_xyz }} {{ l_xyz }} {{ l_xyz }} {{ l_t }}</nrow>
 
   </HMCTrj>
 </Params>
