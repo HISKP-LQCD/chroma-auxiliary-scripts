@@ -128,9 +128,9 @@
     </RNG>
 
     <StartUpdateNum>0</StartUpdateNum>
-    <NWarmUpUpdates>0</NWarmUpUpdates>
+    <NWarmUpUpdates>100</NWarmUpUpdates>
     <NProductionUpdates>10000</NProductionUpdates>
-    <NUpdatesThisRun>12</NUpdatesThisRun>
+    <NUpdatesThisRun>1</NUpdatesThisRun>
 
     <ReproCheckP>false</ReproCheckP>
     <ReproCheckFrequency>1</ReproCheckFrequency>
