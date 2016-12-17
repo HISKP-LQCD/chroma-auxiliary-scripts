@@ -216,6 +216,14 @@
               <AntiPeriodicT>true</AntiPeriodicT>
             </InvertParam>
             <RationalApprox>
+              <!--
+              <ratApproxType>REMEZ</ratApproxType>
+              <lowerMin>1.0e-3</lowerMin>
+              <upperMax>33</upperMax>
+              <numPower>-1</numPower>
+              <denPower>4</denPower>
+              <degree>16</degree>
+              -->
               <ratApproxType>READ_COEFFS</ratApproxType>
               <PFECoeffs>
                 <norm>0.1555998230003145</norm>
@@ -243,6 +251,14 @@
               <AntiPeriodicT>true</AntiPeriodicT>
             </InvertParam>
             <RationalApprox>
+              <!--
+              <ratApproxType>REMEZ</ratApproxType>
+              <lowerMin>1.0e-3</lowerMin>
+              <upperMax>33</upperMax>
+              <numPower>-1</numPower>
+              <denPower>2</denPower>
+              <degree>14</degree>
+              -->
               <ratApproxType>READ_COEFFS</ratApproxType>
               <PFECoeffs>
                 <norm>0.02517732603611377</norm>
