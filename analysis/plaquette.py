@@ -64,11 +64,11 @@ def plot_deltaH(tree, path_base):
         '{}-deltaH.pdf',
     )
 
-def plot_deltaH(tree, path_base):
+def plot_seconds_for_trajectory(tree, path_base):
     plot_generic_1d(
         tree,
         path_base,
-        '//seconds_for_trajectory/text()'
+        '//seconds_for_trajectory/text()',
         'Markov Chain Position',
         r'Seconds for Trajectory',
         '{}-seconds_for_trajectory.pdf',
@@ -81,12 +81,17 @@ def main():
     options = _parse_args()
 
     for xml_file in options.xml_file:
+        print('Loading {} …'.format(xml_file))
         path_base, ext = os.path.splitext(xml_file)
-        tree = etree.parse(xml_file)
-
-        plot_plaquette(tree, path_base)
-        plot_deltaH(tree, path_base)
-        plot_seconds_for_trajectory(tree, path_base)
+        try:
+            tree = etree.parse(xml_file)
+        except etree.XMLSyntaxError as e:
+            print('XML file could not be loaded')
+            print(e)
+        else:
+            plot_plaquette(tree, path_base)
+            plot_deltaH(tree, path_base)
+            plot_seconds_for_trajectory(tree, path_base)
 
 
 def _parse_args():
