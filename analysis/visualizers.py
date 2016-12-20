@@ -3,6 +3,8 @@
 
 # Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
 
+import json
+import collections
 import os
 
 import matplotlib.pyplot as pl
@@ -22,6 +24,9 @@ def main(options):
     names_seconds = [os.path.join(x, 'extract-seconds_for_trajectory.tsv') for x in options.dirname]
     plot_seconds(names_seconds)
 
+    names_perf = [os.path.join(x, 'extract-perf.json') for x in options.dirname]
+    plot_perf(names_perf)
+
 
 def dandify_axes(ax):
     ax.grid(True)
@@ -31,6 +36,35 @@ def dandify_axes(ax):
 
 def dandify_figure(fig):
     fig.tight_layout()
+
+
+def plot_perf(filenames):
+    fig = pl.figure()
+    ax = fig.add_subplot(1, 1, 1)
+
+    for filename in filenames:
+        with open(filename) as f:
+            data = json.load(f)
+
+        solvers = collections.defaultdict(list)
+
+        for update_no, solver_data in sorted(data.items()):
+            for solver, gflops in solver_data.items():
+                solvers[solver].append((update_no, np.mean(gflops), np.std(gflops)))
+
+        for solver, tuples in sorted(solvers.items()):
+            x, y, yerr = zip(*tuples)
+            ax.errorbar(x, y, yerr, marker='o', label=solver)
+
+    ax.set_title('Solver Performance')
+    ax.set_xlabel('Update Number')
+    ax.set_ylabel(r'Gflop/s per Node')
+
+    dandify_axes(ax)
+    dandify_figure(fig)
+
+    pl.savefig('plot-perf.pdf')
+    pl.savefig('plot-perf.png')
 
 
 def plot_delta_h(filenames):
