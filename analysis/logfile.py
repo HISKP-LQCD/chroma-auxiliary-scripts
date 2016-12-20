@@ -4,109 +4,76 @@
 # Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
+import collections
+import json
+import os
 import pprint
-import textwrap
+import re
 
-from pyparsing import Word, Optional, OneOrMore, Group, ParseException, Suppress, SkipTo, ZeroOrMore, Combine
+import numpy as np
 
-caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-lowers = caps.lower()
-digits = "0123456789"
+perf_pattern = re.compile(r'QDP:FlopCount:(\S+) Total performance:  ([\d.]+) Mflops = ([\d.]+) Gflops = ([\d.]+) Tflops')
+nodes_pattern = re.compile(r'total number of nodes = (\d+)')
+jobid_pattern = re.compile(r'\D(\d{6})\D')
+subgrid_volume_pattern = re.compile(r'subgrid volume = (\d+)')
 
+doing_update_pattern = re.compile(r'Doing Update: (\d+)')
 
-def print_results(results):
-    lines = []
-    #lines.append(str(type(results)))
-    if isinstance(results, str):
-        lines.append(results)
-    else:
-        for key, val in sorted(results.items()):
-            lines.append(key)
-            lines.append(textwrap.indent(print_results(val), '  '))
-
-    return '\n'.join(lines)
-
+patterns = {
+    'invcg2': re.compile(r'QDP:FlopCount:invcg2 Total performance:  [\d.]+ Mflops = ([\d.]+) Gflops = [\d.]+ Tflops'),
+    'minvcg': re.compile(r'QDP:FlopCount:minvcg Total performance:  [\d.]+ Mflops = ([\d.]+) Gflops = [\d.]+ Tflops'),
+    'QPhiX Clover M-Shift CG': re.compile(r'QPHIX_CLOVER_MULTI_SHIFT_CG_MDAGM_SOLVER: .* Performance=([\d.]+) GFLOPS'),
+    'QPhiX Clover BICGSTAB': re.compile(r'QPHIX_CLOVER_BICGSTAB_SOLVER: .* Performance=([\d.]+) GFLOPS'),
+    'QPhiX Clover CG': re.compile(r'QPHIX_CLOVER_CG_SOLVER: .* Performance=([\d.]+) GFLOPS'),
+}
 
 
 def main(options):
     pp = pprint.PrettyPrinter()
 
+    bucket_before = []
+    bucket_update = collections.defaultdict(list)
+
     with open(options.logfile) as f:
-        content = f.read()
+        bucket = bucket_before
+        for line in f:
+            m = doing_update_pattern.search(line)
+            if m:
+                update_no = int(m.group(1))
+                bucket = bucket_update[update_no]
 
-    all_letters = ''.join(sorted(set(content)))
+            bucket.append(line)
 
-    g_integer = Word(digits)
-    g_float = Word(digits + '+-.eE')
+    all_gflops = {}
 
-    g_subgrid_volume = Suppress('subgrid volume =') + g_integer('subgrid_volume')
+    for update_no, lines in sorted(bucket_update.items()):
+        gflops = parse_update_block(lines)
+        all_gflops[update_no] = gflops
 
-    g_invcg = Combine(Suppress('QDP:FlopCount:invcg2 Performance/CPU: t=')
-                      + Suppress(g_float)
-                      + Suppress('(s) Flops=')
-                      + Suppress(g_float)
-                      + Suppress(' => ')
-                      + Suppress(g_float)
-                      + Suppress(' Mflops/cpu.\nQDP:FlopCount:invcg2 Total performance:  ')
-                      + Suppress(g_float)
-                      + Suppress(' Mflops = ')
-                      + g_float('gflops')
-                      + Suppress(' Gflops = ')
-                      + Suppress(g_float)
-                      + Suppress(' Tflops\nCG_SOLVER: ')
-                      + g_integer('iterations')
-                      + Suppress(' iterations. Rsd = ')
-                      + Suppress(g_float)
-                      + Suppress(' Relative Rsd = ')
-                      + Suppress(g_float)
-                      + Suppress('\nCG_SOLVER_TIME: ')
-                      + Suppress(g_float)
-                      + Suppress(' sec')
-                     )
+    #pp.pprint(all_gflops)
 
-    g_minvcg = Combine(Suppress('MInvCG2: ')
-                       + g_integer('iterations')
-                       + Suppress(' iterations\nQDP:FlopCount:minvcg Performance/CPU: t=')
-                       + Suppress(g_float)
-                       + Suppress('(s) Flops=')
-                       + Suppress(g_float)
-                       + Suppress(' => ')
-                       + Suppress(g_float)
-                       + Suppress(' Mflops/cpu.\nQDP:FlopCount:minvcg Total performance:  ')
-                       + Suppress(g_float)
-                       + Suppress(' Mflops = ')
-                       + g_float('gflops')
-                       + Suppress(' Gflops = ')
-                       + Suppress(g_float)
-                       + Suppress(' Tflops')
-                      )
+    for update_no, solver_data in sorted(all_gflops.items()):
+        print(update_no)
+        for solver, gflops in sorted(solver_data.items()):
+            print(solver, np.mean(gflops), np.std(gflops))
+        print()
+        
+    json_file = os.path.join(os.path.dirname(options.logfile), 'extract-perf.json')
+    with open(json_file, 'w') as f:
+        json.dump(all_gflops, f, indent=4)
 
-    g_qphix_clover_cg = Combine(
-        'QPHIX_CLOVER_CG_SOLVER: '
-        + g_integer('iterations')
-        + ' iters,  rsd_sq_final='
-        + Suppress(g_float)
-        + '\nQPHIX_CLOVER_CG_SOLVER: || r || / || b || = '
-        + Suppress(g_float)
-        + '\nQPHIX_CLOVER_CG_SOLVER: Solver Time='
-        + Suppress(g_float)
-        + ' (sec)  Performance='
-        + g_float('gflops')
-        + ' GFLOPS\nQPHIX_MDAGM_SOLVER: total time: '
-        + Suppress(g_float)
-        + ' (sec)'
-    )
 
-    g_update = Suppress('Doing Update:') + g_integer('update_no')
-    g_before_update = SkipTo(g_update)
-    g_solver_block = (g_invcg('invcg') | g_minvcg('minvcg') | g_qphix_clover_cg('qphix_clover_cg'))
-    g_solver_blocks = Suppress(SkipTo(g_solver_block)) + g_solver_block
-    g_update_block = Suppress(g_before_update) + Group(g_update + OneOrMore(g_solver_blocks))('update_block')
-    g_logfile = Suppress(SkipTo(g_subgrid_volume)) + g_subgrid_volume + OneOrMore(g_update_block)
+def parse_update_block(lines):
+    results = collections.defaultdict(list)
+    for line in lines:
+        for solver, pattern in patterns.items():
+            m = pattern.match(line)
+            if m:
+                gflops = float(m.group(1))
+                results[solver].append(gflops)
 
-    results = g_logfile.parseString(content)
-
-    print(print_results(results))
+    return results
+    
 
 
 def _parse_args():
