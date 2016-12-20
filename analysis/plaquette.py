@@ -12,17 +12,43 @@ import matplotlib.pyplot as pl
 import numpy as np
 import scipy.optimize as op
 
-measurements = [
-    ('.//w_plaq/text()', 'Plaquette'),
-    ('.//deltaH/text()', r'$\Delta H$'),
-    ('.//seconds_for_trajectory/text()', r'Seconds for Trajectory'),
-]
+measurements = {
+    'w_plaq': ('.//w_plaq/text()', 'Plaquette'),
+    'deltaH': ('.//deltaH/text()', r'$\Delta H/V$'),
+    'seconds_for_trajectory': ('.//seconds_for_trajectory/text()', r'Seconds for Trajectory'),
+    'seconds_for_trajectory': ('.//seconds_for_trajectory/text()', r'Seconds for Trajectory'),
+}
 
-scales = [
-    None,
-    'log',
-    None,
-]
+extracted = collections.defaultdict(dict)
+
+def extract_from_all(xml_files, xpath):
+    update_no_list = []
+    number_list = []
+
+    for xml_file in xml_files:
+        try:
+            tree = etree.parse(xml_file)
+        except etree.XMLSyntaxError as e:
+            print('XML file could not be loaded')
+            print(e)
+            continue
+
+        updates = tree.xpath('//Update')
+
+        for update in updates:
+            update_no = int(update.xpath('./update_no/text()')[0])
+            print('Update:', update_no)
+            update_no_list.append(update_no)
+
+            number_list_local = []
+
+            matches = update.xpath(xpath)
+            assert len(matches) == 1
+            number = float(matches[0])
+            print(xpath, number)
+            number_list.append(number)
+
+    return update_no_list, number_list
 
 
 def dandify_axes(ax):
@@ -91,45 +117,46 @@ def extract_measurements(xml_file):
     return update_no_list, zip(*number_list)
 
 
+def make_safe_name(name):
+    return ''.join([c for c in name.replace(' ', '_') if ord('A') <= ord(c) <= ord('Z') or ord('a') <= ord(c) <= ord('z') or c in '_'])
+
+
 def main():
     options = _parse_args()
 
-    figs = [pl.figure() for i in range(len(measurements))]
-    axs = [fig.add_subplot(1, 1, 1) for fig in figs]
+    figs = {key: pl.figure() for key in measurements}
+    axs = {key: fig.add_subplot(1, 1, 1) for key, fig in figs.items()}
 
     groups = collections.defaultdict(list)
     for xml_file in options.xml_file:
         dirname = os.path.dirname(xml_file)
         basename = os.path.basename(xml_file)
-        groups[dirname].append(basename)
+        groups[dirname].append(xml_file)
 
     for group, files in sorted(groups.items()):
-        update_no_group = []
-        measured_group_all = [[] for i in measurements]
-        for xml_file in files:
-            xml_path = os.path.join(group, xml_file)
-            update_no, measured_all = extract_measurements(xml_path)
+        for key, (xpath, ylabel) in measurements.items():
+            extracted[key][group] = extract_from_all(files, xpath)
 
-            if update_no is None:
-                continue
+    for run, (update_no, meas) in sorted(extracted['deltaH'].items()):
+        y = [x / 16**3 * 32 for x in meas]
+        print(np.min(y), np.max(y))
+        axs['deltaH'].plot(update_no[1:], y[1:], marker='o', label=os.path.basename(run))
 
-            update_no_group += update_no
-            for measured_group, measured in zip(measured_group_all, measured_all):
-                measured_group += measured
+    for run, (update_no, meas) in sorted(extracted['w_plaq'].items()):
+        axs['w_plaq'].plot(update_no, meas, marker='o', label=os.path.basename(run))
 
+    for run, (update_no, meas) in sorted(extracted['seconds_for_trajectory'].items()):
+        axs['seconds_for_trajectory'].plot(update_no, meas, marker='o', label=os.path.basename(run))
 
-        for measured, ax in zip(measured_group_all, axs):
-            ax.plot(update_no_group, measured, marker='o', label=os.path.basename(group))
-
-    for ax, fig, yscale, (xpath, ylabel) in zip(axs, figs, scales, measurements):
+    for key, ax in axs.items():
         ax.set_xlabel('Update Number')
-        ax.set_ylabel(ylabel)
-        if yscale is not None:
-            ax.set_yscale(yscale)
+        ax.set_ylabel(measurements[key][1])
         dandify_axes(ax)
+    for fig in figs.values():
         dandify_figure(fig)
-        safe_name = ''.join([c for c in ylabel.replace(' ', '_') if ord('A') <= ord(c) <= ord('Z') or ord('a') <= ord(c) <= ord('z') or c in '_'])
-        fig.savefig('plot-{}.pdf'.format(safe_name))
+
+    for key, fig in figs.items():
+        fig.savefig('plot-{}.pdf'.format(make_safe_name(key)))
 
 
 def _parse_args():

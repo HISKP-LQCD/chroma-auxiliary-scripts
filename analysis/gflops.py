@@ -79,7 +79,7 @@ def main():
     fig = pl.figure(figsize=(10, 6))
     ax = fig.add_subplot(1, 1, 1)
     twin = ax.twiny()
-    ax.boxplot(values, labels=keys, vert=False)
+    ax.boxplot(values, labels=keys, vert=False, whis='range')
     xmin, xmax = ax.get_xlim()
     ax.set_xlim(0, xmax)
     twin.set_xlim(0, xmax / (2.5 * 24))
