@@ -81,9 +81,25 @@ def main(options):
                        + Suppress(' Tflops')
                       )
 
+    g_qphix_clover_cg = Combine(
+        'QPHIX_CLOVER_CG_SOLVER: '
+        + g_integer('iterations')
+        + ' iters,  rsd_sq_final='
+        + Suppress(g_float)
+        + '\nQPHIX_CLOVER_CG_SOLVER: || r || / || b || = '
+        + Suppress(g_float)
+        + '\nQPHIX_CLOVER_CG_SOLVER: Solver Time='
+        + Suppress(g_float)
+        + ' (sec)  Performance='
+        + g_float('gflops')
+        + ' GFLOPS\nQPHIX_MDAGM_SOLVER: total time: '
+        + Suppress(g_float)
+        + ' (sec)'
+    )
+
     g_update = Suppress('Doing Update:') + g_integer('update_no')
     g_before_update = SkipTo(g_update)
-    g_solver_block = (g_invcg('invcg') | g_minvcg('minvcg'))
+    g_solver_block = (g_invcg('invcg') | g_minvcg('minvcg') | g_qphix_clover_cg('qphix_clover_cg'))
     g_solver_blocks = Suppress(SkipTo(g_solver_block)) + g_solver_block
     g_update_block = Suppress(g_before_update) + Group(g_update + OneOrMore(g_solver_blocks))('update_block')
     g_logfile = Suppress(SkipTo(g_subgrid_volume)) + g_subgrid_volume + OneOrMore(g_update_block)
