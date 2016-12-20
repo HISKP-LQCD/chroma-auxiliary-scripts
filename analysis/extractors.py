@@ -57,14 +57,16 @@ def extract_xpath_from_all(xml_files, xpath):
         for update in updates:
             update_no = int(update.xpath('./update_no/text()')[0])
             print('Update:', update_no)
-            update_no_list.append(update_no)
 
             number_list_local = []
 
             matches = update.xpath(xpath)
-            assert len(matches) == 1
+            assert len(matches) != 0
+
             number = float(matches[0])
             print(xpath, number)
+
+            update_no_list.append(update_no)
             number_list.append(number)
 
     return update_no_list, number_list
