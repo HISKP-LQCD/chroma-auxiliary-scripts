@@ -12,43 +12,7 @@ import matplotlib.pyplot as pl
 import numpy as np
 import scipy.optimize as op
 
-measurements = {
-    'w_plaq': ('.//w_plaq/text()', 'Plaquette'),
-    'deltaH': ('.//deltaH/text()', r'$\Delta H/V$'),
-    'seconds_for_trajectory': ('.//seconds_for_trajectory/text()', r'Seconds for Trajectory'),
-    'seconds_for_trajectory': ('.//seconds_for_trajectory/text()', r'Seconds for Trajectory'),
-}
-
-extracted = collections.defaultdict(dict)
-
-def extract_from_all(xml_files, xpath):
-    update_no_list = []
-    number_list = []
-
-    for xml_file in xml_files:
-        try:
-            tree = etree.parse(xml_file)
-        except etree.XMLSyntaxError as e:
-            print('XML file could not be loaded')
-            print(e)
-            continue
-
-        updates = tree.xpath('//Update')
-
-        for update in updates:
-            update_no = int(update.xpath('./update_no/text()')[0])
-            print('Update:', update_no)
-            update_no_list.append(update_no)
-
-            number_list_local = []
-
-            matches = update.xpath(xpath)
-            assert len(matches) == 1
-            number = float(matches[0])
-            print(xpath, number)
-            number_list.append(number)
-
-    return update_no_list, number_list
+import extractors
 
 
 def dandify_axes(ax):
@@ -121,21 +85,10 @@ def make_safe_name(name):
     return ''.join([c for c in name.replace(' ', '_') if ord('A') <= ord(c) <= ord('Z') or ord('a') <= ord(c) <= ord('z') or c in '_'])
 
 
-def main():
-    options = _parse_args()
-
+def main(options):
     figs = {key: pl.figure() for key in measurements}
     axs = {key: fig.add_subplot(1, 1, 1) for key, fig in figs.items()}
 
-    groups = collections.defaultdict(list)
-    for xml_file in options.xml_file:
-        dirname = os.path.dirname(xml_file)
-        basename = os.path.basename(xml_file)
-        groups[dirname].append(xml_file)
-
-    for group, files in sorted(groups.items()):
-        for key, (xpath, ylabel) in measurements.items():
-            extracted[key][group] = extract_from_all(files, xpath)
 
     for run, (update_no, meas) in sorted(extracted['deltaH'].items()):
         y = [x / 16**3 * 32 for x in meas]
@@ -167,11 +120,17 @@ def _parse_args():
     :rtype: Namespace
     '''
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('xml_file', nargs='+')
+    parser.set_defaults(func=main)
+    subparsers = parser.add_subparsers()
+
+    parser_extract = subparsers.add_parser('extract')
+    parser_extract.set_defaults(func=extractors.main)
+    parser_extract.add_argument('xml_file', nargs='+')
+
     options = parser.parse_args()
 
-    return options
+    options.func(options)
 
 
 if __name__ == '__main__':
-    main()
+    _parse_args()
