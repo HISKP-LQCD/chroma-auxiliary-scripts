@@ -4,6 +4,7 @@
 # Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
 
 import collections
+import glob
 import os
 
 from lxml import etree
@@ -13,32 +14,27 @@ import scipy.optimize as op
 
 
 def main(options):
-    groups = group_files(options.xml_file)
-
-    for dirname, files in sorted(groups.items()):
+    for dirname in options.dirname:
         for key, extractor in bits.items():
-            update_no_list, number_list = extractor(files)
-
+            update_no_list, number_list = extractor(dirname)
             outfile = os.path.join(dirname, 'extract-{}.tsv'.format(key))
             np.savetxt(outfile, np.column_stack([update_no_list, number_list]))
 
-
-def group_files(filenames):
-    groups = collections.defaultdict(list)
-    for xml_file in filenames:
-        dirname = os.path.dirname(xml_file)
-        basename = os.path.basename(xml_file)
-        groups[dirname].append(xml_file)
-    return groups
+        convert_to_md_time(dirname, 'w_plaq')
+        convert_to_md_time(dirname, 'deltaH')
+        convert_time_to_minutes(dirname)
 
 
 def make_xpath_extractor(xpath):
-    def extractor(xml_files):
+    def extractor(dirname):
+        xml_files = glob.glob(os.path.join(dirname, '*.xml'))
         return extract_xpath_from_all(xml_files, xpath)
     return extractor
 
 
-def extract_md_time(xml_files):
+def extract_md_time(dirname):
+    xml_files = glob.glob(os.path.join(dirname, '*.xml'))
+
     update_no_list = []
     md_time_list = []
 
@@ -107,6 +103,8 @@ def extract_xpath_from_all(xml_files, xpath):
             update_no_list.append(update_no)
             number_list.append(number)
 
+    update_no_list, number_list = zip(*sorted(zip(update_no_list, number_list)))
+
     return update_no_list, number_list
 
 
@@ -116,3 +114,27 @@ bits = {
     'seconds_for_trajectory': make_xpath_extractor('.//seconds_for_trajectory/text()'),
     'md_time': extract_md_time,
 }
+
+
+def convert_to_md_time(dirname, name_in):
+    data = np.loadtxt(os.path.join(dirname, 'extract-md_time.tsv'))
+    update_no = data[:, 0]
+    md_time = data[:, 1]
+
+    data = np.loadtxt(os.path.join(dirname, 'extract-{}.tsv'.format(name_in)))
+    update_no_2 = data[:, 0]
+    y = data[:, 1]
+
+    assert all(update_no == update_no_2), "Update Numbers must match.\n{}\n{}".format(str(update_no), str(update_no_2))
+
+    np.savetxt(os.path.join(dirname, 'extract-{}-vs-md_time.tsv'.format(name_in)),
+               np.column_stack([md_time, y]))
+
+
+def convert_time_to_minutes(dirname):
+    data = np.loadtxt(os.path.join(dirname, 'extract-seconds_for_trajectory.tsv'))
+    update_no = data[:, 0]
+    seconds = data[:, 1]
+
+    np.savetxt(os.path.join(dirname, 'extract-minutes_for_trajectory.tsv'),
+               np.column_stack([update_no, seconds / 60]))

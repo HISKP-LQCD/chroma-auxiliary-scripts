@@ -15,48 +15,11 @@ import scipy.optimize as op
 def main(options):
     options.dirname.sort()
 
-    names_w_plaq = filter(os.path.isfile, [os.path.join(x, 'extract-w_plaq.tsv') for x in options.dirname])
-    plot_generic_1d(names_w_plaq, 'Plaquette', r'$1 - \frac{1}{N_\mathrm{c}} \mathrm{Tr}(W_{1\times1})$')
+    plot_generic(options.dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 0.0)', 'Plaquette')
+    plot_generic(options.dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 0.0)', 'Plaquette')
 
-    names_delta_h = filter(os.path.isfile, [os.path.join(x, 'extract-deltaH.tsv') for x in options.dirname])
-    plot_delta_h(names_delta_h)
-
-    names_seconds = filter(os.path.isfile, [os.path.join(x, 'extract-seconds_for_trajectory.tsv') for x in options.dirname])
-    plot_seconds(names_seconds)
-
-    names_perf = filter(os.path.isfile, [os.path.join(x, 'extract-perf.json') for x in options.dirname])
-    plot_perf(names_perf)
-
-    plot_plaquette_vs_md_time(options.dirname)
-
-
-def plot_plaquette_vs_md_time(dirnames):
-    fig = pl.figure()
-    ax = fig.add_subplot(1, 1, 1)
-
-    for dirname in dirnames:
-        data = np.loadtxt(os.path.join(dirname, 'extract-w_plaq.tsv'))
-        update_no = data[:, 0]
-        plaquette = 1 - data[:, 1]
-
-        data = np.loadtxt(os.path.join(dirname, 'extract-md_time.tsv'))
-        update_no_2 = data[:, 0]
-        md_time = data[:, 1]
-
-        assert all(update_no == update_no_2)
-
-        ax.plot(md_time, plaquette, marker='o', label=os.path.basename(os.path.realpath(dirname)))
-
-    ax.set_title('Plaquette vs. MD Time')
-    ax.set_xlabel('MD Time')
-    ax.set_ylabel(r'$\frac{1}{N_\mathrm{c}} \mathrm{Tr}(W_{1\times1})$ (cold is 1.0)')
-
-    dandify_axes(ax)
-    dandify_figure(fig)
-
-    pl.savefig('plot-plaquette_vs_md_time.pdf')
-    pl.savefig('plot-plaquette_vs_md_time.png')
-
+    plot_generic(options.dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy', transform_delta_h)
+    plot_generic(options.dirname, 'deltaH-vs-md_time', 'MD Time', r'$\Delta H$', 'MD Energy', transform_delta_h_md_time)
 
 
 def dandify_axes(ax):
@@ -69,7 +32,7 @@ def dandify_figure(fig):
     fig.tight_layout()
 
 
-def plot_perf(filenames):
+def plot_perf(dirnames):
     fig = pl.figure()
     ax = fig.add_subplot(1, 1, 1)
 
@@ -98,64 +61,28 @@ def plot_perf(filenames):
     pl.savefig('plot-perf.png')
 
 
-def plot_delta_h(filenames):
+def transform_delta_h(x, y):
+    sel = x > 10
+    return x[sel], y[sel]
+
+
+def transform_delta_h_md_time(x, y):
+    sel = x > 0.1
+    return x[sel], y[sel]
+
+
+def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (x, y)):
     fig = pl.figure()
     ax = fig.add_subplot(1, 1, 1)
 
-    for filename in filenames:
+    for dirname in dirnames:
+        filename = os.path.join(dirname, 'extract-{}.tsv'.format(name))
         data = np.loadtxt(filename)
-        label = os.path.basename(os.path.dirname(filename))
-        update_no = data[:, 0]
-        delta_h = data[:, 1]
-        sel = update_no > 10
-        ax.plot(update_no[sel], delta_h[sel], marker='o', label=label)
-
-    ax.set_title('Energy in Molecular Dynamics')
-    ax.set_xlabel('Update Number')
-    ax.set_ylabel(r'$\Delta H$')
-
-    dandify_axes(ax)
-    dandify_figure(fig)
-
-    pl.savefig('plot-delta_h.pdf')
-    pl.savefig('plot-delta_h.png')
-
-
-def plot_seconds(filenames):
-    fig = pl.figure()
-    ax = fig.add_subplot(1, 1, 1)
-
-    for filename in filenames:
-        data = np.loadtxt(filename)
-        label = os.path.basename(os.path.dirname(filename))
-        update_no = data[:, 0]
-        delta_h = data[:, 1]
-        ax.plot(update_no, delta_h, marker='o', label=label)
-
-    ax.set_title('Time for Trajectory')
-    ax.set_xlabel('Update Number')
-    ax.set_ylabel('Seconds')
-
-    twin = ax.twinx()
-    twin.set_ylabel('Minutes')
-    ymin, ymax = ax.get_ylim()
-    twin.set_ylim(ymin / 60, ymax / 60)
-
-    dandify_axes(ax)
-    dandify_figure(fig)
-
-    pl.savefig('plot-time_for_trajectory.pdf')
-    pl.savefig('plot-time_for_trajectory.png')
-
-
-def plot_generic_1d(filenames, title, ylabel, xlabel='Update Number'):
-    fig = pl.figure()
-    ax = fig.add_subplot(1, 1, 1)
-
-    for filename in filenames:
-        data = np.loadtxt(filename)
-        label = os.path.basename(os.path.dirname(filename))
-        ax.plot(data[:, 0], data[:, 1], marker='o', label=label)
+        label = os.path.basename(os.path.realpath(dirname))
+        x = data[:, 0]
+        y = data[:, 1]
+        x, y = transform(x, y)
+        ax.plot(x, y, marker='o', label=label)
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)
@@ -164,11 +91,9 @@ def plot_generic_1d(filenames, title, ylabel, xlabel='Update Number'):
     dandify_axes(ax)
     dandify_figure(fig)
 
-    pl.savefig('plot-{}.pdf'.format(make_safe_name(title)))
-    pl.savefig('plot-{}.png'.format(make_safe_name(title)))
+    pl.savefig('plot-{}.pdf'.format(name))
+    pl.savefig('plot-{}.png'.format(name))
 
 
 def make_safe_name(name):
     return ''.join([c for c in name.replace(' ', '_') if ord('A') <= ord(c) <= ord('Z') or ord('a') <= ord(c) <= ord('z') or c in '_'])
-
-

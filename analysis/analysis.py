@@ -33,7 +33,7 @@ def _parse_args():
 
     parser_extract = subparsers.add_parser('extract')
     parser_extract.set_defaults(func=extractors.main)
-    parser_extract.add_argument('xml_file', nargs='+')
+    parser_extract.add_argument('dirname', nargs='+')
 
     parser_visualize = subparsers.add_parser('visualize')
     parser_visualize.set_defaults(func=visualizers.main)
