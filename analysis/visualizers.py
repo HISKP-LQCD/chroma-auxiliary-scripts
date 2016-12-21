@@ -23,6 +23,8 @@ def main(options):
 
     plot_generic(options.dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory')
 
+    plot_perf(options.dirname)
+
 
 def dandify_axes(ax):
     ax.grid(True)
@@ -38,7 +40,14 @@ def plot_perf(dirnames):
     fig = pl.figure()
     ax = fig.add_subplot(1, 1, 1)
 
-    for filename in filenames:
+    for dirname in dirnames:
+        filename = os.path.join(dirname, 'extract-log.json')
+
+        if not os.path.isfile(filename):
+            print('File is missing:', filename)
+            continue
+
+
         with open(filename) as f:
             data = json.load(f)
 
