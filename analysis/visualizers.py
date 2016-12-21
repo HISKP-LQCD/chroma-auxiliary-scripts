@@ -112,7 +112,7 @@ def plot_perf_vs_sublattice(dirnames):
 
         ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=solver)
 
-    ax.set_title('Solver Performance')
+    ax.set_title('Solver Scaling')
     ax.set_xlabel('Subgrid Volume')
     ax.set_ylabel(r'Gflop/s per Node')
 
