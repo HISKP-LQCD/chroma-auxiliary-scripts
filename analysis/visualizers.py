@@ -27,6 +27,39 @@ def main(options):
     names_perf = filter(os.path.isfile, [os.path.join(x, 'extract-perf.json') for x in options.dirname])
     plot_perf(names_perf)
 
+    plot_plaquette_vs_md_time(options.dirname)
+
+
+def plot_plaquette_vs_md_time(dirnames):
+    fig = pl.figure()
+    ax = fig.add_subplot(1, 1, 1)
+
+    for dirname in dirnames:
+        data = np.loadtxt(os.path.join(dirname, 'extract-w_plaq.tsv'))
+        update_no = data[:, 0]
+        plaquette = 1 - data[:, 1]
+
+        data = np.loadtxt(os.path.join(dirname, 'extract-md_time.tsv'))
+        update_no_2 = data[:, 0]
+        md_time = data[:, 1]
+
+        md_dict = {update: time for update, time in zip(update_no_2, md_time)}
+
+        time = [md_dict[u] for u in update_no]
+
+        ax.plot(time, plaquette, marker='o', label=os.path.basename(os.path.realpath(dirname)))
+
+    ax.set_title('Plaquette vs. MD Time')
+    ax.set_xlabel('MD Time')
+    ax.set_ylabel(r'$\frac{1}{N_\mathrm{c}} \mathrm{Tr}(W_{1\times1})$ (cold is 1.0)')
+
+    dandify_axes(ax)
+    dandify_figure(fig)
+
+    pl.savefig('plot-plaquette_vs_md_time.pdf')
+    pl.savefig('plot-plaquette_vs_md_time.png')
+
+
 
 def dandify_axes(ax):
     ax.grid(True)

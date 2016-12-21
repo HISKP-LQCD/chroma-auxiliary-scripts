@@ -13,8 +13,6 @@ import scipy.optimize as op
 
 
 def main(options):
-    print(options)
-
     groups = group_files(options.xml_file)
 
     for dirname, files in sorted(groups.items()):
@@ -38,6 +36,46 @@ def make_xpath_extractor(xpath):
     def extractor(xml_files):
         return extract_xpath_from_all(xml_files, xpath)
     return extractor
+
+
+def extract_md_time(xml_files):
+    update_no_list = []
+    md_time_list = []
+
+    step_sizes = {}
+
+    for xml_file in xml_files:
+        print(xml_file)
+        try:
+            tree = etree.parse(xml_file)
+        except etree.XMLSyntaxError as e:
+            print('XML file could not be loaded')
+            print(e)
+            continue
+
+        if len(tree.xpath('//doHMC')) == 0:
+            # This is not an output XML file
+            continue
+
+        tau0 = float(tree.xpath('//hmc/Input/Params/HMCTrj/MDIntegrator/tau0/text()')[0])
+        print(tau0)
+
+        updates = tree.xpath('//Update')
+
+        for update in updates:
+            update_no = int(update.xpath('./update_no/text()')[0])
+            print('Update:', update_no)
+
+            step_sizes[update_no] = tau0
+
+    md_time = 0.0
+
+    for update_no, tau0 in sorted(step_sizes.items()):
+        update_no_list.append(update_no)
+        md_time += tau0
+        md_time_list.append(md_time)
+
+    return update_no_list, md_time_list
 
 
 def extract_xpath_from_all(xml_files, xpath):
@@ -76,4 +114,5 @@ bits = {
     'w_plaq': make_xpath_extractor('.//w_plaq/text()'),
     'deltaH': make_xpath_extractor('.//deltaH/text()'),
     'seconds_for_trajectory': make_xpath_extractor('.//seconds_for_trajectory/text()'),
+    'md_time': extract_md_time,
 }
