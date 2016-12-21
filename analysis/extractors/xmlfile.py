@@ -46,7 +46,6 @@ def extract_md_time(dirname):
     step_sizes = {}
 
     for xml_file in xml_files:
-        extractors.print_progress(xml_file)
         try:
             tree = etree.parse(xml_file)
         except etree.XMLSyntaxError as e:
