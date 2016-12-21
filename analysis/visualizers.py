@@ -43,11 +43,9 @@ def plot_plaquette_vs_md_time(dirnames):
         update_no_2 = data[:, 0]
         md_time = data[:, 1]
 
-        md_dict = {update: time for update, time in zip(update_no_2, md_time)}
+        assert all(update_no == update_no_2)
 
-        time = [md_dict[u] for u in update_no]
-
-        ax.plot(time, plaquette, marker='o', label=os.path.basename(os.path.realpath(dirname)))
+        ax.plot(md_time, plaquette, marker='o', label=os.path.basename(os.path.realpath(dirname)))
 
     ax.set_title('Plaquette vs. MD Time')
     ax.set_xlabel('MD Time')
