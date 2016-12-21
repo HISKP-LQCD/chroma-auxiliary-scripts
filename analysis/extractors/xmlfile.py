@@ -17,10 +17,13 @@ import extractors
 
 def main(options):
     for dirname in options.dirname:
+        extractors.print_progress(dirname)
         for key, extractor in bits.items():
-            update_no_list, number_list = extractor(dirname)
-            outfile = os.path.join(dirname, 'extract-{}.tsv'.format(key))
-            np.savetxt(outfile, np.column_stack([update_no_list, number_list]))
+            extracted = extractor(dirname)
+            if extracted is not None:
+                update_no_list, number_list = extracted
+                outfile = os.path.join(dirname, 'extract-{}.tsv'.format(key))
+                np.savetxt(outfile, np.column_stack([update_no_list, number_list]))
 
         convert_to_md_time(dirname, 'w_plaq')
         convert_to_md_time(dirname, 'deltaH')
@@ -81,7 +84,6 @@ def extract_xpath_from_all(xml_files, xpath):
     number_list = []
 
     for xml_file in xml_files:
-        extractors.print_progress(xml_file)
         try:
             tree = etree.parse(xml_file)
         except etree.XMLSyntaxError as e:
@@ -106,6 +108,9 @@ def extract_xpath_from_all(xml_files, xpath):
             update_no_list.append(update_no)
             number_list.append(number)
 
+    if len(update_no_list) == 0:
+        return None
+
     update_no_list, number_list = zip(*sorted(zip(update_no_list, number_list)))
 
     return update_no_list, number_list
@@ -120,7 +125,12 @@ bits = {
 
 
 def convert_to_md_time(dirname, name_in):
-    data = np.atleast_2d(np.loadtxt(os.path.join(dirname, 'extract-md_time.tsv')))
+    file_in = os.path.join(dirname, 'extract-md_time.tsv')
+    data = np.atleast_2d(np.loadtxt(file_in))
+
+    if data.shape[1] == 0:
+        return
+
     update_no = data[:, 0]
     md_time = data[:, 1]
 
@@ -135,7 +145,12 @@ def convert_to_md_time(dirname, name_in):
 
 
 def convert_time_to_minutes(dirname):
-    data = np.atleast_2d(np.loadtxt(os.path.join(dirname, 'extract-seconds_for_trajectory.tsv')))
+    file_in = os.path.join(dirname, 'extract-seconds_for_trajectory.tsv')
+    data = np.atleast_2d(np.loadtxt(file_in))
+
+    if data.shape[1] == 0:
+        return
+
     update_no = data[:, 0]
     seconds = data[:, 1]
 

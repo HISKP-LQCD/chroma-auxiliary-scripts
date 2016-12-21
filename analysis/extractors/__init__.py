@@ -21,4 +21,4 @@ def main(options):
 
 
 def print_progress(filename):
-    cprint('=== Processing {} ==='.format(filename), 'white')
+    cprint('=== {} ==='.format(filename), 'white')
