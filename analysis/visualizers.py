@@ -53,8 +53,10 @@ def plot_perf(dirnames):
 
         solvers = collections.defaultdict(list)
 
-        for update_no, solver_data in sorted(data.items()):
-            for solver, gflops in solver_data.items():
+        for update_no, solver_data in sorted(data['updates'].items()):
+            for solver, details in solver_data.items():
+                gflops = details['gflops']
+                iters = details['iters']
                 solvers[solver].append((update_no, np.mean(gflops), np.std(gflops)))
 
         for solver, tuples in sorted(solvers.items()):
