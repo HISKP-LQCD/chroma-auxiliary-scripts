@@ -12,19 +12,28 @@ import re
 
 import numpy as np
 
-perf_pattern = re.compile(r'QDP:FlopCount:(\S+) Total performance:  ([\d.]+) Mflops = ([\d.]+) Gflops = ([\d.]+) Tflops')
-nodes_pattern = re.compile(r'total number of nodes = (\d+)')
-jobid_pattern = re.compile(r'\D(\d{6})\D')
-subgrid_volume_pattern = re.compile(r'subgrid volume = (\d+)')
+patterns_before = {
+    'nodes': (int, re.compile(r'  total number of nodes = (\d+)')),
+    #'jobid' = re.compile(r'\D(\d{6})\D')
+    'subgrid_volume': (int, re.compile(r'  subgrid volume = (\d+)')),
+}
 
 doing_update_pattern = re.compile(r'Doing Update: (\d+)')
 
-patterns = {
+patterns_gflops = {
     'invcg2': re.compile(r'QDP:FlopCount:invcg2 Total performance:  [\d.]+ Mflops = ([\d.]+) Gflops = [\d.]+ Tflops'),
     'minvcg': re.compile(r'QDP:FlopCount:minvcg Total performance:  [\d.]+ Mflops = ([\d.]+) Gflops = [\d.]+ Tflops'),
     'QPhiX Clover M-Shift CG': re.compile(r'QPHIX_CLOVER_MULTI_SHIFT_CG_MDAGM_SOLVER: .* Performance=([\d.]+) GFLOPS'),
     'QPhiX Clover BICGSTAB': re.compile(r'QPHIX_CLOVER_BICGSTAB_SOLVER: .* Performance=([\d.]+) GFLOPS'),
     'QPhiX Clover CG': re.compile(r'QPHIX_CLOVER_CG_SOLVER: .* Performance=([\d.]+) GFLOPS'),
+}
+
+patterns_iterations = {
+    'invcg2': re.compile(r'CG_SOLVER: (\d+) iterations.*'),
+    'minvcg': re.compile(r'MInvCG2: (\d+) iterations'),
+    'QPhiX Clover M-Shift CG': re.compile(r'QPHIX_CLOVER_MULTI_SHIFT_CG_MDAGM_SOLVER: Iters=(\d+) .*'),
+    'QPhiX Clover BICGSTAB': re.compile(r'QPHIX_CLOVER_BICGSTAB_SOLVER: (\d+) iters,.*'),
+    'QPhiX Clover CG': re.compile(r'QPHIX_CLOVER_CG_SOLVER: (\d+) iters,.*'),
 }
 
 
@@ -44,35 +53,58 @@ def main(options):
 
             bucket.append(line)
 
+    results = {}
+
+    for line in bucket_before:
+        for key, (transform, pattern) in patterns_before.items():
+            m = pattern.match(line)
+            if m:
+                results[key] = transform(m.group(1))
+
     all_gflops = {}
+    all_iters = {}
 
     for update_no, lines in sorted(bucket_update.items()):
-        gflops = parse_update_block(lines)
+        gflops, iters = parse_update_block(lines)
         all_gflops[update_no] = gflops
+        all_iters[update_no] = iters
 
-    #pp.pprint(all_gflops)
+    per_update = collections.defaultdict(lambda: collections.defaultdict(dict))
 
-    for update_no, solver_data in sorted(all_gflops.items()):
-        print(update_no)
-        for solver, gflops in sorted(solver_data.items()):
-            print(solver, np.mean(gflops), np.std(gflops))
-        print()
+    for update_no, solver_data in all_gflops.items():
+        for solver, gflops in solver_data.items():
+            per_update[update_no][solver]['gflops'] = gflops
+
+    for update_no, solver_data in all_iters.items():
+        for solver, iters in solver_data.items():
+            per_update[update_no][solver]['iters'] = iters
+
+    results['updates'] = per_update
         
-    json_file = os.path.join(os.path.dirname(options.logfile), 'extract-perf.json')
+    json_file = os.path.join(os.path.dirname(options.logfile), 'extract-log.json')
     with open(json_file, 'w') as f:
-        json.dump(all_gflops, f, indent=4)
+        json.dump(results, f, indent=4, sort_keys=True)
 
 
 def parse_update_block(lines):
-    results = collections.defaultdict(list)
+    results_gflops = collections.defaultdict(list)
+    results_iter = collections.defaultdict(list)
+
     for line in lines:
-        for solver, pattern in patterns.items():
+        for solver, pattern in patterns_gflops.items():
             m = pattern.match(line)
             if m:
                 gflops = float(m.group(1))
-                results[solver].append(gflops)
+                results_gflops[solver].append(gflops)
 
-    return results
+    for line in lines:
+        for solver, pattern in patterns_iterations.items():
+            m = pattern.match(line)
+            if m:
+                iters = float(m.group(1))
+                results_iter[solver].append(iters)
+
+    return results_gflops, results_iter
     
 
 
