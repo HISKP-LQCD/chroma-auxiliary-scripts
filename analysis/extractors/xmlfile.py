@@ -12,6 +12,8 @@ import matplotlib.pyplot as pl
 import numpy as np
 import scipy.optimize as op
 
+import extractors
+
 
 def main(options):
     for dirname in options.dirname:
@@ -41,7 +43,7 @@ def extract_md_time(dirname):
     step_sizes = {}
 
     for xml_file in xml_files:
-        print(xml_file)
+        extractors.print_progress(xml_file)
         try:
             tree = etree.parse(xml_file)
         except etree.XMLSyntaxError as e:
@@ -79,6 +81,7 @@ def extract_xpath_from_all(xml_files, xpath):
     number_list = []
 
     for xml_file in xml_files:
+        extractors.print_progress(xml_file)
         try:
             tree = etree.parse(xml_file)
         except etree.XMLSyntaxError as e:
@@ -117,11 +120,11 @@ bits = {
 
 
 def convert_to_md_time(dirname, name_in):
-    data = np.loadtxt(os.path.join(dirname, 'extract-md_time.tsv'))
+    data = np.atleast_2d(np.loadtxt(os.path.join(dirname, 'extract-md_time.tsv')))
     update_no = data[:, 0]
     md_time = data[:, 1]
 
-    data = np.loadtxt(os.path.join(dirname, 'extract-{}.tsv'.format(name_in)))
+    data = np.atleast_2d(np.loadtxt(os.path.join(dirname, 'extract-{}.tsv'.format(name_in))))
     update_no_2 = data[:, 0]
     y = data[:, 1]
 
@@ -132,7 +135,7 @@ def convert_to_md_time(dirname, name_in):
 
 
 def convert_time_to_minutes(dirname):
-    data = np.loadtxt(os.path.join(dirname, 'extract-seconds_for_trajectory.tsv'))
+    data = np.atleast_2d(np.loadtxt(os.path.join(dirname, 'extract-seconds_for_trajectory.tsv')))
     update_no = data[:, 0]
     seconds = data[:, 1]
 

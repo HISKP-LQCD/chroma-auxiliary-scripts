@@ -13,6 +13,8 @@ import re
 
 import numpy as np
 
+import extractors
+
 patterns_before = {
     'nodes': (int, re.compile(r'  total number of nodes = (\d+)')),
     #'jobid' = re.compile(r'\D(\d{6})\D')
@@ -45,6 +47,7 @@ def main(options):
 
     for dirname in options.dirname:
         for filename in glob.glob(os.path.join(dirname, '*.out')):
+            extractors.print_progress(filename)
 
             bucket_before = []
             bucket_update = collections.defaultdict(list)
