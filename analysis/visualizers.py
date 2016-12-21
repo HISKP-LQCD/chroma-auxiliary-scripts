@@ -59,11 +59,12 @@ def plot_perf(dirnames):
             for solver, solver_data in update_data['solvers'].items():
                 gflops = solver_data['gflops']
                 iters = solver_data['iters']
-                solvers[solver].append((update_no, np.mean(gflops), np.std(gflops)))
+                solvers[solver].append((int(update_no), np.mean(gflops) / nodes, np.std(gflops) / nodes))
 
         for solver, tuples in sorted(solvers.items()):
             x, y, yerr = zip(*tuples)
-            ax.errorbar(x, y, yerr, marker='o', label=solver)
+            label = '{} -- {}'.format(os.path.basename(os.path.realpath(dirname)), solver)
+            ax.errorbar(x, y, yerr, marker='o', linestyle='none', label=label)
 
     ax.set_title('Solver Performance')
     ax.set_xlabel('Update Number')
