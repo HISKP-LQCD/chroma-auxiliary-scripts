@@ -5,6 +5,7 @@
 
 import argparse
 import collections
+import glob
 import json
 import os
 import pprint
@@ -40,50 +41,53 @@ patterns_iterations = {
 def main(options):
     pp = pprint.PrettyPrinter()
 
-    bucket_before = []
-    bucket_update = collections.defaultdict(list)
+    per_update = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(dict)))
 
-    with open(options.logfile) as f:
-        bucket = bucket_before
-        for line in f:
-            m = doing_update_pattern.search(line)
-            if m:
-                update_no = int(m.group(1))
-                bucket = bucket_update[update_no]
+    for dirname in options.dirname:
+        for filename in glob.glob(os.path.join(dirname, '*.out')):
 
-            bucket.append(line)
+            bucket_before = []
+            bucket_update = collections.defaultdict(list)
 
-    results = {}
+            with open(filename) as f:
+                bucket = bucket_before
+                for line in f:
+                    m = doing_update_pattern.search(line)
+                    if m:
+                        update_no = int(m.group(1))
+                        bucket = bucket_update[update_no]
 
-    for line in bucket_before:
-        for key, (transform, pattern) in patterns_before.items():
-            m = pattern.match(line)
-            if m:
-                results[key] = transform(m.group(1))
+                    bucket.append(line)
 
-    all_gflops = {}
-    all_iters = {}
+            results = {}
 
-    for update_no, lines in sorted(bucket_update.items()):
-        gflops, iters = parse_update_block(lines)
-        all_gflops[update_no] = gflops
-        all_iters[update_no] = iters
+            for line in bucket_before:
+                for key, (transform, pattern) in patterns_before.items():
+                    m = pattern.match(line)
+                    if m:
+                        results[key] = transform(m.group(1))
 
-    per_update = collections.defaultdict(lambda: collections.defaultdict(dict))
+            all_gflops = {}
+            all_iters = {}
 
-    for update_no, solver_data in all_gflops.items():
-        for solver, gflops in solver_data.items():
-            per_update[update_no][solver]['gflops'] = gflops
+            for update_no, lines in sorted(bucket_update.items()):
+                gflops, iters = parse_update_block(lines)
+                all_gflops[update_no] = gflops
+                all_iters[update_no] = iters
 
-    for update_no, solver_data in all_iters.items():
-        for solver, iters in solver_data.items():
-            per_update[update_no][solver]['iters'] = iters
+            for update_no, solver_data in all_gflops.items():
+                for key, val in results.items():
+                    per_update[update_no][key] = val
+                for solver, gflops in solver_data.items():
+                    per_update[update_no]['solvers'][solver]['gflops'] = gflops
 
-    results['updates'] = per_update
-        
-    json_file = os.path.join(os.path.dirname(options.logfile), 'extract-log.json')
-    with open(json_file, 'w') as f:
-        json.dump(results, f, indent=4, sort_keys=True)
+            for update_no, solver_data in all_iters.items():
+                for solver, iters in solver_data.items():
+                    per_update[update_no]['solvers'][solver]['iters'] = iters
+
+        json_file = os.path.join(dirname, 'extract-log.json')
+        with open(json_file, 'w') as f:
+            json.dump(per_update, f, indent=4, sort_keys=True)
 
 
 def parse_update_block(lines):
@@ -117,7 +121,7 @@ def _parse_args():
     '''
     parser = argparse.ArgumentParser(description='')
 
-    parser.add_argument('logfile')
+    parser.add_argument('dirname', nargs='+')
 
     options = parser.parse_args()
     main(options)
