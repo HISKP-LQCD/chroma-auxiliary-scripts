@@ -15,16 +15,16 @@ import scipy.optimize as op
 def main(options):
     options.dirname.sort()
 
-    names_w_plaq = [os.path.join(x, 'extract-w_plaq.tsv') for x in options.dirname]
+    names_w_plaq = filter(os.path.isfile, [os.path.join(x, 'extract-w_plaq.tsv') for x in options.dirname])
     plot_generic_1d(names_w_plaq, 'Plaquette', r'$1 - \frac{1}{N_\mathrm{c}} \mathrm{Tr}(W_{1\times1})$')
 
-    names_delta_h = [os.path.join(x, 'extract-deltaH.tsv') for x in options.dirname]
+    names_delta_h = filter(os.path.isfile, [os.path.join(x, 'extract-deltaH.tsv') for x in options.dirname])
     plot_delta_h(names_delta_h)
 
-    names_seconds = [os.path.join(x, 'extract-seconds_for_trajectory.tsv') for x in options.dirname]
+    names_seconds = filter(os.path.isfile, [os.path.join(x, 'extract-seconds_for_trajectory.tsv') for x in options.dirname])
     plot_seconds(names_seconds)
 
-    names_perf = [os.path.join(x, 'extract-perf.json') for x in options.dirname]
+    names_perf = filter(os.path.isfile, [os.path.join(x, 'extract-perf.json') for x in options.dirname])
     plot_perf(names_perf)
 
 
