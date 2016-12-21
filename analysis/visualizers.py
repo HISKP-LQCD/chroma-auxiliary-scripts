@@ -139,7 +139,11 @@ def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (
 
     for dirname in dirnames:
         filename = os.path.join(dirname, 'extract-{}.tsv'.format(name))
-        data = np.loadtxt(filename)
+        if not os.path.isfile(filename):
+            continue
+        data = np.atleast_2d(np.loadtxt(filename))
+        if data.shape[1] == 0:
+            continue
         label = os.path.basename(os.path.realpath(dirname))
         x = data[:, 0]
         y = data[:, 1]
