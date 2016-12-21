@@ -1,10 +1,12 @@
 *.lime
 *.out
+__pycache__
 analysis/*.pdf
 analysis/*.png
 evaluations.*
 smear-configuration/chroma-smear.ini.xml
+smear-configuration/smeared-smear.chroma-ini.xml
+smear-configuration/wilson-clover_cfg_1-smear.chroma-ini.xml
 wilson-clover/hmc-wilson-clover.ini.xml
 XMLDAT
 XMLLOG
-
