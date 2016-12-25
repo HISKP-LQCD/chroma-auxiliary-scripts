@@ -112,9 +112,10 @@ def plot_perf(dirnames):
                 ))
 
         for solver, tuples in sorted(solvers.items()):
-            x, y, yerr_low, yerr_high = zip(*tuples)
+            x, y, yerr_low, yerr_high = zip(*sorted(tuples))
             label = '{} -- {}'.format(os.path.basename(os.path.realpath(dirname)), solver)
-            ax.errorbar(x, y, (yerr_low, yerr_high), marker='o', linestyle='none', label=label, errorevery=5)
+            line, = ax.plot(x, y, marker='o', label=label)
+            ax.fill_between(x, np.array(y) - np.array(yerr_low), np.array(y) + np.array(yerr_high), alpha=0.2, color=line.get_color())
 
     ax.set_title('Solver Performance')
     ax.set_xlabel('Update Number')
