@@ -25,4 +25,4 @@ export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 export KMP_AFFINITY=scatter,0
 
 # Start the Hybrid Monte Carlo simulation.
-srun ./hmc -i $input -o slurm-${SLURM_JOB_ID}.out.xml -by 8 -bz 8 -c 24 -sy 1 -sz 1 -pxy 1 -pxyz 0 -minct 2
+srun ./hmc -i $input -o slurm-${SLURM_JOB_ID}.out.xml -l slurm-${SLURM_JOB_ID}.log.xml -by 8 -bz 8 -c 24 -sy 1 -sz 1 -pxy 1 -pxyz 0 -minct 2
