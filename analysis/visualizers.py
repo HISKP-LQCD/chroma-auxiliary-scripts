@@ -15,6 +15,7 @@ import scipy.optimize as op
 def main(options):
     options.dirname.sort()
 
+    plot_solver_iters(options.dirname)
     plot_perf(options.dirname)
     plot_perf_vs_sublattice(options.dirname)
 
@@ -37,6 +38,51 @@ def dandify_figure(fig):
     fig.tight_layout()
 
 
+def plot_solver_iters(dirnames):
+    fig = pl.figure()
+    ax = fig.add_subplot(1, 1, 1)
+
+    to_plot = collections.defaultdict(lambda: collections.defaultdict(list))
+
+    for dirname in dirnames:
+        filename = os.path.join(dirname, 'extract-log.json')
+
+        if not os.path.isfile(filename):
+            print('File is missing:', filename)
+            continue
+
+        with open(filename) as f:
+            data = json.load(f)
+
+        for update_no, update_data in sorted(data.items()):
+            nodes = update_data['nodes']
+            subgrid_volume = update_data['subgrid_volume']
+
+            for solver, solver_data in update_data['solvers'].items():
+                gflops = solver_data['gflops']
+                iters = solver_data['iters']
+
+                to_plot[solver][update_no] += iters
+
+    for solver, tuples in sorted(to_plot.items()):
+        x = sorted(tuples.keys())
+        y = np.array([np.percentile(gflops, 50) / nodes for subgrid_volume, gflops in sorted(tuples.items())])
+        yerr_down = y - np.array([np.percentile(gflops, 50 - 34.13) / nodes for subgrid_volume, gflops in sorted(tuples.items())])
+        yerr_up = np.array([np.percentile(gflops, 50 + 34.13) / nodes for subgrid_volume, gflops in sorted(tuples.items())]) - y
+
+        ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=solver, errorevery=5)
+
+    ax.set_title('Solver Scaling')
+    ax.set_xlabel('Subgrid Volume')
+    ax.set_ylabel(r'Gflop/s per Node')
+
+    dandify_axes(ax)
+    dandify_figure(fig)
+
+    pl.savefig('plot-solver_iters-vs-update_no.pdf')
+    pl.savefig('plot-solver_iters-vs-update_no.png')
+
+
 def plot_perf(dirnames):
     fig = pl.figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -47,7 +93,6 @@ def plot_perf(dirnames):
         if not os.path.isfile(filename):
             print('File is missing:', filename)
             continue
-
 
         with open(filename) as f:
             data = json.load(f)
@@ -65,7 +110,7 @@ def plot_perf(dirnames):
         for solver, tuples in sorted(solvers.items()):
             x, y, yerr = zip(*tuples)
             label = '{} -- {}'.format(os.path.basename(os.path.realpath(dirname)), solver)
-            ax.errorbar(x, y, yerr, marker='o', linestyle='none', label=label)
+            ax.errorbar(x, y, yerr, marker='o', linestyle='none', label=label, errorevery=5)
 
     ax.set_title('Solver Performance')
     ax.set_xlabel('Update Number')
@@ -76,6 +121,14 @@ def plot_perf(dirnames):
 
     pl.savefig('plot-perf.pdf')
     pl.savefig('plot-perf.png')
+
+
+def percentiles(datas):
+    y = np.array([np.percentile(data, 50) for data in datas])
+    yerr_down = y - np.array([np.percentile(data, 50 - 34.13) for data in datas])
+    yerr_up = np.array([np.percentile(data, 50 + 34.13) for data in datas]) - y
+
+    return y, yerr_down, yerr_up
 
 
 def plot_perf_vs_sublattice(dirnames):
@@ -110,7 +163,7 @@ def plot_perf_vs_sublattice(dirnames):
         yerr_down = y - np.array([np.percentile(gflops, 50 - 34.13) / nodes for subgrid_volume, gflops in sorted(tuples.items())])
         yerr_up = np.array([np.percentile(gflops, 50 + 34.13) / nodes for subgrid_volume, gflops in sorted(tuples.items())]) - y
 
-        ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=solver)
+        ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=solver, errorevery=5)
 
     ax.set_title('Solver Scaling')
     ax.set_xlabel('Subgrid Volume')
