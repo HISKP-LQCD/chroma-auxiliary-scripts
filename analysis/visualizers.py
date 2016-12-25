@@ -66,9 +66,8 @@ def plot_solver_iters(dirnames):
 
     for solver, tuples in sorted(to_plot.items()):
         x = sorted(tuples.keys())
-        y = np.array([np.percentile(gflops, 50) / nodes for subgrid_volume, gflops in sorted(tuples.items())])
-        yerr_down = y - np.array([np.percentile(gflops, 50 - 34.13) / nodes for subgrid_volume, gflops in sorted(tuples.items())])
-        yerr_up = np.array([np.percentile(gflops, 50 + 34.13) / nodes for subgrid_volume, gflops in sorted(tuples.items())]) - y
+        datas = [gflops for subgrid_volume, gflops in sorted(tuples.items())]
+        y, yerr_down, yerr_up = percentiles(datas)
 
         ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=solver, errorevery=5)
 
@@ -105,12 +104,17 @@ def plot_perf(dirnames):
             for solver, solver_data in update_data['solvers'].items():
                 gflops = solver_data['gflops']
                 iters = solver_data['iters']
-                solvers[solver].append((int(update_no), np.mean(gflops) / nodes, np.std(gflops) / nodes))
+                solvers[solver].append((
+                    int(update_no),
+                    np.median(gflops) / nodes,
+                    np.percentile(gflops, PERCENTILE_LOW) / nodes,
+                    np.percentile(gflops, PERCENTILE_HIGH) / nodes,
+                ))
 
         for solver, tuples in sorted(solvers.items()):
-            x, y, yerr = zip(*tuples)
+            x, y, yerr_low, yerr_high = zip(*tuples)
             label = '{} -- {}'.format(os.path.basename(os.path.realpath(dirname)), solver)
-            ax.errorbar(x, y, yerr, marker='o', linestyle='none', label=label, errorevery=5)
+            ax.errorbar(x, y, (yerr_low, yerr_high), marker='o', linestyle='none', label=label, errorevery=5)
 
     ax.set_title('Solver Performance')
     ax.set_xlabel('Update Number')
@@ -122,11 +126,14 @@ def plot_perf(dirnames):
     pl.savefig('plot-perf.pdf')
     pl.savefig('plot-perf.png')
 
+PERCENTILE_LOW = 50 - 34.13
+PERCENTILE_HIGH = 50 + 34.13
+
 
 def percentiles(datas):
     y = np.array([np.percentile(data, 50) for data in datas])
-    yerr_down = y - np.array([np.percentile(data, 50 - 34.13) for data in datas])
-    yerr_up = np.array([np.percentile(data, 50 + 34.13) for data in datas]) - y
+    yerr_down = y - np.array([np.percentile(data, PERCENTILE_LOW) for data in datas])
+    yerr_up = np.array([np.percentile(data, PERCENTILE_HIGH) for data in datas]) - y
 
     return y, yerr_down, yerr_up
 
