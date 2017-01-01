@@ -28,10 +28,10 @@ def process_directory(dirname):
             np.savetxt(outfile, np.column_stack([update_no_list, number_list]))
 
     transforms.convert_tau0_to_md_time(dirname)
-    transforms.convert_to_md_time(dirname, 'w_plaq')
-    transforms.convert_to_md_time(dirname, 'deltaH')
-    transforms.convert_to_md_time(dirname, 'n_steps')
     transforms.convert_time_to_minutes(dirname)
+
+    for name in ['w_plaq', 'deltaH', 'n_steps']:
+        transforms.convert_to_md_time(dirname, name)
 
 
 def make_xpath_extractor(xpath):
