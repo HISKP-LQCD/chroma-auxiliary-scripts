@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
 import json
 import collections
@@ -26,6 +26,16 @@ def main(options):
     plot_generic(options.dirname, 'deltaH-vs-md_time', 'MD Time', r'$\Delta H$', 'MD Energy', transform_delta_h_md_time)
 
     plot_generic(options.dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory')
+
+    plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance')
+    plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Step Size', 'MD Step Size', transform_step_size, outname='step_size')
+
+
+def transform_step_size(x, y):
+    new_x = x[1:]
+    new_y = y[1:] - y[:-1]
+
+    return new_x, new_y
 
 
 def dandify_axes(ax):
@@ -71,9 +81,9 @@ def plot_solver_iters(dirnames):
 
         ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=solver, errorevery=5)
 
-    ax.set_title('Solver Scaling')
-    ax.set_xlabel('Subgrid Volume')
-    ax.set_ylabel(r'Gflop/s per Node')
+    ax.set_title('Solver Iterations')
+    ax.set_xlabel('Update Number')
+    ax.set_ylabel(r'Iteration Count')
 
     dandify_axes(ax)
     dandify_figure(fig)
@@ -194,7 +204,7 @@ def transform_delta_h_md_time(x, y):
     return x[sel], y[sel]
 
 
-def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (x, y)):
+def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (x, y), outname=None):
     fig = pl.figure()
     ax = fig.add_subplot(1, 1, 1)
 
@@ -218,8 +228,11 @@ def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (
     dandify_axes(ax)
     dandify_figure(fig)
 
-    pl.savefig('plot-{}.pdf'.format(name))
-    pl.savefig('plot-{}.png'.format(name))
+    if outname is None:
+        outname = name
+
+    pl.savefig('plot-{}.pdf'.format(outname))
+    pl.savefig('plot-{}.png'.format(outname))
 
 
 def make_safe_name(name):
