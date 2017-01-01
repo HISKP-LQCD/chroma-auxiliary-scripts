@@ -10,9 +10,13 @@ import os
 import matplotlib.pyplot as pl
 import numpy as np
 
+import transforms
+
 
 def main(options):
     options.dirname.sort()
+
+    transforms.combine_solver_iters(options.dirname)
 
     plot_solver_iters(options.dirname)
     plot_perf(options.dirname)
@@ -72,7 +76,7 @@ def plot_solver_iters(dirnames):
     for solver, tuples in sorted(to_plot.items()):
         x = sorted(tuples.keys())
         datas = [gflops for subgrid_volume, gflops in sorted(tuples.items())]
-        y, yerr_down, yerr_up = percentiles(datas)
+        y, yerr_down, yerr_up = transforms.percentiles(datas)
 
         ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=solver, errorevery=5)
 
@@ -112,8 +116,8 @@ def plot_perf(dirnames):
                 solvers[solver].append((
                     int(update_no),
                     np.median(gflops) / nodes,
-                    np.percentile(gflops, PERCENTILE_LOW) / nodes,
-                    np.percentile(gflops, PERCENTILE_HIGH) / nodes,
+                    np.percentile(gflops, transforms.PERCENTILE_LOW) / nodes,
+                    np.percentile(gflops, transforms.PERCENTILE_HIGH) / nodes,
                 ))
 
         for solver, tuples in sorted(solvers.items()):
@@ -131,17 +135,6 @@ def plot_perf(dirnames):
 
     pl.savefig('plot-perf.pdf')
     pl.savefig('plot-perf.png')
-
-PERCENTILE_LOW = 50 - 34.13
-PERCENTILE_HIGH = 50 + 34.13
-
-
-def percentiles(datas):
-    y = np.array([np.percentile(data, 50) for data in datas])
-    yerr_down = y - np.array([np.percentile(data, PERCENTILE_LOW) for data in datas])
-    yerr_up = np.array([np.percentile(data, PERCENTILE_HIGH) for data in datas]) - y
-
-    return y, yerr_down, yerr_up
 
 
 def plot_perf_vs_sublattice(dirnames):

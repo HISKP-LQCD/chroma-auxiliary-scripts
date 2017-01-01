@@ -5,9 +5,71 @@
 
 import collections
 import glob
+import json
 import os
 
 import numpy as np
+
+
+PERCENTILE_LOW = 50 - 34.13
+PERCENTILE_HIGH = 50 + 34.13
+
+
+def percentiles(datas):
+    y = np.array([np.percentile(data, 50) for data in datas])
+    yerr_down = y - np.array([np.percentile(data, PERCENTILE_LOW) for data in datas])
+    yerr_up = np.array([np.percentile(data, PERCENTILE_HIGH) for data in datas]) - y
+    return y, yerr_down, yerr_up
+
+
+def convert_solver_iters(dirname):
+    filename_in = os.path.join(dirname, 'extract-log.json')
+    filename_out = os.path.join(dirname, 'extract-solver_iters.json')
+
+    if not os.path.isfile(filename_in):
+        print('File is missing:', filename_in)
+        return
+
+    with open(filename_in) as f:
+        data = json.load(f)
+
+    for update_no, update_data in sorted(data.items()):
+        nodes = update_data['nodes']
+        subgrid_volume = update_data['subgrid_volume']
+
+        for solver, solver_data in update_data['solvers'].items():
+            gflops = solver_data['gflops']
+            iters = solver_data['iters']
+
+            to_plot[solver][update_no] += iters
+
+    with open(filename_out) as f:
+        json.dump(to_plot, f)
+
+
+def merge_dict_2(base, add):
+    for key1, val1 in add.items():
+        for key2, val2 in val1.items():
+            base[key1][key2] += val2
+
+
+def combine_solver_iters(dirnames):
+    all_data = collections.defaultdict(lambda: collections.defaultdict(list))
+
+    for dirname in dirnames:
+        filename = os.path.join(dirname, 'extract-solver_iters.json')
+
+        if not os.path.isfile(filename):
+            print('File is missing:', filename)
+            continue
+
+        with open(filename) as f:
+            data = json.load(f)
+
+        merge_dict_2(all_data, data)
+
+    with open('extract-solver_iters.json', 'w') as f:
+        json.dump(all_data, f)
 
 
 def convert_to_md_time(dirname, name_in):
