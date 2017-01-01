@@ -8,9 +8,7 @@ import glob
 import os
 
 from lxml import etree
-import matplotlib.pyplot as pl
 import numpy as np
-import scipy.optimize as op
 
 import extractors
 

@@ -9,7 +9,6 @@ import os
 
 import matplotlib.pyplot as pl
 import numpy as np
-import scipy.optimize as op
 
 
 def main(options):
