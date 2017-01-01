@@ -102,8 +102,14 @@ def extract_xpath_from_all(xml_files, xpath):
 
             number = float(matches[0])
 
-            update_no_list.append(update_no)
-            number_list.append(number)
+            if update_no in update_no_list:
+                # This number is already extracted for that update. Make sure
+                # that the extracted value is the same.
+                index = update_no_list.index(update_no)
+                assert number_list[index] == number
+            else:
+                update_no_list.append(update_no)
+                number_list.append(number)
 
     if len(update_no_list) == 0:
         return None
@@ -135,7 +141,9 @@ def convert_to_md_time(dirname, name_in):
     update_no_2 = data[:, 0]
     y = data[:, 1]
 
-    assert all(update_no == update_no_2), "Update Numbers must match.\n{}\n{}".format(str(update_no), str(update_no_2))
+    eq = update_no == update_no_2
+    if (isinstance(eq, bool) and not eq) or (isinstance(eq, np.ndarray) and not all(eq)):
+        assert False, "Update Numbers must match for {}.\n{}\n{}".format(name_in, str(update_no), str(update_no_2))
 
     np.savetxt(os.path.join(dirname, 'extract-{}-vs-md_time.tsv'.format(name_in)),
                np.column_stack([md_time, y]))
