@@ -27,6 +27,9 @@ def main(options):
 
     plot_generic(options.dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory')
 
+    plot_generic(options.dirname, 'n_steps', 'Update Number', r'Step Count (coarsest time scale)', 'Integration Steps')
+    plot_generic(options.dirname, 'n_steps-vs-md_time', 'MD Time', r'Step Count (coarsest time scale)', 'Integration Steps')
+
     plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance')
     plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Step Size', 'MD Step Size', transform_step_size, outname='step_size')
 
