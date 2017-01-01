@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
 import collections
 import glob
@@ -54,17 +54,15 @@ def extract_md_time(dirname):
             continue
 
         if len(tree.xpath('//doHMC')) == 0:
-            # This is not an output XML file
+            # This is not an output XML file.
             continue
 
         tau0 = float(tree.xpath('//hmc/Input/Params/HMCTrj/MDIntegrator/tau0/text()')[0])
-        print(tau0)
 
         updates = tree.xpath('//Update')
 
         for update in updates:
             update_no = int(update.xpath('./update_no/text()')[0])
-            print('Update:', update_no)
 
             step_sizes[update_no] = tau0
 
@@ -94,15 +92,15 @@ def extract_xpath_from_all(xml_files, xpath):
 
         for update in updates:
             update_no = int(update.xpath('./update_no/text()')[0])
-            print('Update:', update_no)
 
             number_list_local = []
 
             matches = update.xpath(xpath)
-            assert len(matches) != 0
+            if len(matches) == 0:
+                print("No measurements of {} in XML file {}".format(xpath, xml_file))
+                continue
 
             number = float(matches[0])
-            print(xpath, number)
 
             update_no_list.append(update_no)
             number_list.append(number)
