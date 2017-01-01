@@ -27,6 +27,7 @@ def process_directory(dirname):
             outfile = os.path.join(dirname, 'extract-{}.tsv'.format(key))
             np.savetxt(outfile, np.column_stack([update_no_list, number_list]))
 
+    transforms.convert_tau0_to_md_time(dirname)
     transforms.convert_to_md_time(dirname, 'w_plaq')
     transforms.convert_to_md_time(dirname, 'deltaH')
     transforms.convert_to_md_time(dirname, 'n_steps')
@@ -129,6 +130,6 @@ bits = {
     'w_plaq': make_xpath_extractor('.//w_plaq/text()'),
     'deltaH': make_xpath_extractor('.//deltaH/text()'),
     'seconds_for_trajectory': make_xpath_extractor('.//seconds_for_trajectory/text()'),
-    'md_time': make_single_xpath_extractor('//hmc/Input/Params/HMCTrj/MDIntegrator/tau0/text()'),
+    'tau0': make_single_xpath_extractor('//hmc/Input/Params/HMCTrj/MDIntegrator/tau0/text()'),
     'n_steps': make_single_xpath_extractor('//hmc/Input/Params/HMCTrj/MDIntegrator/Integrator/n_steps/text()'),
 }

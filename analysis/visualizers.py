@@ -30,14 +30,7 @@ def main(options):
     plot_generic(options.dirname, 'n_steps-vs-md_time', 'MD Time', r'Step Count (coarsest time scale)', 'Integration Steps')
 
     plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance')
-    plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Step Size', 'MD Step Size', transform_step_size, outname='step_size')
-
-
-def transform_step_size(x, y):
-    new_x = x[1:]
-    new_y = y[1:] - y[:-1]
-
-    return new_x, new_y
+    plot_generic(options.dirname, 'tau0', 'Update Number', r'MD Step Size', 'MD Step Size')
 
 
 def dandify_axes(ax):
