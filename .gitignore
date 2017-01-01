@@ -10,3 +10,5 @@ smear-configuration/wilson-clover_cfg_1-smear.chroma-ini.xml
 wilson-clover/hmc-wilson-clover.ini.xml
 XMLDAT
 XMLLOG
+analysis/.kdev4/
+analysis/analysis.kdev4
