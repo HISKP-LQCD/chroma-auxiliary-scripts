@@ -5,7 +5,7 @@
 {% set clovCoeff = '1.715' -%}
 {% set kappa_light = '0.13727' -%}
 {% set kappa_strange = '0.13640' -%}
-{% set residual = '1e-18' -%}
+{% set residual = '1e-15' -%}
 {% set beta = '1.9' -%}
 {% set l_xyz = 16 -%}
 {% set l_t = 32 -%}
@@ -146,10 +146,10 @@
       <elem>
         <Name>GAUGE_MONOMIAL</Name>
         <GaugeAction>
-          <!-- TODO -->
-          <Name>LW_TREE_GAUGEACT</Name>
+          <!-- Renormalization Group improved gauge action. The parameter `c1` is the only parameter that controls the rectangular part. The Iwasaki action is just a certain choice of `c1`. -->
+          <Name>RG_GAUGEACT</Name>
           <beta>{{ beta }}</beta>
-          <u0>0.832605301399891</u0>
+          <c1>-0.331</c1>
           <GaugeBC>
             <Name>PERIODIC_GAUGEBC</Name>
           </GaugeBC>
