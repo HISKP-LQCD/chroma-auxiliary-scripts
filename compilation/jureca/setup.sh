@@ -5,66 +5,6 @@ module load Autotools
 module list
 set -x
 
-# Clones a git repository if the directory does not exist. It does not call
-# `git pull`.
-clone-if-needed() {
-    local url="$1"
-    local dir="$2"
-    local branch="$3"
-
-    if ! [[ -d "$dir" ]]
-    then
-        git clone "$url" --recursive -b "$branch"
-    fi
-}
-
-wget-if-needed() {
-    local url="$1"
-    local dir="$2"
-
-    if ! [[ -d "$dir" ]]; then
-        base=${url##*/}
-        wget $url
-        tar -xf $base
-    fi
-}
-
-# Runs `make && make install` with appropriate flags that make compilation
-# parallel on multiple cores. A sentinel file is created such that `make` is
-# not invoked once it has correctly built.
-make_smp_template="-j $(nproc)"
-make_smp_flags="${SMP-$make_smp_template}"
-
-make-make-install() {
-    if ! [[ -f build-succeeded ]]; then
-        nice make $make_smp_flags
-        make install
-        touch build-succeeded
-        pushd $prefix/lib
-        rm -f *.so *.so.*
-        popd
-    fi
-}
-
-print-fancy-heading() {
-    set +x
-    echo "######################################################################"
-    echo "# $*"
-    echo "######################################################################"
-    set -x
-    pushd "$sourcedir/$repo"
-    git branch
-    popd
-}
-
-autoreconf-if-needed() {
-    if ! [[ -f configure ]]; then
-        aclocal
-        autoreconf -f
-        automake --add-missing
-    fi
-}
-
 # Basic flags that are used for every single project compiled.
 compiler=${COMPILER-icc}
 
@@ -114,7 +54,6 @@ build="$HOME/jureca-build-$compiler"
 mkdir -p "$build"
 
 PATH=$prefix/bin:$PATH
-
 
 cc=$(which $cc_name)
 cxx=$(which $cxx_name)
