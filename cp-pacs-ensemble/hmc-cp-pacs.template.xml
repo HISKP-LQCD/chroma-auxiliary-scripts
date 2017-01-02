@@ -37,6 +37,7 @@
       <FermAct>CLOVER</FermAct>
       <Kappa>{{ kappa_numerator }}</Kappa>
       <clovCoeff>{{ clovCoeff }}</clovCoeff>
+      {{ boundary_conditions() }}
     </FermionAction>
   </Action>
   <PrecAction>
@@ -55,6 +56,7 @@
       <FermAct>CLOVER</FermAct>
       <Kappa>{{ kappa_denominator }}</Kappa>
       <clovCoeff>{{ clovCoeff }}</clovCoeff>
+      {{ boundary_conditions() }}
     </FermionAction>
   </PrecAction>
   <ChronologicalPredictor>
@@ -85,6 +87,7 @@
     <FermAct>CLOVER</FermAct>
     <Kappa>{{ kappa }}</Kappa>
     <clovCoeff>{{ clovCoeff }}</clovCoeff>
+    {{ boundary_conditions() }}
   </FermionAction>
   <ChronologicalPredictor>
     <Name>LAST_SOLUTION_4D_PREDICTOR</Name>
@@ -170,6 +173,7 @@
           <FermAct>CLOVER</FermAct>
           <Kappa>{{ kappa_light }}</Kappa>
           <clovCoeff>{{ clovCoeff }}</clovCoeff>
+          {{ boundary_conditions() }}
         </FermionAction>
         <num_flavors>2</num_flavors>
         <NamedObject>
@@ -186,6 +190,7 @@
             <FermAct>CLOVER</FermAct>
             <Kappa>{{ kappa_strange }}</Kappa>
             <clovCoeff>{{ clovCoeff }}</clovCoeff>
+            {{ boundary_conditions() }}
           </FermionAction>
           <ActionApprox>
             <InvertParam>
@@ -273,6 +278,7 @@
           <FermAct>CLOVER</FermAct>
           <Kappa>{{ kappa_strange }}</Kappa>
           <clovCoeff>{{ clovCoeff }}</clovCoeff>
+          {{ boundary_conditions() }}
         </FermionAction>
         <num_flavors>1</num_flavors>
         <NamedObject>
