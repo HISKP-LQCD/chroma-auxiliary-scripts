@@ -72,6 +72,19 @@ def combine_solver_iters(dirnames):
         json.dump(all_data, f)
 
 
+def prepare_solver_iters():
+    with open('extract-solver_iters.json') as f:
+        data = json.load(f)
+
+    for solver, tuples in sorted(data.items()):
+        x = sorted(tuples.keys())
+        datas = [gflops for subgrid_volume, gflops in sorted(tuples.items())]
+        y, yerr_down, yerr_up = transforms.percentiles(datas)
+
+        np.savetxt('extract-solver_iters-{}.json'.format(solver),
+                   np.column_stack([x, y, yerr_down, yerr_up]))
+
+
 def convert_to_md_time(dirname, name_in):
     file_in = os.path.join(dirname, 'extract-md_time.tsv')
     data = np.atleast_2d(np.loadtxt(file_in))
