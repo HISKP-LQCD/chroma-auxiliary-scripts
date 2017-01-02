@@ -101,7 +101,7 @@
   <MCControl><!--[[[-->
 
     <Cfg>
-      <cfg_type>DISORDERED</cfg_type>
+      <cfg_type>WEAK_FIELD</cfg_type>
       <cfg_file>DUMMY</cfg_file>
     </Cfg>
 
@@ -115,7 +115,7 @@
     </RNG>
 
     <StartUpdateNum>0</StartUpdateNum>
-    <NWarmUpUpdates>100</NWarmUpUpdates>
+    <NWarmUpUpdates>500</NWarmUpUpdates>
     <NProductionUpdates>10000</NProductionUpdates>
     <NUpdatesThisRun>1</NUpdatesThisRun>
 
@@ -144,7 +144,6 @@
     <Monomials>
       <!-- (gauge) Gauge [[[ -->
       <elem>
-        <!-- Tree level Symanzik improved gauge, here it is called Lüscher-Weiß. The β is set to the value from the paper. -->
         <Name>GAUGE_MONOMIAL</Name>
         <GaugeAction>
           <!-- TODO -->
