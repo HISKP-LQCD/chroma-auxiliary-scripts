@@ -11,11 +11,11 @@ clone-if-needed() {
     if ! [[ -d "$dir" ]]
     then
         git clone "$url" --recursive -b "$branch"
-    fi
 
-    pushd "$dir"
-    rm -f configure Makefile
-    popd
+        pushd "$dir"
+        rm -f configure Makefile
+        popd
+    fi
 }
 
 wget-if-needed() {

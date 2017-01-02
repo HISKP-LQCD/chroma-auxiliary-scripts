@@ -7,10 +7,10 @@ case $compiler in
         cxx_name=g++
         color_flags="-fdiagnostics-color=auto"
         openmp_flags="-fopenmp"
-        base_flags="-O2 -finline-limit=50000 -fmax-errors=1 $color_flags"
+        base_flags="-O2 -finline-limit=50000 -fmax-errors=1 $color_flags -mavx"
         cxx11_flags="--std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
-        qphix_flags="-Drestrict=__restrict__ -mavx"
+        qphix_flags="-Drestrict=__restrict__"
         qphix_configure=""
         ;;
     *)
