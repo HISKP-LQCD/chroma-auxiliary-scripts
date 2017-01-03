@@ -1,0 +1,17 @@
+#!/bin/bash
+# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
+
+set -e
+set -u
+
+dest="$WORK/$1"
+
+source ~/jureca-modules
+
+../execute-template/execute-jinja-template hmc-cp-pacs
+cp hmc-cp-pacs.ini.xml .
+cp jureca/wilson-clover.slurm.sh "$dest/$1-batch.slurm.sh"
+cp jureca/wilson-clover.slurm.sh "$dest/$1-devel.slurm.sh"
+sed -i 's/06:00:00/02:00:00/' "$dest/$1-devel.slurm.sh"
+sed -i 's/batch/devel/' "$dest/$1-devel.slurm.sh"
+cp $HOME/jureca-local-icc/bin/hmc "$dest/"
