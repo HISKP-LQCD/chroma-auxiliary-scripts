@@ -28,6 +28,7 @@ set -e
 set -u
 set -x
 
+# Force the user specify a directory where everything should be put into.
 if (( $# == 0 )); then
     echo "usage: $0 BASE"
 fi
