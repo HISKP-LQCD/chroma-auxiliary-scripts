@@ -11,9 +11,9 @@ echo "Created $dest"
 source ~/jureca-modules.sh
 
 ../execute-template/execute-jinja-template hmc-cp-pacs
-cp hmc-cp-pacs.ini.xml .
-cp jureca/wilson-clover.slurm.sh "$dest/$1-batch.slurm.sh"
-cp jureca/wilson-clover.slurm.sh "$dest/$1-devel.slurm.sh"
+cp hmc-cp-pacs.ini.xml "$dest/"
+cp wilson-clover.slurm.sh "$dest/$1-batch.slurm.sh"
+cp wilson-clover.slurm.sh "$dest/$1-devel.slurm.sh"
 sed -i 's/06:00:00/02:00:00/' "$dest/$1-devel.slurm.sh"
 sed -i 's/batch/devel/' "$dest/$1-devel.slurm.sh"
 cp $HOME/jureca-local-icc/bin/hmc "$dest/"
