@@ -8,7 +8,7 @@ dest="$WORK/$1"
 mkdir "$dest"
 echo "Created $dest"
 
-source ~/jureca-modules
+source ~/jureca-modules.sh
 
 ../execute-template/execute-jinja-template hmc-cp-pacs
 cp hmc-cp-pacs.ini.xml .
