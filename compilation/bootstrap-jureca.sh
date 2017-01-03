@@ -12,11 +12,13 @@ set -x
 # This makes debugging way easier.
 export LC_ALL=C
 
-if (( $# = 0 )); then
+compiler=${COMPILER-icc}
+
+if (( $# == 0 )); then
     echo "usage: $0 BASE"
 fi
 
-basedir="$1"
+basedir="$PWD/$1"
 
 sourcedir="$basedir/sources"
 mkdir -p "$sourcedir"
@@ -36,8 +38,6 @@ module list
 set -x
 
 # Basic flags that are used for every single project compiled.
-compiler=${COMPILER-icc}
-
 case $compiler in
     icc)
         set +x
@@ -177,7 +177,7 @@ autoreconf-if-needed() {
     fi
 }
 
-pushd "$sourcedir"
+cd "$sourcedir"
 
 ###############################################################################
 #                                     QMP                                     #
@@ -263,7 +263,7 @@ repo=qdpxx
 
 print-fancy-heading $repo
 
-clone-if-needed https://github.com/usqcd-software/qdpxx.git $repo martins-fedora24-build
+clone-if-needed https://github.com/usqcd-software/qdpxx.git $repo devel
 
 pushd $repo
 cflags="$base_cflags $openmp_flags"
