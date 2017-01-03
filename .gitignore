@@ -12,3 +12,6 @@ XMLDAT
 XMLLOG
 analysis/.kdev4/
 analysis/analysis.kdev4
+cp-pacs-ensemble/hmc-cp-pacs.ini.xml
+cp-pacs-ensemble/hmc-cp-pacs.ini.yml
+cp-pacs-ensemble/output
