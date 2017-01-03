@@ -18,9 +18,9 @@ def main(options):
 
     transforms.combine_solver_iters(options.dirname)
 
-    plot_solver_iters(options.dirname)
-    plot_perf(options.dirname)
-    plot_perf_vs_sublattice(options.dirname)
+    #plot_solver_iters(options.dirname)
+    #plot_perf(options.dirname)
+    #plot_perf_vs_sublattice(options.dirname)
 
     plot_generic(options.dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 0.0)', 'Plaquette')
     plot_generic(options.dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 0.0)', 'Plaquette')

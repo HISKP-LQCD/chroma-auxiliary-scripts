@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
 import math
@@ -32,12 +32,11 @@ def main():
 
     avg = total_time / len(updates)
 
-    max_wtime = 5.3 * 3600
+    for max_wtime in [1.6 * 3600, 5.3 * 3600]:
+        recommended = math.floor(max_wtime / avg)
 
-    recommended = math.floor(max_wtime / avg)
-
-    print('Recommended:', recommended)
-    print('Time estimated:', recommended * avg / 3600)
+        print('Recommended:', recommended)
+        print('Time estimated:', recommended * avg / 3600)
 
 
 

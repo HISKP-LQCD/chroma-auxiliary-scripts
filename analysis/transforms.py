@@ -10,6 +10,8 @@ import os
 
 import numpy as np
 
+import util
+
 
 PERCENTILE_LOW = 50 - 34.13
 PERCENTILE_HIGH = 50 + 34.13
@@ -123,9 +125,8 @@ def convert_time_to_minutes(dirname):
 
 def convert_tau0_to_md_time(dirname):
     file_in = os.path.join(dirname, 'extract-tau0.tsv')
-    data = np.loadtxt(file_in)
-    update_no = data[:, 0]
-    tau0 = data[:, 1]
+
+    update_no, tau0 = util.load_columns(file_in)
     md_time = np.cumsum(tau0)
 
     assert tau0.shape == md_time.shape
