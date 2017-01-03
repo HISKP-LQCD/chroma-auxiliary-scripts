@@ -335,6 +335,10 @@ if ! [[ -f Makefile ]]; then
         --with-qmp="$prefix" \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
+
+# In the current version, the tests to do not build. This is not a problem as
+# they are not needed to run Chroma. Compiling and installing the include files
+# and libraries is enough.
 pushd include
 make-make-install
 popd
