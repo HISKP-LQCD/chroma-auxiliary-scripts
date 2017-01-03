@@ -5,6 +5,8 @@ set -e
 set -u
 
 dest="$WORK/$1"
+mkdir "$dest"
+echo "Created $dest"
 
 source ~/jureca-modules
 
