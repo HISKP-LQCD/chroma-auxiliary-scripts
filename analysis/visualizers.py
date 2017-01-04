@@ -55,7 +55,7 @@ def plot_solver_iters():
     for f in files:
         x, y, yerr_down, yerr_up = util.load_columns(f)
         m = re.match(r'extract-solver_iters-(.+?).tsv', f)
-        ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=m.group(1))
+        ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=m.group(1).replace('_', ' '))
 
     ax.set_title('Solver Iterations')
     ax.set_xlabel('Update Number')
