@@ -30,11 +30,13 @@ def main(options):
     #plot_perf(options.dirname)
     #plot_perf_vs_sublattice(options.dirname)
 
-    plot_generic(options.dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 0.0)', 'Plaquette')
-    plot_generic(options.dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 0.0)', 'Plaquette')
+    plot_generic(options.dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 1.0)', 'Plaquette')
+    plot_generic(options.dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 1.0)', 'Plaquette')
 
     plot_generic(options.dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy', transform_delta_h)
     plot_generic(options.dirname, 'deltaH-vs-md_time', 'MD Time', r'$\Delta H$', 'MD Energy', transform_delta_h_md_time)
+
+    plot_generic(options.dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy (Zoom)', ax_transform=set_y_limits_delta_h, outname='deltaH-narrow')
 
     plot_generic(options.dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory')
 
@@ -44,7 +46,11 @@ def main(options):
     plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance')
     plot_generic(options.dirname, 'tau0', 'Update Number', r'MD Step Size', 'MD Step Size')
 
-    subprocess.check_call(['pdfunite'] + glob.glob('plot-*.pdf') + ['plots.pdf'])
+    subprocess.check_call(['pdfunite'] + sorted(glob.glob('plot-*.pdf')) + ['plots.pdf'])
+
+
+def set_y_limits_delta_h(ax):
+    ax.set_ylim(-0.5, 0.5)
 
 
 def plot_solver_iters():
@@ -100,7 +106,7 @@ def plot_perf(dirnames):
             ax.fill_between(x, np.array(y) - np.array(yerr_low), np.array(y) + np.array(yerr_high), alpha=0.2, color=line.get_color())
 
     ax.set_title('Solver Performance')
-    ax.set_xlabel('Update Number')
+    ax.set_xlabel('Update Number (shifted for visibility)')
     ax.set_ylabel(r'Gflop/s per Node')
 
     util.dandify_axes(ax)
@@ -165,11 +171,11 @@ def transform_delta_h_md_time(x, y):
     return x[sel], y[sel]
 
 
-def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (x, y), outname=None):
+def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (x, y), outname=None, ax_transform=None):
     fig = pl.figure()
     ax = fig.add_subplot(1, 1, 1)
 
-    for dirname in dirnames:
+    for i, dirname in enumerate(dirnames):
         filename = os.path.join(dirname, 'extract-{}.tsv'.format(name))
         if not os.path.isfile(filename):
             continue
@@ -180,11 +186,14 @@ def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (
         x = data[:, 0]
         y = data[:, 1]
         x, y = transform(x, y)
-        ax.plot(x, y, marker='o', label=label)
+        ax.plot(np.array(x) + 0.1 * i, y, marker='o', label=label, markersize=2)
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
+
+    if ax_transform is not None:
+        ax_transform(ax)
 
     util.dandify_axes(ax)
     util.dandify_figure(fig)

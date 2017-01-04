@@ -24,9 +24,11 @@ def process_directory(dirname):
     for key, extractor in bits.items():
         extracted = extractor(dirname)
         if extracted is not None:
-            update_no_list, number_list = extracted
-            outfile = os.path.join(dirname, 'extract-{}.tsv'.format(key))
-            np.savetxt(outfile, np.column_stack([update_no_list, number_list]))
+            extracted = list(extracted)
+            if len(extracted) != 0:
+                update_no_list, number_list = extracted
+                outfile = os.path.join(dirname, 'extract-{}.tsv'.format(key))
+                np.savetxt(outfile, np.column_stack([update_no_list, number_list]))
 
     transforms.convert_tau0_to_md_time(dirname)
     transforms.convert_time_to_minutes(dirname)
