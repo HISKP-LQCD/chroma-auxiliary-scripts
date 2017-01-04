@@ -28,6 +28,8 @@ def convert_solver_iters(dirname):
     filename_in = os.path.join(dirname, 'extract-log.json')
     filename_out = os.path.join(dirname, 'extract-solver_iters.json')
 
+    to_plot = collections.defaultdict(lambda: collections.defaultdict(list))
+
     if not os.path.isfile(filename_in):
         print('File is missing:', filename_in)
         return
@@ -40,12 +42,17 @@ def convert_solver_iters(dirname):
         subgrid_volume = update_data['subgrid_volume']
 
         for solver, solver_data in update_data['solvers'].items():
-            gflops = solver_data['gflops']
-            iters = solver_data['iters']
+            try:
+                gflops = solver_data['gflops']
+                iters = solver_data['iters']
+            except KeyError:
+                print('filename_in:', filename_in)
+                print('keys:', solver_data.keys())
+                raise
 
             to_plot[solver][update_no] += iters
 
-    with open(filename_out) as f:
+    with open(filename_out, 'w') as f:
         json.dump(to_plot, f)
 
 
@@ -79,11 +86,11 @@ def prepare_solver_iters():
         data = json.load(f)
 
     for solver, tuples in sorted(data.items()):
-        x = sorted(tuples.keys())
+        x = sorted(map(float, tuples.keys()))
         datas = [gflops for subgrid_volume, gflops in sorted(tuples.items())]
-        y, yerr_down, yerr_up = transforms.percentiles(datas)
+        y, yerr_down, yerr_up = percentiles(datas)
 
-        np.savetxt('extract-solver_iters-{}.json'.format(solver),
+        np.savetxt(util.make_safe_name('extract-solver_iters-{}.tsv'.format(solver)),
                    np.column_stack([x, y, yerr_down, yerr_up]))
 
 

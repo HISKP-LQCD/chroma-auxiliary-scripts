@@ -3,22 +3,30 @@
 
 # Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
-import json
 import collections
+import glob
+import json
 import os
+import re
+import subprocess
 
 import matplotlib.pyplot as pl
 import numpy as np
 
 import transforms
+import util
 
 
 def main(options):
     options.dirname.sort()
 
-    transforms.combine_solver_iters(options.dirname)
+    for dirname in options.dirname:
+        transforms.convert_solver_iters(dirname)
 
-    #plot_solver_iters(options.dirname)
+    transforms.combine_solver_iters(options.dirname)
+    transforms.prepare_solver_iters()
+
+    plot_solver_iters()
     #plot_perf(options.dirname)
     #plot_perf_vs_sublattice(options.dirname)
 
@@ -36,59 +44,24 @@ def main(options):
     plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance')
     plot_generic(options.dirname, 'tau0', 'Update Number', r'MD Step Size', 'MD Step Size')
 
-
-def dandify_axes(ax):
-    ax.grid(True)
-    ax.margins(0.05)
-    ax.legend(loc='best', prop={'size': 8})
+    subprocess.check_call(['pdfunite'] + glob.glob('plot-*.pdf') + ['plots.pdf'])
 
 
-def dandify_figure(fig):
-    fig.tight_layout()
+def plot_solver_iters():
+    fig, ax = util.make_figure()
 
+    files = glob.glob('extract-solver_iters-*.tsv')
 
-def plot_solver_iters(dirnames):
-    fig = pl.figure()
-    ax = fig.add_subplot(1, 1, 1)
-
-    to_plot = collections.defaultdict(lambda: collections.defaultdict(list))
-
-    for dirname in dirnames:
-        filename = os.path.join(dirname, 'extract-log.json')
-
-        if not os.path.isfile(filename):
-            print('File is missing:', filename)
-            continue
-
-        with open(filename) as f:
-            data = json.load(f)
-
-        for update_no, update_data in sorted(data.items()):
-            nodes = update_data['nodes']
-            subgrid_volume = update_data['subgrid_volume']
-
-            for solver, solver_data in update_data['solvers'].items():
-                gflops = solver_data['gflops']
-                iters = solver_data['iters']
-
-                to_plot[solver][update_no] += iters
-
-    for solver, tuples in sorted(to_plot.items()):
-        x = sorted(tuples.keys())
-        datas = [gflops for subgrid_volume, gflops in sorted(tuples.items())]
-        y, yerr_down, yerr_up = transforms.percentiles(datas)
-
-        ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=solver, errorevery=5)
+    for f in files:
+        x, y, yerr_down, yerr_up = util.load_columns(f)
+        m = re.match(r'extract-solver_iters-(.+?).tsv', f)
+        ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=m.group(1))
 
     ax.set_title('Solver Iterations')
     ax.set_xlabel('Update Number')
     ax.set_ylabel(r'Iteration Count')
 
-    dandify_axes(ax)
-    dandify_figure(fig)
-
-    pl.savefig('plot-solver_iters-vs-update_no.pdf')
-    pl.savefig('plot-solver_iters-vs-update_no.png')
+    util.save_figure(fig, 'plot-solver_iters-vs-update_no')
 
 
 def plot_perf(dirnames):
@@ -130,8 +103,8 @@ def plot_perf(dirnames):
     ax.set_xlabel('Update Number')
     ax.set_ylabel(r'Gflop/s per Node')
 
-    dandify_axes(ax)
-    dandify_figure(fig)
+    util.dandify_axes(ax)
+    util.dandify_figure(fig)
 
     pl.savefig('plot-perf.pdf')
     pl.savefig('plot-perf.png')
@@ -169,14 +142,14 @@ def plot_perf_vs_sublattice(dirnames):
         yerr_down = y - np.array([np.percentile(gflops, 50 - 34.13) / nodes for subgrid_volume, gflops in sorted(tuples.items())])
         yerr_up = np.array([np.percentile(gflops, 50 + 34.13) / nodes for subgrid_volume, gflops in sorted(tuples.items())]) - y
 
-        ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=solver, errorevery=5)
+        ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=solver)
 
     ax.set_title('Solver Scaling')
     ax.set_xlabel('Subgrid Volume')
     ax.set_ylabel(r'Gflop/s per Node')
 
-    dandify_axes(ax)
-    dandify_figure(fig)
+    util.dandify_axes(ax)
+    util.dandify_figure(fig)
 
     pl.savefig('plot-gflops-vs-subgrid_volume.pdf')
     pl.savefig('plot-gflops-vs-subgrid_volume.png')
@@ -213,15 +186,11 @@ def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
 
-    dandify_axes(ax)
-    dandify_figure(fig)
+    util.dandify_axes(ax)
+    util.dandify_figure(fig)
 
     if outname is None:
         outname = name
 
     pl.savefig('plot-{}.pdf'.format(outname))
     pl.savefig('plot-{}.png'.format(outname))
-
-
-def make_safe_name(name):
-    return ''.join([c for c in name.replace(' ', '_') if ord('A') <= ord(c) <= ord('Z') or ord('a') <= ord(c) <= ord('z') or c in '_'])
