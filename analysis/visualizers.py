@@ -18,8 +18,6 @@ import util
 
 
 def main(options):
-    options.dirname.sort()
-
     for dirname in options.dirname:
         transforms.convert_solver_iters(dirname)
 
@@ -30,27 +28,27 @@ def main(options):
     #plot_perf(options.dirname)
     #plot_perf_vs_sublattice(options.dirname)
 
-    plot_generic(options.dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 1.0)', 'Plaquette')
-    plot_generic(options.dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 1.0)', 'Plaquette')
+    plot_generic(options.dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 1.0)', 'Plaquette', shift=options.shift, shift_amount=options.shift_amount)
+    plot_generic(options.dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 1.0)', 'Plaquette', shift=options.shift, shift_amount=options.shift_amount)
 
-    plot_generic(options.dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy', transform_delta_h)
-    plot_generic(options.dirname, 'deltaH-vs-md_time', 'MD Time', r'$\Delta H$', 'MD Energy', transform_delta_h_md_time)
+    plot_generic(options.dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy', transform_delta_h, shift=options.shift, shift_amount=options.shift_amount)
+    plot_generic(options.dirname, 'deltaH-vs-md_time', 'MD Time', r'$\Delta H$', 'MD Energy', transform_delta_h_md_time, shift=options.shift, shift_amount=options.shift_amount)
 
-    plot_generic(options.dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy (Zoom)', ax_transform=set_y_limits_delta_h, outname='deltaH-narrow')
+    plot_generic(options.dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy (Zoom)', ax_transform=set_y_limits_delta_h, outname='deltaH-narrow', shift=options.shift, shift_amount=options.shift_amount)
 
-    plot_generic(options.dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory')
+    plot_generic(options.dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory', shift=options.shift, shift_amount=options.shift_amount)
 
-    plot_generic(options.dirname, 'n_steps', 'Update Number', r'Step Count (coarsest time scale)', 'Integration Steps')
-    plot_generic(options.dirname, 'n_steps-vs-md_time', 'MD Time', r'Step Count (coarsest time scale)', 'Integration Steps')
+    plot_generic(options.dirname, 'n_steps', 'Update Number', r'Step Count (coarsest time scale)', 'Integration Steps', shift=options.shift, shift_amount=options.shift_amount)
+    plot_generic(options.dirname, 'n_steps-vs-md_time', 'MD Time', r'Step Count (coarsest time scale)', 'Integration Steps', shift=options.shift, shift_amount=options.shift_amount)
 
-    plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance')
-    plot_generic(options.dirname, 'tau0', 'Update Number', r'MD Step Size', 'MD Step Size')
+    plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance', shift=options.shift, shift_amount=options.shift_amount)
+    plot_generic(options.dirname, 'tau0', 'Update Number', r'MD Step Size', 'MD Step Size', shift=options.shift, shift_amount=options.shift_amount)
 
-    subprocess.check_call(['pdfunite'] + sorted(glob.glob('plot-*.pdf')) + ['plots.pdf'])
+    subprocess.check_call(['pdfunite'] + sorted(glob.glob('plot-*.pdf')) + [options.united_name])
 
 
 def set_y_limits_delta_h(ax):
-    ax.set_ylim(-0.5, 0.5)
+    ax.set_ylim(-1, 1)
 
 
 def plot_solver_iters():
@@ -171,9 +169,12 @@ def transform_delta_h_md_time(x, y):
     return x[sel], y[sel]
 
 
-def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (x, y), outname=None, ax_transform=None):
+def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (x, y), outname=None, ax_transform=None, shift=False, shift_amount=0.1):
     fig = pl.figure()
     ax = fig.add_subplot(1, 1, 1)
+
+    if shift:
+        xlabel += ' (shifted by {} per curve)'.format(shift_amount)
 
     for i, dirname in enumerate(dirnames):
         filename = os.path.join(dirname, 'extract-{}.tsv'.format(name))
@@ -186,7 +187,9 @@ def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (
         x = data[:, 0]
         y = data[:, 1]
         x, y = transform(x, y)
-        ax.plot(np.array(x) + 0.1 * i, y, marker='o', label=label, markersize=2)
+        if shift:
+            x = np.array(x) + shift_amount * i
+        ax.plot(x, y, marker='o', label=label, markersize=2)
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)

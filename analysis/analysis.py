@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
 import collections
@@ -38,6 +38,9 @@ def _parse_args():
     parser_visualize = subparsers.add_parser('visualize')
     parser_visualize.set_defaults(func=visualizers.main)
     parser_visualize.add_argument('dirname', nargs='+')
+    parser_visualize.add_argument('--shift', action='store_true', help='Shift the X values for better legibility')
+    parser_visualize.add_argument('--shift-amount', type=float, default=0.1, help='Shift per curve (default: %(default)s)')
+    parser_visualize.add_argument('--united-name', default='plots.pdf', help='Filename for combined PDF of all plots (default: %(default)s)')
 
     options = parser.parse_args()
     options.func(options)
