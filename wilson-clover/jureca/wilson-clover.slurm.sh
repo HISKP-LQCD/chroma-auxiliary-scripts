@@ -1,5 +1,5 @@
 #!/bin/bash -x
-# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
 #SBATCH --nodes=8
 #SBATCH --ntasks-per-node=1
@@ -18,7 +18,7 @@ last_restart=$(ls -rt | grep restart | grep xml | tail -n 1)
 # In case no restart file can be found, use the start file. The `-` means
 # “default”, the `:` means that an empty but defined variable still counts as
 # undefined. That is exactly what we want here.
-input=${last_restart:-hmc-wilson-clover.ini.xml}
+input=${last_restart:-hmc.ini.xml}
 
 # Set the approprite OpenMP variables for thread count and binding.
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}

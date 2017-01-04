@@ -216,14 +216,13 @@
               <AntiPeriodicT>true</AntiPeriodicT>
             </InvertParam>
             <RationalApprox>
-              <!--
               <ratApproxType>REMEZ</ratApproxType>
               <lowerMin>1.0e-3</lowerMin>
               <upperMax>33</upperMax>
               <numPower>-1</numPower>
               <denPower>4</denPower>
               <degree>16</degree>
-              -->
+              <!--
               <ratApproxType>READ_COEFFS</ratApproxType>
               <PFECoeffs>
                 <norm>0.1555998230003145</norm>
@@ -235,6 +234,7 @@
                 <res>-7.29056568824904e-06 -3.08449297938295e-05 -9.37710341257919e-05 -0.000264162081194322 -0.000727076084674794 -0.087366185888659 -2.76674191920454 -10.330167418357 -60.7697414728541 -1657.35364282683</res>
                 <pole>0.000130231892071377 0.000677702407873996 0.00201524287479766 0.00504156833792643 0.0117904629620992 0.02679983758094845985 21.0108066373413 67.6993629063764 496.579346046959</pole>
               </IPFECoeffs>
+              -->
             </RationalApprox>
           </ActionApprox>
           <ForceApprox>
@@ -251,14 +251,13 @@
               <AntiPeriodicT>true</AntiPeriodicT>
             </InvertParam>
             <RationalApprox>
-              <!--
               <ratApproxType>REMEZ</ratApproxType>
               <lowerMin>1.0e-3</lowerMin>
               <upperMax>33</upperMax>
               <numPower>-1</numPower>
               <denPower>2</denPower>
               <degree>14</degree>
-              -->
+              <!--
               <ratApproxType>READ_COEFFS</ratApproxType>
               <PFECoeffs>
                 <norm>0.02517732603611377</norm>
@@ -270,6 +269,7 @@
                 <res>-2.23452961610184e-06 -1.42439478447941e-05 -6.35310799261578e-05 -0.00025967481522029 -0.00103247483279225 -0.0040755357 -232.527272190937 -20404.0362904484</res>
                 <pole>0.000221064398288062 0.00107974589695072 0.00333542889962994 0.00898331702448543 0.0230214209006101 0.057886929220349853 628.465778925603</pole>
               </IPFECoeffs>
+              -->
             </RationalApprox>
           </ForceApprox>
         </Action>
