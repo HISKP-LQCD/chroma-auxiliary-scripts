@@ -20,11 +20,9 @@ import util
 def main(options):
     for dirname in options.dirname:
         transforms.convert_solver_iters(dirname)
+        transforms.prepare_solver_iters(dirname)
 
-    transforms.combine_solver_iters(options.dirname)
-    transforms.prepare_solver_iters()
-
-    plot_solver_iters()
+    plot_solver_iters(options.dirname)
     #plot_perf(options.dirname)
     #plot_perf_vs_sublattice(options.dirname)
 
@@ -51,15 +49,18 @@ def set_y_limits_delta_h(ax):
     ax.set_ylim(-1, 1)
 
 
-def plot_solver_iters():
+def plot_solver_iters(dirnames):
     fig, ax = util.make_figure()
 
-    files = glob.glob('extract-solver_iters-*.tsv')
+    for dirname in dirnames:
+        files = glob.glob(os.path.join(dirname, 'extract-solver_iters-*.tsv'))
 
-    for f in files:
-        x, y, yerr_down, yerr_up = util.load_columns(f)
-        m = re.match(r'extract-solver_iters-(.+?).tsv', f)
-        ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=m.group(1).replace('_', ' '))
+        for f in files:
+            x, y, yerr_down, yerr_up = util.load_columns(f)
+            m = re.search(r'extract-solver_iters-(.+?).tsv', f)
+            solver_name = m.group(1).replace('_', ' ')
+            label = '{}/{}'.format(os.path.basename(os.path.realpath(dirname)), solver_name)
+            ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=label)
 
     ax.set_title('Solver Iterations')
     ax.set_xlabel('Update Number')

@@ -62,27 +62,8 @@ def merge_dict_2(base, add):
             base[key1][key2] += val2
 
 
-def combine_solver_iters(dirnames):
-    all_data = collections.defaultdict(lambda: collections.defaultdict(list))
-
-    for dirname in dirnames:
-        filename = os.path.join(dirname, 'extract-solver_iters.json')
-
-        if not os.path.isfile(filename):
-            print('File is missing:', filename)
-            continue
-
-        with open(filename) as f:
-            data = json.load(f)
-
-        merge_dict_2(all_data, data)
-
-    with open('extract-solver_iters.json', 'w') as f:
-        json.dump(all_data, f)
-
-
-def prepare_solver_iters():
-    with open('extract-solver_iters.json') as f:
+def prepare_solver_iters(dirname):
+    with open(os.path.join(dirname, 'extract-solver_iters.json')) as f:
         data = json.load(f)
 
     for solver, tuples in sorted(data.items()):
@@ -90,7 +71,7 @@ def prepare_solver_iters():
         datas = [gflops for subgrid_volume, gflops in sorted(tuples.items())]
         y, yerr_down, yerr_up = percentiles(datas)
 
-        np.savetxt(util.make_safe_name('extract-solver_iters-{}.tsv'.format(solver)),
+        np.savetxt(os.path.join(dirname, util.make_safe_name('extract-solver_iters-{}.tsv'.format(solver))),
                    np.column_stack([x, y, yerr_down, yerr_up]))
 
 
