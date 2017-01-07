@@ -41,6 +41,12 @@ def iteration_converter(solver_data, update_data):
     gflops_dist = solver_data['iters']
     return get_percentiles(gflops_dist)
 
+
+def residual_converter(solver_data, update_data):
+    gflops_dist = solver_data['residuals']
+    return get_percentiles(gflops_dist)
+
+
 #subgrid_volume = update_data['subgrid_volume']
 
 
@@ -58,13 +64,21 @@ def convert_solver_list(dirname, converter, outname):
 
     for update_no, update_data in sorted(data.items()):
         for solver, solver_data in update_data['solvers'].items():
-            result = list(converter(solver_data, update_data))
+            try:
+                result = list(converter(solver_data, update_data))
+            except KeyError as e:
+                print(filename_in, e)
+                continue
+
             results[solver].append([float(update_no)] + result)
 
 
     for solver, solver_results in results.items():
-        np.savetxt(os.path.join(dirname, 'extract-solver-{}-{}.tsv'.format(util.make_safe_name(solver), outname)),
-                  solver_results)
+        if len(solver_results) > 0:
+            np.savetxt(os.path.join(
+                dirname,
+                'extract-solver-{}-{}.tsv'.format(util.make_safe_name(solver), outname)),
+                solver_results)
 
 
 def merge_dict_2(base, add):

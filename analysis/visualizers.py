@@ -25,6 +25,9 @@ def main(options):
         transforms.convert_solver_list(dirname,
                                        transforms.iteration_converter, 
                                        'iters')
+        transforms.convert_solver_list(dirname,
+                                       transforms.residual_converter, 
+                                       'residuals')
 
     plot_solver_iters(options.dirname)
     #plot_perf(options.dirname)
