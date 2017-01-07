@@ -30,7 +30,7 @@ def main(options):
                                        'residuals')
 
     plot_solver_data(options.dirname, 'iters', 'Solver Iterations')
-    plot_solver_data(options.dirname, 'gflops_per_node', 'GFLOP/s per Node')
+    plot_solver_data(options.dirname, 'gflops_per_node', 'GFLOP/s per Rank')
     plot_solver_data(options.dirname, 'residuals', 'Residuals', log_scale=True)
 
     plot_generic(options.dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 1.0)', 'Plaquette', shift=options.shift, shift_amount=options.shift_amount)
