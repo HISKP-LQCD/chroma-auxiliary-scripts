@@ -32,9 +32,9 @@ def get_percentiles(data):
 
 
 def gflops_per_node_converter(solver_data, update_data):
-    gflops_dist = solver_data['gflops']
+    gflops_dist = np.array(solver_data['gflops'])
     nodes = update_data['nodes']
-    return get_percentiles(gflops_dist)
+    return get_percentiles(gflops_dist / nodes)
 
 
 def iteration_converter(solver_data, update_data):

@@ -29,9 +29,9 @@ def main(options):
                                        transforms.residual_converter, 
                                        'residuals')
 
-    plot_solver_iters(options.dirname)
-    #plot_perf(options.dirname)
-    #plot_perf_vs_sublattice(options.dirname)
+    plot_solver_data(options.dirname, 'iters', 'Solver Iterations')
+    plot_solver_data(options.dirname, 'gflops_per_node', 'GFLOP/s per Node')
+    plot_solver_data(options.dirname, 'residuals', 'Residuals', log_scale=True)
 
     plot_generic(options.dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 1.0)', 'Plaquette', shift=options.shift, shift_amount=options.shift_amount)
     plot_generic(options.dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 1.0)', 'Plaquette', shift=options.shift, shift_amount=options.shift_amount)
@@ -56,24 +56,32 @@ def set_y_limits_delta_h(ax):
     ax.set_ylim(-1, 1)
 
 
-def plot_solver_iters(dirnames):
+def plot_solver_data(dirnames, key, ylabel, log_scale=False):
     fig, ax = util.make_figure()
 
     for dirname in dirnames:
-        files = glob.glob(os.path.join(dirname, 'extract-solver_iters-*.tsv'))
+        files = glob.glob(os.path.join(dirname, 'extract-solver-*-{}.tsv'.format(key)))
 
         for f in files:
             x, y, yerr_down, yerr_up = util.load_columns(f)
-            m = re.search(r'extract-solver_iters-(.+?).tsv', f)
+
+            m = re.search(r'extract-solver-(.+?)-{}.tsv'.format(key), f)
+            if not m:
+                continue
+
             solver_name = m.group(1).replace('_', ' ')
+
             label = '{}/{}'.format(os.path.basename(os.path.realpath(dirname)), solver_name)
             ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=label)
 
-    ax.set_title('Solver Iterations')
+    ax.set_title('Solver Data')
     ax.set_xlabel('Update Number')
-    ax.set_ylabel(r'Iteration Count')
+    ax.set_ylabel(ylabel)
 
-    util.save_figure(fig, 'plot-solver_iters-vs-update_no')
+    if log_scale:
+        ax.set_yscale('log')
+
+    util.save_figure(fig, 'plot-solver-{}-vs-update_no'.format(key))
 
 
 def plot_perf(dirnames):
