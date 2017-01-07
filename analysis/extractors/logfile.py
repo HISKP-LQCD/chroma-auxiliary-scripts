@@ -51,9 +51,9 @@ patterns_resiuals = {
 def main(options):
     pp = pprint.PrettyPrinter()
 
-    results = {}
-
     for dirname in options.dirname:
+        results = {}
+
         for filename in glob.glob(os.path.join(dirname, '*.out')):
             extractors.print_progress(filename)
 
