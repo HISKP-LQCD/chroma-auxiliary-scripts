@@ -17,18 +17,35 @@ PERCENTILE_LOW = 50 - 34.13
 PERCENTILE_HIGH = 50 + 34.13
 
 
-def percentiles(datas):
+def get_multiple_percentiles(datas):
     y = np.array([np.percentile(data, 50) for data in datas])
     yerr_down = y - np.array([np.percentile(data, PERCENTILE_LOW) for data in datas])
     yerr_up = np.array([np.percentile(data, PERCENTILE_HIGH) for data in datas]) - y
     return y, yerr_down, yerr_up
 
 
-def convert_solver_iters(dirname):
-    filename_in = os.path.join(dirname, 'extract-log.json')
-    filename_out = os.path.join(dirname, 'extract-solver_iters.json')
+def get_percentiles(data):
+    y = np.percentile(data, 50)
+    yerr_down = y - np.percentile(data, PERCENTILE_LOW)
+    yerr_up = np.percentile(data, PERCENTILE_HIGH) - y
+    return y, yerr_down, yerr_up
 
-    to_plot = collections.defaultdict(lambda: collections.defaultdict(list))
+
+def gflops_per_node_converter(solver_data, update_data):
+    gflops_dist = solver_data['gflops']
+    nodes = update_data['nodes']
+    return get_percentiles(gflops_dist)
+
+
+def iteration_converter(solver_data, update_data):
+    gflops_dist = solver_data['iters']
+    return get_percentiles(gflops_dist)
+
+#subgrid_volume = update_data['subgrid_volume']
+
+
+def convert_solver_list(dirname, converter, outname):
+    filename_in = os.path.join(dirname, 'extract-log.json')
 
     if not os.path.isfile(filename_in):
         print('File is missing:', filename_in)
@@ -37,23 +54,17 @@ def convert_solver_iters(dirname):
     with open(filename_in) as f:
         data = json.load(f)
 
+    results = collections.defaultdict(list)
+
     for update_no, update_data in sorted(data.items()):
-        nodes = update_data['nodes']
-        subgrid_volume = update_data['subgrid_volume']
-
         for solver, solver_data in update_data['solvers'].items():
-            try:
-                gflops = solver_data['gflops']
-                iters = solver_data['iters']
-            except KeyError:
-                print('filename_in:', filename_in)
-                print('keys:', solver_data.keys())
-                raise
+            result = list(converter(solver_data, update_data))
+            results[solver].append([float(update_no)] + result)
 
-            to_plot[solver][update_no] += iters
 
-    with open(filename_out, 'w') as f:
-        json.dump(to_plot, f)
+    for solver, solver_results in results.items():
+        np.savetxt(os.path.join(dirname, 'extract-solver-{}-{}.tsv'.format(util.make_safe_name(solver), outname)),
+                  solver_results)
 
 
 def merge_dict_2(base, add):

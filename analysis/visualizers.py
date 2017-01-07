@@ -19,8 +19,12 @@ import util
 
 def main(options):
     for dirname in options.dirname:
-        transforms.convert_solver_iters(dirname)
-        transforms.prepare_solver_iters(dirname)
+        transforms.convert_solver_list(dirname,
+                                       transforms.gflops_per_node_converter, 
+                                       'gflops_per_node')
+        transforms.convert_solver_list(dirname,
+                                       transforms.iteration_converter, 
+                                       'iters')
 
     plot_solver_iters(options.dirname)
     #plot_perf(options.dirname)
