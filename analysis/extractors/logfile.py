@@ -39,15 +39,25 @@ patterns_iterations = {
     'QPhiX Clover CG': re.compile(r'QPHIX_CLOVER_CG_SOLVER: (\d+) iters,.*'),
 }
 
+patterns_resiuals = {
+    #'invcg2': re.compile(r'CG_SOLVER: (\d+) iterations.*'),
+    #'minvcg': re.compile(r'MInvCG2: (\d+) iterations'),
+    'QPhiX Clover M-Shift CG': re.compile(r'shift[0]  Actual \|\| r \|\| / \|\| b \|\| = ([\d.e+-]+)'),
+    #'QPhiX Clover BICGSTAB': re.compile(r'QPHIX_CLOVER_BICGSTAB_SOLVER: (\d+) iters,.*'),
+    'QPhiX Clover CG': re.compile(r'QPHIX_CLOVER_CG_SOLVER: \|\| r \|\| / \|\| b \|\| = ([\d.e+-]+)'),
+}
+
 
 def main(options):
     pp = pprint.PrettyPrinter()
 
-    per_update = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.defaultdict(dict)))
+    results = {}
 
     for dirname in options.dirname:
         for filename in glob.glob(os.path.join(dirname, '*.out')):
             extractors.print_progress(filename)
+
+            common = {}
 
             bucket_before = []
             bucket_update = collections.defaultdict(list)
@@ -62,56 +72,57 @@ def main(options):
 
                     bucket.append(line)
 
-            results = {}
 
             for line in bucket_before:
                 for key, (transform, pattern) in patterns_before.items():
                     m = pattern.match(line)
                     if m:
-                        results[key] = transform(m.group(1))
-
-            all_gflops = {}
-            all_iters = {}
+                        common[key] = transform(m.group(1))
 
             for update_no, lines in sorted(bucket_update.items()):
-                gflops, iters = parse_update_block(lines)
-                all_gflops[update_no] = gflops
-                all_iters[update_no] = iters
+                results[update_no] = parse_update_block(lines)
 
-            for update_no, solver_data in all_gflops.items():
-                for key, val in results.items():
-                    per_update[update_no][key] = val
-                for solver, gflops in solver_data.items():
-                    per_update[update_no]['solvers'][solver]['gflops'] = gflops
+                # Copy common fields for each update.
+                for key, val in common.items():
+                    results[update_no][key] = val
 
-            for update_no, solver_data in all_iters.items():
-                for solver, iters in solver_data.items():
-                    per_update[update_no]['solvers'][solver]['iters'] = iters
 
         json_file = os.path.join(dirname, 'extract-log.json')
         with open(json_file, 'w') as f:
-            json.dump(per_update, f, indent=4, sort_keys=True)
+            json.dump(results, f, indent=4, sort_keys=True)
 
 
 def parse_update_block(lines):
-    results_gflops = collections.defaultdict(list)
-    results_iter = collections.defaultdict(list)
+    update_results = {
+        'solvers': collections.defaultdict(lambda: collections.defaultdict(list)),
+    }
 
     for line in lines:
         for solver, pattern in patterns_gflops.items():
             m = pattern.match(line)
             if m:
                 gflops = float(m.group(1))
-                results_gflops[solver].append(gflops)
+                update_results['solvers'][solver]['gflops'].append(gflops)
 
-    for line in lines:
         for solver, pattern in patterns_iterations.items():
             m = pattern.match(line)
             if m:
                 iters = float(m.group(1))
-                results_iter[solver].append(iters)
+                update_results['solvers'][solver]['iters'].append(iters)
 
-    return results_gflops, results_iter
+        for solver, pattern in patterns_resiuals.items():
+            m = pattern.search(line)
+            if m:
+                try:
+                    iters = float(m.group(1))
+                except TypeError:
+                    print(m)
+                    print(m.groups())
+                    raise
+                else:
+                    update_results['solvers'][solver]['residuals'].append(iters)
+
+    return update_results
     
 
 
