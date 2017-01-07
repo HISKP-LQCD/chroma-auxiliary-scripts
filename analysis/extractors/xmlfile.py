@@ -14,6 +14,9 @@ import extractors
 import transforms
 
 
+parser = etree.XMLParser(recover=False)
+
+
 def main(options):
     for dirname in options.dirname:
         process_directory(dirname)
@@ -55,7 +58,7 @@ def make_single_xpath_extractor(xpath):
 
         for xml_file in xml_files:
             try:
-                tree = etree.parse(xml_file)
+                tree = etree.parse(xml_file, parser)
             except etree.XMLSyntaxError as e:
                 print('XML file could not be loaded')
                 print(e)
@@ -92,7 +95,7 @@ def extract_xpath_from_all(xml_files, xpath):
 
     for xml_file in xml_files:
         try:
-            tree = etree.parse(xml_file)
+            tree = etree.parse(xml_file, parser)
         except etree.XMLSyntaxError as e:
             print('XML file could not be loaded')
             print(e)
