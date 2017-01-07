@@ -19,7 +19,10 @@ parser = etree.XMLParser(recover=False)
 
 def main(options):
     for dirname in options.dirname:
-        process_directory(dirname)
+        try:
+            process_directory(dirname)
+        except FileNotFoundError as e:
+            print(e)
 
 
 def process_directory(dirname):
