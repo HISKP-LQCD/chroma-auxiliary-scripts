@@ -312,7 +312,7 @@
       <tau0>1.0</tau0>
       <Integrator>
         <Name>LCM_STS_MIN_NORM_2</Name>
-        <n_steps>100</n_steps>
+        <n_steps>20</n_steps>
         <monomial_ids>
           <elem>light_det_ratio_1</elem>
         </monomial_ids>
