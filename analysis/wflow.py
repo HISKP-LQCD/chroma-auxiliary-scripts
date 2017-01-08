@@ -51,8 +51,8 @@ def convert_xml_to_tsv(xml_file):
 def compute_w(xml_file):
     t, spatial, temporal = util.load_columns(xml_file + '.tsv')
 
-    deriv_s = np.gradient(spatial, t)
-    deriv_t = np.gradient(temporal, t)
+    deriv_s = np.gradient(t**2 * spatial, t)
+    deriv_t = np.gradient(t**2 * temporal, t)
 
     w_s = deriv_s * t
     w_t = deriv_t * t
