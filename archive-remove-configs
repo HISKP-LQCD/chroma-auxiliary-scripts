@@ -4,19 +4,25 @@
 set -e
 set -u
 
-run="$PWD/${1%/}"
-dest="${2-$HOME/archived-logs/}"
-basename="${run##*/}"
-dirname="${run%/*}"
+dest="$HOME/archived-logs/"
 
-pushd "$run" > /dev/null
-rm -f ./*.lime hmc core.*
-popd > /dev/null
+for arg
+do
+    run="$PWD/${arg%/}"
+    basename="${run##*/}"
+    dirname="${run%/*}"
 
-pushd "$dirname" > /dev/null
-archive="$basename.tar.gz" 
-tar -czf "$archive" "$basename"
-mv "$archive" "$dest"
-popd > /dev/null
+    echo $arg
 
-rm -rf "$run"
+    pushd "$run" > /dev/null
+    rm -f ./*.lime hmc core.*
+    popd > /dev/null
+
+    pushd "$dirname" > /dev/null
+    archive="$basename.tar.gz" 
+    tar -czf "$archive" "$basename"
+    mv "$archive" "$dest"
+    popd > /dev/null
+
+    rm -rf "$run"
+done
