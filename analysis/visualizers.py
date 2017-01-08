@@ -62,7 +62,7 @@ def plot_solver_data(dirnames, key, ylabel, log_scale=False):
     for dirname in dirnames:
         files = glob.glob(os.path.join(dirname, 'extract-solver-*-{}.tsv'.format(key)))
 
-        for f in files:
+        for f in sorted(files):
             x, y, yerr_down, yerr_up = util.load_columns(f)
 
             m = re.search(r'extract-solver-(.+?)-{}.tsv'.format(key), f)
