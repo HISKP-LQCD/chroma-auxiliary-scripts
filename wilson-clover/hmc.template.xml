@@ -20,7 +20,7 @@
 {%- macro smear() -%}
 <FermState>
   <Name>STOUT_FERM_STATE</Name>
-  <rho>1.1</rho>
+  <rho>0.11</rho>
   <orthog_dir>-1</orthog_dir>
   <n_smear>6</n_smear>
   {{ boundary_conditions() }}
