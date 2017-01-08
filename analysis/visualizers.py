@@ -29,9 +29,9 @@ def main(options):
                                        transforms.residual_converter, 
                                        'residuals')
 
-    plot_solver_data(options.dirname, 'iters', 'Solver Iterations')
-    plot_solver_data(options.dirname, 'gflops_per_node', 'GFLOP/s per Rank')
-    plot_solver_data(options.dirname, 'residuals', 'Residuals', log_scale=True)
+    plot_solver_data(options.dirname, 'iters', 'Solver Iterations', 'Iterations')
+    plot_solver_data(options.dirname, 'gflops_per_node', 'GFLOP/s per Rank', 'Performance')
+    plot_solver_data(options.dirname, 'residuals', 'Residuals', 'Residuals', log_scale=True)
 
     plot_generic(options.dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 1.0)', 'Plaquette', shift=options.shift, shift_amount=options.shift_amount)
     plot_generic(options.dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 1.0)', 'Plaquette', shift=options.shift, shift_amount=options.shift_amount)
@@ -56,7 +56,7 @@ def set_y_limits_delta_h(ax):
     ax.set_ylim(-1, 1)
 
 
-def plot_solver_data(dirnames, key, ylabel, log_scale=False):
+def plot_solver_data(dirnames, key, ylabel, title='Solver Data', log_scale=False):
     fig, ax = util.make_figure()
 
     for dirname in dirnames:
@@ -74,7 +74,7 @@ def plot_solver_data(dirnames, key, ylabel, log_scale=False):
             label = '{}/{}'.format(os.path.basename(os.path.realpath(dirname)), solver_name)
             ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=label)
 
-    ax.set_title('Solver Data')
+    ax.set_title(title)
     ax.set_xlabel('Update Number')
     ax.set_ylabel(ylabel)
 
