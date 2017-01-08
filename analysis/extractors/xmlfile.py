@@ -138,6 +138,7 @@ def extract_xpath_from_all(xml_files, xpath):
 bits = {
     'w_plaq': make_xpath_extractor('.//w_plaq/text()'),
     'deltaH': make_xpath_extractor('.//deltaH/text()'),
+    'DeltaDeltaH': make_xpath_extractor('.//DeltaDeltaH/text()'),
     'seconds_for_trajectory': make_xpath_extractor('.//seconds_for_trajectory/text()'),
     'tau0': make_single_xpath_extractor('//hmc/Input/Params/HMCTrj/MDIntegrator/tau0/text()'),
     'n_steps': make_single_xpath_extractor('//hmc/Input/Params/HMCTrj/MDIntegrator/Integrator/n_steps/text()'),
