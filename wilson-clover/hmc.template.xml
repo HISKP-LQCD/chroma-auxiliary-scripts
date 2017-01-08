@@ -114,7 +114,7 @@
   <MCControl><!--[[[-->
 
     <Cfg>
-      <cfg_type>DISORDERED</cfg_type>
+      <cfg_type>WEAK_FIELD</cfg_type>
       <cfg_file>DUMMY</cfg_file>
     </Cfg>
 
