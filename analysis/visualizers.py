@@ -19,6 +19,8 @@ import util
 
 def main(options):
     for dirname in options.dirname:
+        transforms.delta_delta_h(dirname)
+
         transforms.convert_solver_list(dirname,
                                        transforms.gflops_per_node_converter, 
                                        'gflops_per_node')
@@ -48,6 +50,9 @@ def main(options):
 
     plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance', shift=options.shift, shift_amount=options.shift_amount)
     plot_generic(options.dirname, 'tau0', 'Update Number', r'MD Step Size', 'MD Step Size', shift=options.shift, shift_amount=options.shift_amount)
+
+    plot_generic(options.dirname, 'DeltaDeltaH', 'Update Number', r'$\Delta \Delta H$', 'Reversibility', shift=options.shift, shift_amount=options.shift_amount)
+    plot_generic(options.dirname, 'DeltaDeltaH_over_DeltaH', 'Update Number', r'$\Delta \Delta H / \Delta H$', 'Reversibility', shift=options.shift, shift_amount=options.shift_amount)
 
     subprocess.check_call(['pdfunite'] + sorted(glob.glob('plot-*.pdf')) + [options.united_name])
 
