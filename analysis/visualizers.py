@@ -81,7 +81,21 @@ def plot_solver_data(dirnames, key, ylabel, title='Solver Data', log_scale=False
     if log_scale:
         ax.set_yscale('log')
 
-    util.save_figure(fig, 'plot-solver-{}-vs-update_no'.format(key))
+    util.dandify_axes(ax)
+
+    if log_scale:
+        start, end = ax.get_ylim()
+        print(start, end)
+        print(end / start)
+        if end / start < 15:
+            start = 10**int(np.log10(start) - 1)
+            end = 10**int(np.log10(end) + 1)
+            print('{:.10g} {:.10g}'.format(start, end))
+            ax.set_ylim(start, end)
+
+    util.dandify_figure(fig)
+
+    fig.savefig('plot-solver-{}-vs-update_no.pdf'.format(key))
 
 
 def plot_perf(dirnames):
