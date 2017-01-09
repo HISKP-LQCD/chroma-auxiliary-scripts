@@ -233,7 +233,7 @@ popd
 
 repo=libxml2
 print-fancy-heading $repo
-clone-if-needed git://git.gnome.org/libxml2 $repo v2.9.4
+clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
 
 pushd $repo
 cflags="$base_cflags"
