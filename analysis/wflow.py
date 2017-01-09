@@ -14,9 +14,16 @@ import util
 def main(options):
     for xml_file in options.xml:
         convert_xml_to_tsv(xml_file)
-        root = find_root(xml_file)
-        print(root)
+        compute_t2_e(xml_file)
+
+        t0 = find_root(xml_file + '.t2e.tsv')
+        print('t0:', t0)
+
         compute_w(xml_file)
+
+        w0 = find_root(xml_file + '.w.tsv')
+        print('w0:', w0)
+
         visualize(xml_file, root=root)
 
 
@@ -25,69 +32,80 @@ def convert_xml_to_tsv(xml_file):
 
     results = tree.xpath('/WilsonFlow/wilson_flow_results')[0]
     wflow_step = results.xpath('wflow_step/text()')[0]
-    wflow_gact4i = results.xpath('wflow_gact4i/text()')[0]
     wflow_gactij = results.xpath('wflow_gactij/text()')[0]
 
     t = np.fromstring(wflow_step, sep=' ')
-    temporal = np.fromstring(wflow_gact4i, sep=' ')
-    spatial = np.fromstring(wflow_gactij, sep=' ')
+    e = np.fromstring(wflow_gactij, sep=' ')
+    e *= 8
+    np.savetxt(xml_file + '.e.tsv', np.column_stack([t, e]))
 
-    #temporal *= steps**2
-    #spatial *= steps**2
 
-    np.savetxt('{}.tsv'.format(xml_file),
-               np.column_stack([t, spatial, temporal]))
-
-    np.savetxt('{}.spatial.tsv'.format(xml_file),
-               np.column_stack([t, spatial]))
-    np.savetxt('{}.temporal.tsv'.format(xml_file),
-               np.column_stack([t, temporal]))
-    np.savetxt('{}.spatial-t2.tsv'.format(xml_file),
-               np.column_stack([t, spatial * t**2]))
-    np.savetxt('{}.temporal-t2.tsv'.format(xml_file),
-               np.column_stack([t, temporal * t**2]))
+def compute_t2_e(xml_file):
+    t, e = util.load_columns(xml_file + '.e.tsv')
+    np.savetxt(xml_file + '.t2e.tsv', np.column_stack([t, t**2 * e]))
 
 
 def compute_w(xml_file):
-    t, spatial, temporal = util.load_columns(xml_file + '.tsv')
-
-    deriv_s = np.gradient(t**2 * spatial, t)
-    deriv_t = np.gradient(t**2 * temporal, t)
-
-    w_s = deriv_s * t
-    w_t = deriv_t * t
-
-    np.savetxt(xml_file + '.w_s.tsv', np.column_stack([t, w_s]))
-    np.savetxt(xml_file + '.w_t.tsv', np.column_stack([t, w_t]))
+    t, e = util.load_columns(xml_file + '.e.tsv')
+    #w = t * np.gradient(t**2 * e, t)
+    w = t * (2*t * e + t**2 * np.gradient(e, t))
+    np.savetxt(xml_file + '.w.tsv', np.column_stack([t, w]))
 
 
-def find_root(xml_file, threshold=0.3):
-    t, spatial, temporal = util.load_columns(xml_file + '.tsv')
-
-    x, y = interpolate_root(t, spatial - threshold)
+def find_root(tsv_file, threshold=0.3):
+    t, t2e = util.load_columns(tsv_file)
+    x, y = interpolate_root(t, t2e - threshold)
     return (x, y + threshold)
 
 
 def interpolate_root(x, y):
     f = scipy.interpolate.interp1d(x, y)
-    root = scipy.optimize.brentq(f, np.min(x), np.max(y))
+    root = scipy.optimize.brentq(f, np.min(x), np.min(x[y > 0]))
     return root, f(root)
 
 
 def visualize(xml_file, root=None):
-    t, spatial, temporal = util.load_columns(xml_file + '.tsv')
+    t, t2e = util.load_columns(xml_file + '.t2e.tsv')
 
-    fig, ax = util.make_figure()
+    fig = pl.figure(figsize=(16, 9))
+    ax1 = fig.add_subplot(1, 2, 1)
+    ax2 = fig.add_subplot(2, 2, 2)
+    ax3 = fig.add_subplot(2, 2, 4)
 
-    ax.plot(t, spatial, label='spatial')
-    ax.plot(t, temporal, label='temporal')
-    ax.plot(t, np.ones(t.shape) * 0.3, label='threshold')
+    ax1.plot(t, t2e)
+    ax1.plot(t, np.ones(t.shape) * 0.3)
 
     if root is not None:
-        circle = pl.Circle(root, 0.04, fill=False)
-        ax.add_artist(circle)
+        x, y = root
 
-    ax.set_xlabel('Wilson Flow Time')
-    ax.set_ylabel('wflow_gact value from Chroma')
+        #ax2 = pl.axes([.65, .6, .3, .3], axisbg='0.9')
+        ax2.plot(t, t2e, marker='o')
+        ax2.plot(t, np.ones(t.shape) * 0.3)
 
-    util.save_figure(fig, xml_file + '.tsv')
+        sel = t < 3 * x
+        ax3.plot(t[sel], t2e[sel])
+        ax3.plot(t[sel], np.ones(t[sel].shape) * 0.3)
+
+        ax1.plot([x], [y], marker='o', alpha=0.3, color='red', markersize=20)
+        ax2.plot([x], [y], marker='o', alpha=0.3, color='red', markersize=20)
+        ax3.plot([x], [y], marker='o', alpha=0.3, color='red', markersize=20)
+
+        ax2.set_xlim(0.7 * x, 1.3 * x)
+        ax2.set_ylim(0.22, 0.38)
+
+    #ax2.locator_params(nbins=6)
+    #ax3.locator_params(nbins=6)
+
+    ax1.set_title('All Computed Data')
+    ax2.set_title('Interpolation')
+    ax3.set_title('First $3 t_0$')
+
+    for ax in [ax1, ax2, ax3]:
+        ax.set_xlabel('Wilson Flow Time $t$')
+        ax.set_ylabel(r'$t^2 \langle E \rangle$')
+
+        util.dandify_axes(ax)
+
+    util.dandify_figure(fig)
+
+    fig.savefig(xml_file + '.t2e.pdf')
