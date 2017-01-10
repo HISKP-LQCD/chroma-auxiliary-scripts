@@ -45,3 +45,13 @@ def save_figure(fig, name):
 
     fig.savefig('{}.pdf'.format(name))
     fig.savefig('{}.png'.format(name))
+
+
+def ignore_missing_files(function):
+    def wrapped(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except FileNotFoundError as e:
+            print('File not found:', e)
+
+    return wrapped

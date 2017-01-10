@@ -148,6 +148,7 @@ def convert_tau0_to_md_time(dirname):
                np.column_stack([update_no, md_time]))
 
 
+@util.ignore_missing_files
 def delta_delta_h(dirname):
     update_no_ddh, ddh = util.load_columns(os.path.join(dirname, 'extract-DeltaDeltaH.tsv'))
     update_no_dh, dh = util.load_columns(os.path.join(dirname, 'extract-deltaH.tsv'))
