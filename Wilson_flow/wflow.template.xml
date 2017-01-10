@@ -22,7 +22,7 @@ Wilson flow.
                 </Param>
 
                 <NamedObject>
-                    <gauge_id>default_gauge_field</gauge_id>
+                    <gauge_in>default_gauge_field</gauge_in>
                     <gauge_out>flowed_gauge_field</gauge_out>
                 </NamedObject>
 
