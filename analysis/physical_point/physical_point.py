@@ -33,6 +33,9 @@ def main():
     m_pi_sq_dist = [
         (a_inv * a_m_pi)**2
         for a_inv, a_m_pi in zip(a_inv_dist, a_m_pi_dist)]
+    m_pi_dist = [
+        np.sqrt(m_pi)
+        for m_pi in m_pi_dist]
 
     popt_dist = [
         op.curve_fit(gmor, x, m_pi_sq)[0]
@@ -49,13 +52,14 @@ def main():
 
     phys_val, phys_err = bootstrap.average_and_std_arrays(phys_dist)
     fit_y_val, fit_y_err = bootstrap.average_and_std_arrays(fit_y_dist)
+    m_pi_val, m_pi_err = bootstrap.average_and_std_arrays(m_pi_dist)
 
     print(phys_val, phys_err)
 
     fig, ax = util.make_figure()
     ax.fill_between(fit_x, fit_y_val - fit_y_err, fit_y_val + fit_y_err, color='0.8')
     ax.plot(fit_x, fit_y_val, color='gray')
-    ax.errorbar(x, a_m_pi_val, yerr=a_m_pi_err, color='blue', marker='+')
+    ax.errorbar(x, m_pi_val, yerr=m_pi_err, color='blue', marker='+')
     ax.errorbar([phys_val], [135], xerr=[phys_err], marker='+', color='red')
     util.save_figure(fig, 'GMOR')
 
