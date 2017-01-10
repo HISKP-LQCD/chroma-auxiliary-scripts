@@ -9,6 +9,7 @@ import itertools
 import matplotlib.pyplot as pl
 import numpy as np
 import scipy.optimize as op
+from unitprint import siunitx
 
 import bootstrap
 import util
@@ -20,7 +21,7 @@ def gmor(a_m_ud, c_1, c_2):
 
 def main():
     options = _parse_args()
-    R = 200
+    R = 1000
 
     a_inv_val = 1616
     a_inv_err = 20
@@ -35,7 +36,7 @@ def main():
         for a_inv, a_m_pi in zip(a_inv_dist, a_m_pi_dist)]
     m_pi_dist = [
         np.sqrt(m_pi)
-        for m_pi in m_pi_dist]
+        for m_pi in m_pi_sq_dist]
 
     popt_dist = [
         op.curve_fit(gmor, x, m_pi_sq)[0]
@@ -50,18 +51,32 @@ def main():
         np.sqrt(gmor(fit_x, *popt))
         for popt in popt_dist]
 
-    phys_val, phys_err = bootstrap.average_and_std_arrays(phys_dist)
-    fit_y_val, fit_y_err = bootstrap.average_and_std_arrays(fit_y_dist)
-    m_pi_val, m_pi_err = bootstrap.average_and_std_arrays(m_pi_dist)
+    phys_cen, phys_val, phys_err = bootstrap.average_and_std_arrays(phys_dist)
+    fit_y_cen, fit_y_val, fit_y_err = bootstrap.average_and_std_arrays(fit_y_dist)
+    m_pi_cen, m_pi_val, m_pi_err = bootstrap.average_and_std_arrays(m_pi_dist)
 
-    print(phys_val, phys_err)
+    print(siunitx(phys_cen, phys_err))
 
-    fig, ax = util.make_figure()
+    fig = pl.figure()
+    ax = fig.add_subplot(2, 1, 1)
     ax.fill_between(fit_x, fit_y_val - fit_y_err, fit_y_val + fit_y_err, color='0.8')
-    ax.plot(fit_x, fit_y_val, color='gray')
-    ax.errorbar(x, m_pi_val, yerr=m_pi_err, color='blue', marker='+')
-    ax.errorbar([phys_val], [135], xerr=[phys_err], marker='+', color='red')
-    util.save_figure(fig, 'GMOR')
+    ax.plot(fit_x, fit_y_val, color='black', label='GMOR Fit')
+    ax.errorbar(x, m_pi_val, yerr=m_pi_err, color='blue', marker='+', linestyle='none', label='Data')
+    ax.errorbar([phys_cen], [135], xerr=[phys_err], marker='+', color='red', label='Extrapolation')
+    ax.set_title('Extrapolation to the Physical Point')
+    ax.set_xlabel(r'$a m_\mathrm{ud}$')
+    ax.set_ylabel(r'$M_\pi / \mathrm{MeV}$')
+    util.dandify_axes(ax)
+
+    ax = fig.add_subplot(2, 1, 2)
+    ax.hist(phys_dist - phys_cen, bins=50)
+    ax.locator_params(nbins=6)
+    ax.set_title('Bootstrap Bias')
+    ax.set_xlabel(r'$(a m_\mathrm{ud}^\mathrm{phys})^* - a m_\mathrm{ud}^\mathrm{phys}$')
+    util.dandify_axes(ax)
+
+    util.dandify_figure(fig)
+    fig.savefig('GMOR.pdf')
 
 
 def _parse_args():

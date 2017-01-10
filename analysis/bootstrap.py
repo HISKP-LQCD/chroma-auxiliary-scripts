@@ -24,12 +24,12 @@ def save_hist(dist, filename):
 def make_dist(val, err, n=50):
     # TODO Make this work nicer with arrays.
     if isinstance(val, (float, int)):
-        dist = np.array([random.gauss(val, err) for i in range(n)])
+        dist = np.array([val] + [random.gauss(val, err) for i in range(n)])
     elif isinstance(val, (np.ndarray, list)):
         dist = []
         for v, e in zip(val, err):
             dist.append([random.gauss(v, e) for i in range(n)])
-        dist = zip(*dist)
+        dist = [val] + list(zip(*dist))
         dist = map(np.array, dist)
 
     else:
@@ -74,10 +74,11 @@ def average_and_std_arrays(arrays):
     '''
     total = np.array(arrays)
     
-    val = np.mean(total, axis=0)
-    err = np.std(total, axis=0)
+    cen = total[0,]
+    val = np.mean(total[1:,], axis=0)
+    err = np.std(total[1:,], axis=0)
 
-    return val, err
+    return cen, val, err
 
 
 def percentile_arrays(arrays, value=None, interval=68.3):
