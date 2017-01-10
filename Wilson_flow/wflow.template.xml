@@ -30,9 +30,9 @@ Wilson flow.
                 <Frequency>1</Frequency>
                 <Param>
                     <version>2</version>
-                    <nstep>100</nstep>
-                    <wtime>1.0</wtime>
-                    <t_dir>3</t_dir>
+                    <nstep>500</nstep>
+                    <wtime>5</wtime>
+                    <t_dir>5</t_dir>
                 </Param>
 
                 <NamedObject>
