@@ -16,7 +16,7 @@ jobscript_text = r'''#!/bin/bash
 #SBATCH --time=02:00:00
 #SBATCH --partition=devel
 #SBATCH --cpus-per-task=24
-#SBATCH --output={{ basename }}.slurm-%j.out.txt
+#SBATCH --output={{ basename }}.wflow.slurm-%j.out.txt
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ueding@hiskp.uni-bonn.de
 
