@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
 import os
 
@@ -13,9 +13,12 @@ except ImportError:
 
 from . import logfile
 from . import xmlfile
+import wflow
 
 
 def main(options):
+    for dirname in options.dirname:
+        wflow.process_directory(dirname)
     xmlfile.main(options)
     logfile.main(options)
 

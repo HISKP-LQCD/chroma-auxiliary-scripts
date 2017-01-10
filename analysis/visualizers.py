@@ -54,6 +54,9 @@ def main(options):
     plot_generic(options.dirname, 'DeltaDeltaH', 'Update Number', r'$\Delta \Delta H$', 'Reversibility', shift=options.shift, shift_amount=options.shift_amount)
     plot_generic(options.dirname, 'DeltaDeltaH_over_DeltaH', 'Update Number', r'$\Delta \Delta H / \Delta H$', 'Reversibility', shift=options.shift, shift_amount=options.shift_amount)
 
+    plot_generic(options.dirname, 't0', 'Update Number', r'$t_0$', 'Wilson Flow Scale Setting', shift=options.shift, shift_amount=options.shift_amount)
+    plot_generic(options.dirname, 'w0', 'Update Number', r'$w_0$', 'Wilson Flow Scale Setting', shift=options.shift, shift_amount=options.shift_amount)
+
     subprocess.check_call(['pdfunite'] + sorted(glob.glob('plot-*.pdf')) + [options.united_name])
 
 

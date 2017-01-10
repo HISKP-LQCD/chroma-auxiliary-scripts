@@ -3,6 +3,9 @@
 
 # Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
+import glob
+import os
+
 from lxml import etree
 import matplotlib.pyplot as pl
 import numpy as np
@@ -10,6 +13,7 @@ import scipy.interpolate
 import scipy.optimize
 
 import util
+
 
 def main(options):
     for xml_file in options.xml:
@@ -25,6 +29,46 @@ def main(options):
         print('w0:', w0)
 
         visualize(xml_file, root=root)
+
+
+def process_directory(dirname):
+    t0s = []
+    w0s = []
+
+    for xml_file in sorted(glob.glob(os.path.join(dirname, '*.wflow.xml'))):
+        print(xml_file)
+
+        try:
+            convert_xml_to_tsv(xml_file)
+        except etree.XMLSyntaxError as e:
+            print(e)
+            continue
+
+        compute_t2_e(xml_file)
+        compute_w(xml_file)
+
+        try:
+            t0 = find_root(xml_file + '.t2e.tsv')[0]
+            w0 = find_root(xml_file + '.w.tsv')[0]
+        except ValueError as e:
+            print(e)
+            continue
+
+        tree = etree.parse(xml_file)
+        results = tree.xpath('//StartUpdateNum/text()')
+        assert len(results) == 1, results
+        update_no = float(results[0])
+
+        t0s.append((update_no, t0))
+        w0s.append((update_no, w0))
+
+    t0s.sort()
+    w0s.sort()
+
+    print(w0s)
+
+    np.savetxt(os.path.join(dirname, 'extract-t0.tsv'), t0s)
+    np.savetxt(os.path.join(dirname, 'extract-w0.tsv'), w0s)
 
 
 def convert_xml_to_tsv(xml_file):
@@ -60,7 +104,7 @@ def find_root(tsv_file, threshold=0.3):
 
 def interpolate_root(x, y):
     f = scipy.interpolate.interp1d(x, y)
-    root = scipy.optimize.brentq(f, np.min(x), np.min(x[y > 0]))
+    root = scipy.optimize.brentq(f, np.min(x[1:]), np.min(x[y > 0]))
     return root, f(root)
 
 
