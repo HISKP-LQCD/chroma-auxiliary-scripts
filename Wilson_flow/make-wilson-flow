@@ -16,6 +16,7 @@ jobscript_text = r'''#!/bin/bash
 #SBATCH --time=02:00:00
 #SBATCH --partition=devel
 #SBATCH --cpus-per-task=24
+#SBATCH --output={{ basename }}.slurm-%j.out.txt
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ueding@hiskp.uni-bonn.de
 
@@ -56,6 +57,7 @@ def main():
         )
         slurm_rendered = slurm_template.render(
             chroma_input=filename_chroma_input,
+            basename=basename,
         )
 
         print('Writing {} …'.format(filename_chroma_input))
