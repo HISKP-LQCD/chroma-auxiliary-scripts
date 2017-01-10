@@ -48,8 +48,8 @@ def main():
         base, ext = os.path.splitext(basename)
 
         filename_xml = '{}.wflow.xml'.format(base)
-        filename_chroma_input = '{}.wflow.chroma-ini.xml'.format(os.path.join(dirname, base))
-        filename_slurm_input = '{}.wflow.slurm.sh'.format(os.path.join(dirname, base))
+        filename_chroma_input = '{}.wflow.chroma-ini.xml'.format(base)
+        filename_slurm_input = '{}.wflow.slurm.sh'.format(base)
 
         chroma_rendered = chroma_template.render(
             config_in_file=gauge_config,
