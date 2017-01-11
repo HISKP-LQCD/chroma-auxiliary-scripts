@@ -46,6 +46,10 @@ def main():
         op.newton(lambda a_m: gmor(a_m, *popt) - 135**2, np.min(x))
         for popt in popt_dist]
 
+    m240_dist = [
+        op.newton(lambda a_m: gmor(a_m, *popt) - 240**2, np.min(x))
+        for popt in popt_dist]
+
     fit_x = np.linspace(np.min(phys_dist), np.max(x), 100)
     fit_y_dist = [
         np.sqrt(gmor(fit_x, *popt))
@@ -54,8 +58,10 @@ def main():
     phys_cen, phys_val, phys_err = bootstrap.average_and_std_arrays(phys_dist)
     fit_y_cen, fit_y_val, fit_y_err = bootstrap.average_and_std_arrays(fit_y_dist)
     m_pi_cen, m_pi_val, m_pi_err = bootstrap.average_and_std_arrays(m_pi_dist)
+    m240_cen, m240_val, m240_err = bootstrap.average_and_std_arrays(m240_dist)
 
-    print(siunitx(phys_cen, phys_err))
+    print('135 MeV:', siunitx(phys_cen, phys_err))
+    print('240 MeV:', siunitx(m240_cen, m240_err))
 
     fig = pl.figure()
     ax = fig.add_subplot(2, 1, 1)
@@ -63,6 +69,7 @@ def main():
     ax.plot(fit_x, fit_y_val, color='black', label='GMOR Fit')
     ax.errorbar(x, m_pi_val, yerr=m_pi_err, color='blue', marker='+', linestyle='none', label='Data')
     ax.errorbar([phys_cen], [135], xerr=[phys_err], marker='+', color='red', label='Extrapolation')
+    ax.errorbar([m240_cen], [240], xerr=[phys_err], marker='+', color='red')
     ax.set_title('Extrapolation to the Physical Point')
     ax.set_xlabel(r'$a m_\mathrm{ud}$')
     ax.set_ylabel(r'$M_\pi / \mathrm{MeV}$')
