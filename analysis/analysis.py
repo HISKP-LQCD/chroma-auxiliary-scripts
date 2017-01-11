@@ -12,6 +12,7 @@ import matplotlib.pyplot as pl
 import numpy as np
 import scipy.optimize as op
 
+import correlators
 import extractors
 import visualizers
 import wflow
@@ -46,6 +47,10 @@ def _parse_args():
     parser_wflow = subparsers.add_parser('wflow')
     parser_wflow.set_defaults(func=wflow.main)
     parser_wflow.add_argument('xml', nargs='+')
+
+    parser_corr = subparsers.add_parser('corr')
+    parser_corr.set_defaults(func=correlators.main)
+    parser_corr.add_argument('dirname', nargs='+')
 
     options = parser.parse_args()
     options.func(options)
