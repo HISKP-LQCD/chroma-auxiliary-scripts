@@ -16,7 +16,7 @@ jobscript_text = r'''#!/bin/bash
 #SBATCH --time=02:00:00
 #SBATCH --partition=batch
 #SBATCH --cpus-per-task=24
-#SBATCH --output={{ base }}.wflow.slurm-%j.out.txt
+#SBATCH --output={{ base }}.corr.slurm-%j.out.txt
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ueding@hiskp.uni-bonn.de
 
@@ -38,7 +38,7 @@ def main():
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(".")
     )
-    chroma_template = env.get_template('wflow.template.xml')
+    chroma_template = env.get_template('pion-correlator.template.xml')
     slurm_template = jinja2.Template(jobscript_text)
 
     for gauge_config in options.gauge_config:
@@ -47,9 +47,9 @@ def main():
         dirname = os.path.dirname(gauge_config)
         base, ext = os.path.splitext(basename)
 
-        filename_xml = '{}.wflow.xml'.format(base)
-        filename_chroma_input = '{}.wflow.chroma-ini.xml'.format(base)
-        filename_slurm_input = '{}.wflow.slurm.sh'.format(base)
+        filename_xml = '{}.corr.xml'.format(base)
+        filename_chroma_input = '{}.corr.chroma-ini.xml'.format(base)
+        filename_slurm_input = '{}.corr.slurm.sh'.format(base)
 
         chroma_rendered = chroma_template.render(
             config_in_file=gauge_config,
