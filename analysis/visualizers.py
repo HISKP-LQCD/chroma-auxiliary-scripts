@@ -22,14 +22,11 @@ def main(options):
         transforms.delta_delta_h(dirname)
 
         transforms.convert_solver_list(dirname,
-                                       transforms.gflops_per_node_converter, 
-                                       'gflops_per_node')
+                                       transforms.gflops_per_node_converter, 'gflops_per_node')
         transforms.convert_solver_list(dirname,
-                                       transforms.iteration_converter, 
-                                       'iters')
+                                       transforms.iteration_converter, 'iters')
         transforms.convert_solver_list(dirname,
-                                       transforms.residual_converter, 
-                                       'residuals')
+                                       transforms.residual_converter, 'residuals')
 
     plot_solver_data(options.dirname, 'iters', 'Solver Iterations', 'Iterations')
     plot_solver_data(options.dirname, 'gflops_per_node', 'GFLOP/s per Rank', 'Performance')

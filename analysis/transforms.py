@@ -102,6 +102,21 @@ def merge_dict_2(base, add):
             base[key1][key2] += val2
 
 
+def merge_tsv_shards(shard_names, merged_name):
+    all_data = [
+        data
+        for data in map(np.atleast_2d, map(np.loadtxt, shard_names))
+        if data.shape[1] > 0]
+
+    print(all_data)
+    if len(all_data) == 0:
+        merged = []
+    else:
+        merged = np.row_stack(all_data)
+
+    np.savetxt(merged_name, merged)
+
+
 def prepare_solver_iters(dirname):
     with open(os.path.join(dirname, 'extract-solver_iters.json')) as f:
         data = json.load(f)
