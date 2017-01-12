@@ -180,11 +180,13 @@ def convert_tau0_to_md_time(dirname):
 
 
 def delta_delta_h(dirname):
+    result = []
+
     try:
         update_no_ddh, ddh = util.load_columns(os.path.join(dirname, 'extract-DeltaDeltaH.tsv'))
         update_no_dh, dh = util.load_columns(os.path.join(dirname, 'extract-deltaH.tsv'))
     except ValueError:
-        result = []
+        pass
     else:
         for i, update_no in enumerate(update_no_ddh):
             j = np.where(update_no == update_no_dh)[0][0]
