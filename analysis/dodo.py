@@ -80,21 +80,11 @@ def task_xpath_shards():
             }
 
 
-def plot_generic(dirname, name, *args, **kwargs):
-    return {
-        'actions': [(visualizers.plot_generic, [[dirname], name] + list(args), kwargs)],
-        'name': dirname + '/' + name,
-        'file_dep': [os.path.join(dirname, 'extract-{}.tsv'.format(name))],
-        'targets': [os.path.join(dirname, 'plot-{}.pdf'.format(name))],
-    }
-
-
 def task_convert_delta_delta_h():
     for dirname in directories:
         in_files = [os.path.join(dirname, 'extract-DeltaDeltaH.tsv'),
                     os.path.join(dirname, 'extract-deltaH.tsv')]
         out_file = os.path.join(dirname, 'extract-DeltaDeltaH_over_DeltaH.tsv')
-
         yield {
             'actions': [(transforms.delta_delta_h, [dirname])],
             'name': dirname,
@@ -107,7 +97,6 @@ def task_convert_time_to_minutes():
     for dirname in directories:
         in_files = [os.path.join(dirname, 'extract-seconds_for_trajectory.tsv')]
         out_files = [os.path.join(dirname, 'extract-minutes_for_trajectory.tsv')]
-
         yield {
             'actions': [(transforms.convert_time_to_minutes, [dirname])],
             'name': dirname,
@@ -115,6 +104,26 @@ def task_convert_time_to_minutes():
             'targets': out_files,
         }
 
+
+def task_convert_t0_to_md_time():
+    for dirname in directories:
+        in_files = [os.path.join(dirname, 'extract-tau0.tsv')]
+        out_files = [os.path.join(dirname, 'extract-md_time.tsv')]
+        yield {
+            'actions': [(transforms.convert_tau0_to_md_time, [dirname])],
+            'name': dirname,
+            'file_dep': in_files,
+            'targets': out_files,
+        }
+
+
+def plot_generic(dirname, name, *args, **kwargs):
+    return {
+        'actions': [(visualizers.plot_generic, [[dirname], name] + list(args), kwargs)],
+        'name': dirname + '/' + name,
+        'file_dep': [os.path.join(dirname, 'extract-{}.tsv'.format(name))],
+        'targets': [os.path.join(dirname, 'plot-{}.pdf'.format(name))],
+    }
 
 
 def task_make_plot():
@@ -130,7 +139,7 @@ def task_make_plot():
         yield plot_generic(dirname, 'n_steps', 'Update Number', r'Step Count (coarsest time scale)', 'Integration Steps')
         #yield plot_generic(dirname, 'n_steps-vs-md_time', 'MD Time', r'Step Count (coarsest time scale)', 'Integration Steps')
 
-        #yield plot_generic(dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance')
+        yield plot_generic(dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance')
         yield plot_generic(dirname, 'tau0', 'Update Number', r'MD Step Size', 'MD Step Size')
 
         yield plot_generic(dirname, 'DeltaDeltaH', 'Update Number', r'$\Delta \Delta H$', 'Reversibility')
