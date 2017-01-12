@@ -10,6 +10,7 @@ import os
 import extractors
 import transforms
 import visualizers
+import wflow
 
 os.chdir('/home/mu/Dokumente/Studium/Master_Science_Physik/Masterarbeit/Runs')
 
@@ -112,6 +113,27 @@ def task_convert_t0_to_md_time():
                                     'extract-tau0.tsv',
                                     'extract-md_time.tsv')
 
+def task_wflow_xml_to_tsv():
+    for dirname in directories:
+        shard_names = []
+        for xml_file in glob.glob(os.path.join(dirname, 'wflow.config-*.out.xml')):
+            file_e = wflow.get_xml_shard_name(xml_file, 'e')
+            file_t2e = wflow.get_xml_shard_name(xml_file, 't2e')
+            file_w = wflow.get_xml_shard_name(xml_file, 'w')
+            yield make_single_transform(dirname,
+                                        wflow.convert_xml_to_tsv,
+                                        os.path.basename(xml_file),
+                                        os.path.basename(file_e))
+            yield make_single_transform(dirname,
+                                        wflow.compute_t2_e,
+                                        os.path.basename(file_e),
+                                        os.path.basename(file_t2e))
+            yield make_single_transform(dirname,
+                                        wflow.compute_w,
+                                        os.path.basename(file_e),
+                                        os.path.basename(file_w))
+
+
 
 def make_single_transform(dirname, function, file_in, file_out):
     path_in = os.path.join(dirname, file_in)
@@ -122,7 +144,6 @@ def make_single_transform(dirname, function, file_in, file_out):
         'file_dep': [path_in],
         'targets': [path_out],
     }
-
 
 
 def plot_generic(dirname, name, *args, **kwargs):

@@ -71,9 +71,10 @@ def process_directory(dirname):
     np.savetxt(os.path.join(dirname, 'extract-w0.tsv'), w0s)
 
 
-def convert_xml_to_tsv(xml_file):
-    tree = etree.parse(xml_file)
+def convert_xml_to_tsv(path_in, path_out):
+    tree = etree.parse(path_in)
 
+    print(path_in)
     results = tree.xpath('/WilsonFlow/wilson_flow_results')[0]
     wflow_step = results.xpath('wflow_step/text()')[0]
     wflow_gactij = results.xpath('wflow_gactij/text()')[0]
@@ -81,19 +82,19 @@ def convert_xml_to_tsv(xml_file):
     t = np.fromstring(wflow_step, sep=' ')
     e = np.fromstring(wflow_gactij, sep=' ')
     e *= 8
-    np.savetxt(xml_file + '.e.tsv', np.column_stack([t, e]))
+    np.savetxt(path_out, np.column_stack([t, e]))
 
 
-def compute_t2_e(xml_file):
-    t, e = util.load_columns(xml_file + '.e.tsv')
-    np.savetxt(xml_file + '.t2e.tsv', np.column_stack([t, t**2 * e]))
+def compute_t2_e(path_in, path_out):
+    t, e = util.load_columns(path_in)
+    np.savetxt(path_out, np.column_stack([t, t**2 * e]))
 
 
-def compute_w(xml_file):
-    t, e = util.load_columns(xml_file + '.e.tsv')
+def compute_w(path_in, path_out):
+    t, e = util.load_columns(path_in)
     #w = t * np.gradient(t**2 * e, t)
     w = t * (2*t * e + t**2 * np.gradient(e, t))
-    np.savetxt(xml_file + '.w.tsv', np.column_stack([t, w]))
+    np.savetxt(path_out, np.column_stack([t, w]))
 
 
 def find_root(tsv_file, threshold=0.3):
@@ -153,3 +154,9 @@ def visualize(xml_file, root=None):
     util.dandify_figure(fig)
 
     fig.savefig(xml_file + '.t2e.pdf')
+
+
+def get_xml_shard_name(xml_file, key):
+    dirname = os.path.dirname(xml_file)
+    basename = os.path.basename(xml_file)
+    return os.path.join(dirname, 'shard-{}.{}.tsv'.format(basename, key))
