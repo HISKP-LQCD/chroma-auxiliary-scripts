@@ -167,16 +167,11 @@ def convert_time_to_minutes(dirname):
                np.column_stack([update_no, seconds / 60]))
 
 
-def convert_tau0_to_md_time(dirname):
-    file_in = os.path.join(dirname, 'extract-tau0.tsv')
-
+def convert_tau0_to_md_time(file_in, file_out):
     update_no, tau0 = util.load_columns(file_in)
     md_time = np.cumsum(tau0)
-
     assert tau0.shape == md_time.shape
-
-    np.savetxt(os.path.join(dirname, 'extract-md_time.tsv'),
-               np.column_stack([update_no, md_time]))
+    np.savetxt(file_out, np.column_stack([update_no, md_time]))
 
 
 def delta_delta_h(dirname):

@@ -107,14 +107,22 @@ def task_convert_time_to_minutes():
 
 def task_convert_t0_to_md_time():
     for dirname in directories:
-        in_files = [os.path.join(dirname, 'extract-tau0.tsv')]
-        out_files = [os.path.join(dirname, 'extract-md_time.tsv')]
-        yield {
-            'actions': [(transforms.convert_tau0_to_md_time, [dirname])],
-            'name': dirname,
-            'file_dep': in_files,
-            'targets': out_files,
-        }
+        yield make_single_transform(dirname,
+                                    transforms.convert_tau0_to_md_time,
+                                    'extract-tau0.tsv',
+                                    'extract-md_time.tsv')
+
+
+def make_single_transform(dirname, function, file_in, file_out):
+    path_in = os.path.join(dirname, file_in)
+    path_out = os.path.join(dirname, file_out)
+    return {
+        'actions': [(function, [path_in, path_out])],
+        'name': dirname + '/' + file_out,
+        'file_dep': [path_in],
+        'targets': [path_out],
+    }
+
 
 
 def plot_generic(dirname, name, *args, **kwargs):
