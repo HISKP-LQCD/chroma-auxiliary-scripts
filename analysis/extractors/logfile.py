@@ -55,41 +55,53 @@ def main(options):
         results = {}
 
         for filename in glob.glob(os.path.join(dirname, '*.out.txt')):
-            extractors.print_progress(filename)
-
-            common = {}
-
-            bucket_before = []
-            bucket_update = collections.defaultdict(list)
-
-            with open(filename) as f:
-                bucket = bucket_before
-                for line in f:
-                    m = doing_update_pattern.search(line)
-                    if m:
-                        update_no = int(m.group(1))
-                        bucket = bucket_update[update_no]
-
-                    bucket.append(line)
-
-
-            for line in bucket_before:
-                for key, (transform, pattern) in patterns_before.items():
-                    m = pattern.match(line)
-                    if m:
-                        common[key] = transform(m.group(1))
-
-            for update_no, lines in sorted(bucket_update.items()):
-                results[update_no] = parse_update_block(lines)
-
-                # Copy common fields for each update.
-                for key, val in common.items():
-                    results[update_no][key] = val
+            parse_log_file_to_shards(filename)
 
 
         json_file = os.path.join(dirname, 'extract-log.json')
         with open(json_file, 'w') as f:
             json.dump(results, f, indent=4, sort_keys=True)
+
+
+def get_log_shard_name(logfile):
+    dirname = os.path.dirname(logfile)
+    basename = os.path.basename(logfile)
+    return os.path.join(dirname, 'shard-' + basename + '.json')
+
+
+def parse_logfile_to_shard(logfile):
+    common = {}
+    results = {}
+
+    bucket_before = []
+    bucket_update = collections.defaultdict(list)
+
+    with open(logfile) as f:
+        bucket = bucket_before
+        for line in f:
+            m = doing_update_pattern.search(line)
+            if m:
+                update_no = int(m.group(1))
+                bucket = bucket_update[update_no]
+
+            bucket.append(line)
+
+    for line in bucket_before:
+        for key, (transform, pattern) in patterns_before.items():
+            m = pattern.match(line)
+            if m:
+                common[key] = transform(m.group(1))
+
+    for update_no, lines in sorted(bucket_update.items()):
+        results[update_no] = parse_update_block(lines)
+
+        # Copy common fields for each update.
+        for key, val in common.items():
+            results[update_no][key] = val
+
+    shard_file = get_log_shard_name(logfile)
+    with open(shard_file, 'w') as f:
+        json.dump(results, f, indent=4, sort_keys=True)
 
 
 def parse_update_block(lines):

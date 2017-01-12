@@ -81,6 +81,21 @@ def convert_solver_list(dirname, converter, outname):
                 solver_results)
 
 
+def merge_json_shards(filenames, dest):
+    merged = {}
+
+    for filename in filenames:
+        with open(filename) as f:
+            data = json.load(f)
+
+        for key, val in data.items():
+            assert key not in merged
+            merged[key] = val
+
+    with open(dest, 'w') as f:
+        json.dump(merged, f, indent=4, sort_keys=True)
+
+
 def merge_dict_2(base, add):
     for key1, val1 in add.items():
         for key2, val2 in val1.items():
