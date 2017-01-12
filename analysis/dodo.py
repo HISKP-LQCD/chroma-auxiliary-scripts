@@ -103,6 +103,20 @@ def task_convert_delta_delta_h():
         }
 
 
+def task_convert_time_to_minutes():
+    for dirname in directories:
+        in_files = [os.path.join(dirname, 'extract-seconds_for_trajectory.tsv')]
+        out_files = [os.path.join(dirname, 'extract-minutes_for_trajectory.tsv')]
+
+        yield {
+            'actions': [(transforms.convert_time_to_minutes, [dirname])],
+            'name': dirname,
+            'file_dep': in_files,
+            'targets': out_files,
+        }
+
+
+
 def task_make_plot():
     for dirname in directories:
         yield plot_generic(dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 1.0)', 'Plaquette')
@@ -111,7 +125,7 @@ def task_make_plot():
         yield plot_generic(dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy')
         #yield plot_generic(dirname, 'deltaH-vs-md_time', 'MD Time', r'$\Delta H$', 'MD Energy', transform_delta_h_md_time)
 
-        #yield plot_generic(dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory')
+        yield plot_generic(dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory')
 
         yield plot_generic(dirname, 'n_steps', 'Update Number', r'Step Count (coarsest time scale)', 'Integration Steps')
         #yield plot_generic(dirname, 'n_steps-vs-md_time', 'MD Time', r'Step Count (coarsest time scale)', 'Integration Steps')
