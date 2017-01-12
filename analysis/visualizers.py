@@ -226,18 +226,18 @@ def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (
             x = np.array(x) + shift_amount * i
         ax.plot(x, y, marker='o', label=label, markersize=2)
 
-    ax.set_title(title)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
+        ax.set_title(title)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
 
-    if ax_transform is not None:
-        ax_transform(ax)
+        if ax_transform is not None:
+            ax_transform(ax)
 
-    util.dandify_axes(ax)
-    util.dandify_figure(fig)
+        util.dandify_axes(ax)
+        util.dandify_figure(fig)
 
-    if outname is None:
-        outname = name
+        if outname is None:
+            outname = name
 
-    pl.savefig('plot-{}.pdf'.format(outname))
-    pl.savefig('plot-{}.png'.format(outname))
+        pl.savefig(os.path.join(dirname, 'plot-{}.pdf'.format(outname)))
+        pl.savefig(os.path.join(dirname, 'plot-{}.png'.format(outname)))

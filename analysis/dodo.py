@@ -8,6 +8,7 @@ import os
 
 import extractors
 import transforms
+import visualizers
 
 os.chdir('/home/mu/Dokumente/Studium/Master_Science_Physik/Masterarbeit/Runs')
 
@@ -77,3 +78,33 @@ def task_xpath_shards():
             }
 
 
+def plot_generic(dirname, name, *args, **kwargs):
+    return {
+        'actions': [(visualizers.plot_generic, [[dirname], name] + list(args), kwargs)],
+        'name': dirname + '/' + name,
+        'file_dep': [os.path.join(dirname, 'extract-{}.tsv'.format(name))],
+        'targets': [os.path.join(dirname, 'plot-{}.pdf'.format(name))],
+    }
+
+
+def task_make_plot():
+    for dirname in directories:
+        yield plot_generic(dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 1.0)', 'Plaquette')
+        #yield plot_generic(dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 1.0)', 'Plaquette')
+
+        yield plot_generic(dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy')
+        #yield plot_generic(dirname, 'deltaH-vs-md_time', 'MD Time', r'$\Delta H$', 'MD Energy', transform_delta_h_md_time)
+
+        #yield plot_generic(dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory')
+
+        yield plot_generic(dirname, 'n_steps', 'Update Number', r'Step Count (coarsest time scale)', 'Integration Steps')
+        #yield plot_generic(dirname, 'n_steps-vs-md_time', 'MD Time', r'Step Count (coarsest time scale)', 'Integration Steps')
+
+        #yield plot_generic(dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance')
+        yield plot_generic(dirname, 'tau0', 'Update Number', r'MD Step Size', 'MD Step Size')
+
+        yield plot_generic(dirname, 'DeltaDeltaH', 'Update Number', r'$\Delta \Delta H$', 'Reversibility')
+        #yield plot_generic(dirname, 'DeltaDeltaH_over_DeltaH', 'Update Number', r'$\Delta \Delta H / \Delta H$', 'Reversibility')
+
+        #yield plot_generic(dirname, 't0', 'Update Number', r'$t_0$', 'Wilson Flow Scale Setting')
+        #yield plot_generic(dirname, 'w0', 'Update Number', r'$w_0$', 'Wilson Flow Scale Setting')
