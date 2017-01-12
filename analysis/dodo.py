@@ -113,13 +113,21 @@ def task_convert_t0_to_md_time():
                                     'extract-tau0.tsv',
                                     'extract-md_time.tsv')
 
-def task_wflow_xml_to_tsv():
+def task_wflow():
     for dirname in directories:
-        shard_names = []
+        files_t0 = []
+        files_w0 = []
+
         for xml_file in glob.glob(os.path.join(dirname, 'wflow.config-*.out.xml')):
             file_e = wflow.get_xml_shard_name(xml_file, 'e')
             file_t2e = wflow.get_xml_shard_name(xml_file, 't2e')
             file_w = wflow.get_xml_shard_name(xml_file, 'w')
+            file_t0 = wflow.get_xml_shard_name(xml_file, 't0')
+            file_w0 = wflow.get_xml_shard_name(xml_file, 'w0')
+
+            files_t0.append(file_t0)
+            files_w0.append(file_w0)
+
             yield make_single_transform(dirname,
                                         wflow.convert_xml_to_tsv,
                                         os.path.basename(xml_file),
@@ -132,6 +140,23 @@ def task_wflow_xml_to_tsv():
                                         wflow.compute_w,
                                         os.path.basename(file_e),
                                         os.path.basename(file_w))
+            yield make_single_transform(dirname,
+                                        wflow.compute_intersection,
+                                        os.path.basename(file_t2e),
+                                        os.path.basename(file_t0))
+            yield make_single_transform(dirname,
+                                        wflow.compute_intersection,
+                                        os.path.basename(file_w),
+                                        os.path.basename(file_w0))
+
+        for name, files in [('t0', files_t0), ('w0', files_w0)]:
+            path_out = os.path.join(dirname, 'extract-{}.tsv'.format(name))
+            yield {
+                'actions': [(wflow.merge_intersections, [files, path_out])],
+                'name': path_out,
+                'file_dep': files,
+                'targets': [path_out],
+            }
 
 
 

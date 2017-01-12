@@ -55,3 +55,7 @@ def ignore_missing_files(function):
             print('File not found:', e)
 
     return wrapped
+
+
+def sort_by_first_column(a):
+    return a[a[:, 0].argsort()]

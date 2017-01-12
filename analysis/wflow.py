@@ -5,6 +5,7 @@
 
 import glob
 import os
+import re
 
 from lxml import etree
 import matplotlib.pyplot as pl
@@ -71,6 +72,11 @@ def process_directory(dirname):
     np.savetxt(os.path.join(dirname, 'extract-w0.tsv'), w0s)
 
 
+def compute_intersection(path_in, path_out):
+    root = find_root(path_in)
+    np.savetxt(path_out, [root])
+
+
 def convert_xml_to_tsv(path_in, path_out):
     tree = etree.parse(path_in)
 
@@ -99,14 +105,17 @@ def compute_w(path_in, path_out):
 
 def find_root(tsv_file, threshold=0.3):
     t, t2e = util.load_columns(tsv_file)
-    x, y = interpolate_root(t, t2e - threshold)
-    return (x, y + threshold)
+    x = interpolate_root(t, t2e - threshold)
+    return x
 
 
 def interpolate_root(x, y):
     f = scipy.interpolate.interp1d(x, y)
-    root = scipy.optimize.brentq(f, np.min(x[1:]), np.min(x[y > 0]))
-    return root, f(root)
+    upper = x[y > 0]
+    if len(upper) == 0:
+        return np.nan
+    root = scipy.optimize.brentq(f, np.min(x[1:]), np.min(upper))
+    return root
 
 
 def visualize(xml_file, root=None):
@@ -160,3 +169,22 @@ def get_xml_shard_name(xml_file, key):
     dirname = os.path.dirname(xml_file)
     basename = os.path.basename(xml_file)
     return os.path.join(dirname, 'shard-{}.{}.tsv'.format(basename, key))
+
+
+def merge_intersections(paths_in, path_out):
+    data = []
+    for path_in in paths_in:
+        intersection = np.loadtxt(path_in)
+        print(intersection)
+        if np.isnan(intersection):
+            continue
+        m = re.search(r'config-(\d+)', path_in)
+        update_no = float(m.group(1))
+
+        data.append((update_no, intersection))
+
+    a = np.atleast_2d(np.array(data))
+    if a.shape[1] > 0:
+        a = util.sort_by_first_column(a)
+
+    np.savetxt(path_out, a)
