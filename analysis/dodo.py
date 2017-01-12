@@ -4,6 +4,7 @@
 # Copyright © 2017 Martin Ueding <dev@martin-ueding.de>
 
 import glob
+import itertools
 import os
 
 import extractors
@@ -56,7 +57,8 @@ def task_xpath_shards():
     for directory in directories:
         for key, extractor in extractors.xmlfile.bits.items():
             shard_names = []
-            for xml_file in glob.glob(os.path.join(directory, 'hmc.slurm-*.out.xml')):
+            for xml_file in itertools.chain(glob.glob(os.path.join(directory, 'hmc.slurm-*.out.xml')),
+                                            glob.glob(os.path.join(directory, 'hmc.slurm-*.log.xml'))):
                 shard_name = extractors.xmlfile.get_xpath_shard_name(xml_file, key)
                 shard_names.append(shard_name)
                 yield {
@@ -85,6 +87,20 @@ def plot_generic(dirname, name, *args, **kwargs):
         'file_dep': [os.path.join(dirname, 'extract-{}.tsv'.format(name))],
         'targets': [os.path.join(dirname, 'plot-{}.pdf'.format(name))],
     }
+
+
+def task_convert_delta_delta_h():
+    for dirname in directories:
+        in_files = [os.path.join(dirname, 'extract-DeltaDeltaH.tsv'),
+                    os.path.join(dirname, 'extract-deltaH.tsv')]
+        out_file = os.path.join(dirname, 'extract-DeltaDeltaH_over_DeltaH.tsv')
+
+        yield {
+            'actions': [(transforms.delta_delta_h, [dirname])],
+            'name': dirname,
+            'file_dep': in_files,
+            'targets': [out_file],
+        }
 
 
 def task_make_plot():
