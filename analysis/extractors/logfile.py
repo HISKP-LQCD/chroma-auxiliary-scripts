@@ -54,7 +54,7 @@ def main(options):
     for dirname in options.dirname:
         results = {}
 
-        for filename in glob.glob(os.path.join(dirname, '*.out')):
+        for filename in glob.glob(os.path.join(dirname, '*.out.txt')):
             extractors.print_progress(filename)
 
             common = {}
