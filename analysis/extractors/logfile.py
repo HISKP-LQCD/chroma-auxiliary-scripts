@@ -93,7 +93,11 @@ def parse_logfile_to_shard(logfile):
                 common[key] = transform(m.group(1))
 
     for update_no, lines in sorted(bucket_update.items()):
-        results[update_no] = parse_update_block(lines)
+        try:
+            results[update_no] = parse_update_block(lines)
+        except ValueError as e:
+            print(e)
+            continue
 
         # Copy common fields for each update.
         for key, val in common.items():
