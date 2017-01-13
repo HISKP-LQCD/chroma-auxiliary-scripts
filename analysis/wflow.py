@@ -87,7 +87,7 @@ def convert_xml_to_tsv(path_in, path_out):
 
     t = np.fromstring(wflow_step, sep=' ')
     e = np.fromstring(wflow_gactij, sep=' ')
-    e *= 8
+    #e *= 8
     np.savetxt(path_out, np.column_stack([t, e]))
 
 
