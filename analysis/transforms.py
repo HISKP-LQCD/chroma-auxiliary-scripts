@@ -113,7 +113,7 @@ def merge_tsv_shards(shard_names, merged_name):
         merged = []
     else:
         merged = np.row_stack(all_data)
-        merged = sort_by_first_column(merged)
+        merged = util.sort_by_first_column(merged)
 
     np.savetxt(merged_name, merged)
 
