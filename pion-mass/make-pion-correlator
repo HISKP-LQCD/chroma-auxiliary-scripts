@@ -16,7 +16,7 @@ jobscript_text = r'''#!/bin/bash
 #SBATCH --time=02:00:00
 #SBATCH --partition=devel
 #SBATCH --cpus-per-task=24
-#SBATCH --output={{ base }}.corr.slurm-%j.out.txt
+#SBATCH --output=corr.slurm-%j.out.txt
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ueding@hiskp.uni-bonn.de
 
@@ -26,10 +26,22 @@ module load IntelMPI
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 export KMP_AFFINITY=compact,0
 
+{% for chroma_input in chroma_inputs %}
 srun ~/jureca-local-icc/bin/chroma \
         -i "{{ chroma_input }}" \
         -by 8 -bz 8 -c 24 -sy 1 -sz 1 -pxy 1 -pxyz 0 -minct 2
+{% endfor %}
 '''
+
+
+def chunks(l, n):
+    '''
+    Yield successive n-sized chunks from l.
+
+    http://stackoverflow.com/a/312464
+    '''
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
 
 
 def main():
@@ -41,6 +53,8 @@ def main():
     chroma_template = env.get_template('pion-correlator.template.xml')
     slurm_template = jinja2.Template(jobscript_text)
 
+    chroma_inputs = []
+
     for gauge_config in options.gauge_config:
         print('Working on {} …'.format(gauge_config))
         basename = os.path.basename(gauge_config)
@@ -49,20 +63,24 @@ def main():
 
         filename_xml = '{}.corr.xml'.format(base)
         filename_chroma_input = '{}.corr.chroma-ini.xml'.format(base)
-        filename_slurm_input = '{}.corr.slurm.sh'.format(base)
 
         chroma_rendered = chroma_template.render(
             config_in_file=gauge_config,
             xml_out_file=filename_xml,
         )
-        slurm_rendered = slurm_template.render(
-            chroma_input=filename_chroma_input,
-            base=base,
-        )
+
+        chroma_inputs.append(filename_chroma_input)
 
         print('Writing {} …'.format(filename_chroma_input))
         with open(filename_chroma_input, 'w') as f:
             f.write(chroma_rendered)
+
+    for i, chunk in enumerate(chunks(chroma_inputs, options.package)):
+        slurm_rendered = slurm_template.render(
+            chroma_inputs=chunk,
+        )
+
+        filename_slurm_input = 'corr.{}.slurm.sh'.format(i)
 
         print('Writing {} …'.format(filename_slurm_input))
         with open(filename_slurm_input, 'w') as f:
@@ -78,6 +96,7 @@ def _parse_args():
     '''
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('gauge_config', nargs='+', help='LIME files to smear')
+    parser.add_argument('--package', type=int, default=50)
     options = parser.parse_args()
 
     return options
