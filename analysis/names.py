@@ -62,3 +62,6 @@ def xmllog_extract(directory, key):
     return os.path.join(directory, 'extract', 'extract-{}.tsv'.format(key))
 
 
+@_ensure_dir
+def plot(dirname, name):
+    return os.path.join(dirname, 'plot', 'plot-{}.pdf'.format(name))

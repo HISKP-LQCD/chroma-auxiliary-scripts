@@ -13,6 +13,7 @@ import subprocess
 import matplotlib.pyplot as pl
 import numpy as np
 
+import names
 import transforms
 import util
 
@@ -239,5 +240,5 @@ def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (
         if outname is None:
             outname = name
 
-        pl.savefig(os.path.join(dirname, 'plot-{}.pdf'.format(outname)))
-        pl.savefig(os.path.join(dirname, 'plot-{}.png'.format(outname)))
+
+        pl.savefig(names.plot(dirname, outname))
