@@ -206,10 +206,19 @@ def task_make_plot():
 
 def task_correlators():
     for dirname in directories:
+        corr_tsv_files = []
         for corr_xml in glob.glob(os.path.join(dirname, 'corr.config-*.out.xml')):
             corr_tsv = names.correlator_tsv(corr_xml)
+            corr_tsv_files.append(corr_tsv)
             yield make_single_transform(dirname,
                                         correlators.io_extract_pion_corr,
                                         corr_xml,
                                         corr_tsv)
-
+        
+        path_pion_mass = names.pion_mass(dirname)
+        yield {
+            'actions': [(correlators.io_extract_mass, [corr_tsv_files, path_pion_mass])],
+            'name': dirname,
+            'file_dep': corr_tsv_files,
+            'targets': path_pion_mass,
+        }

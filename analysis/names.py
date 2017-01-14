@@ -65,3 +65,8 @@ def xmllog_extract(directory, key):
 @_ensure_dir
 def plot(dirname, name):
     return os.path.join(dirname, 'plot', 'plot-{}.pdf'.format(name))
+
+
+@_ensure_dir
+def pion_mass(dirname):
+    return os.path.join(dirname, 'extract', 'extract-Mpi.pdf')

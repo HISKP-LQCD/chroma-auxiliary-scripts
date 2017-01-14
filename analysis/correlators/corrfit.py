@@ -1,15 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright © 2015 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2015, 2017 Martin Ueding <dev@martin-ueding.de>
 # Licensed under The GNU Public License Version 2 (or later)
 
 '''
 Fitting correlated data with least squares.
 '''
-
-from __future__ import division, absolute_import, print_function, \
-    unicode_literals
 
 import matplotlib.pyplot as pl
 import numpy as np
@@ -64,7 +61,7 @@ def correlation_matrix(sets):
      [-0.125  -0.275   0.25    0.25  ]]
 
     To leverage NumPy, it treats each square bracket as a matrix, transposes
-    the frist one and does a matrix multiplication.
+    the first one and does a matrix multiplication.
 
     :param np.array sets: All measurements of the time series.
     :returns: Correlation matrix and average vector
@@ -79,19 +76,6 @@ def correlation_matrix(sets):
     deviations = np.asmatrix(x - average)
 
     matrix = 1/(N*(N-1)) * deviations.T * deviations
-
-    # print('----')
-    # print('N')
-    # print(N)
-    # print('x')
-    # print(x)
-    # print('Average')
-    # print(average)
-    # print('vec')
-    # print(vec)
-    # print('Result')
-    # print(matrix)
-    # print('----')
 
     return matrix
 
@@ -155,22 +139,3 @@ def fit(func, x, y, omit_pre=0, omit_post=0, p0=None):
     p_value = 1 - scipy.stats.chi2.cdf(chi_sq, len(used_x) - 1 - len(popt))
 
     return popt, chi_sq, p_value
-
-
-def main():
-    sets = [
-        [10, 8.4, 7.3, 5.1],
-        [10.5, 9.5, 6.3, 4.1],
-        [13.5, 9.3, 6.2, 4.4],
-    ]
-
-    f = correlators.fit.cosh_fit_decorator(10)
-
-    time = np.array(range(len(sets[0])))
-    params, chi_sq = curve_fit_correlated(f, time, sets, [0.3, 10])
-    print(params)
-    print(chi_sq)
-
-
-if __name__ == '__main__':
-    main()
