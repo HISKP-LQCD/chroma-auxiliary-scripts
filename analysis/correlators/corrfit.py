@@ -74,6 +74,8 @@ def correlation_matrix(sets):
     average = np.mean(sets, axis=0)
 
     deviations = np.asmatrix(x - average)
+    
+    #print(deviations)
 
     matrix = 1/(N*(N-1)) * deviations.T * deviations
 

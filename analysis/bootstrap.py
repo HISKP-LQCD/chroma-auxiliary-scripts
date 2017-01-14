@@ -1,16 +1,31 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 # Copyright © 2014-2017 Martin Ueding <dev@martin-ueding.de>
-# Licensed under The GNU Public License Version 2
-
-from __future__ import division, absolute_import, print_function, \
-    unicode_literals
 
 import random
 
 import matplotlib.pyplot as pl
 import numpy as np
+
+
+class Boot(object):
+    def __init__(self, dist):
+        self.dist = dist
+
+    def __str__(self):
+        return str(self.dist)
+
+    @property
+    def cen(self):
+        return self.dist[0]
+
+    @property
+    def val(self):
+        x = np.array(self.dist)
+        return np.mean(x[1:,], axis=0)
+
+    @property
+    def err(self):
+        x = np.array(self.dist)
+        return np.std(x[1:,], axis=0)
 
 
 def save_hist(dist, filename):
@@ -46,6 +61,13 @@ def redraw_count(a):
     return np.array(out).reshape(a.shape)
 
 
+def make_dist_draw(data, n_samples=100):
+    results = [data] + [
+        [random.choice(data) for i in range(len(data))]
+        for j in range(n_samples)]
+    return results
+
+
 def pgfplots_error_band(x, y_val, y_err):
     return np.column_stack([
         np.concatenate((x, x[::-1])),
@@ -57,14 +79,15 @@ def pgfplots_error_band(x, y_val, y_err):
 
 
 def average_arrays(arrays):
-    '''
-    Computes the element wise average of a list of arrays.
-    '''
-    total = np.column_stack(arrays)
-
-    val = np.mean(total, axis=1)
-
+    total = np.array(arrays)
+    val = np.mean(total[1:,], axis=0)
     return val
+
+
+def std_arrays(arrays):
+    total = np.array(arrays)
+    err = np.std(total[1:,], axis=0)
+    return err
 
 
 def average_and_std_arrays(arrays):
@@ -99,17 +122,6 @@ def percentile_arrays(arrays, value=None, interval=68.3):
     e_down = value - p_down
 
     return e_up, e_down
-
-
-def std_arrays(arrays):
-    '''
-    Computes the element wise standard deviation of a list of arrays.
-    '''
-    total = np.array(arrays)
-    
-    err = np.std(total, axis=0)
-
-    return err
 
 
 def bootstrap_and_transform(transform, sets, sample_count=250, seed=None):

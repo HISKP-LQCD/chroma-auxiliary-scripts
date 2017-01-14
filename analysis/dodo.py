@@ -9,6 +9,7 @@ import os
 import re
 
 import correlators
+import correlators.analysis
 import extractors
 import names
 import transforms
@@ -176,8 +177,8 @@ def plot_generic(dirname, name, *args, **kwargs):
     return {
         'actions': [(visualizers.plot_generic, [[dirname], name] + list(args), kwargs)],
         'name': dirname + '/' + name,
-        'file_dep': [os.path.join(dirname, 'extract-{}.tsv'.format(name))],
-        'targets': [os.path.join(dirname, 'plot-{}.pdf'.format(name))],
+        'file_dep': [os.path.join(dirname, 'extract', 'extract-{}.tsv'.format(name))],
+        'targets': [names.plot(dirname, name)],
     }
 
 
@@ -215,10 +216,11 @@ def task_correlators():
                                         corr_xml,
                                         corr_tsv)
         
-        path_pion_mass = names.pion_mass(dirname)
-        yield {
-            'actions': [(correlators.io_extract_mass, [corr_tsv_files, path_pion_mass])],
-            'name': dirname,
-            'file_dep': corr_tsv_files,
-            'targets': path_pion_mass,
-        }
+        if len(corr_tsv_files) > 0:
+            path_pion_mass = names.pion_mass(dirname)
+            yield {
+                'actions': [(correlators.analysis.io_extract_mass, [corr_tsv_files, path_pion_mass])],
+                'name': dirname,
+                'file_dep': corr_tsv_files,
+                'targets': [path_pion_mass],
+            }

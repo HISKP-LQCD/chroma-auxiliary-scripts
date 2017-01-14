@@ -51,7 +51,7 @@ def residual_converter(solver_data, update_data):
 
 
 def convert_solver_list(dirname, converter, outname):
-    filename_in = os.path.join(dirname, 'extract-log.json')
+    filename_in = os.path.join(dirname, 'extract', 'extract-log.json')
 
     if not os.path.isfile(filename_in):
         print('File is missing:', filename_in)
@@ -76,7 +76,7 @@ def convert_solver_list(dirname, converter, outname):
     for solver, solver_results in results.items():
         if len(solver_results) > 0:
             np.savetxt(os.path.join(
-                dirname,
+                dirname, 'extract',
                 'extract-solver-{}-{}.tsv'.format(util.make_safe_name(solver), outname)),
                 solver_results)
 
@@ -119,7 +119,7 @@ def merge_tsv_shards(shard_names, merged_name):
 
 
 def prepare_solver_iters(dirname):
-    with open(os.path.join(dirname, 'extract-solver_iters.json')) as f:
+    with open(os.path.join(dirname, 'extract', 'extract-solver_iters.json')) as f:
         data = json.load(f)
 
     for solver, tuples in sorted(data.items()):
@@ -127,12 +127,12 @@ def prepare_solver_iters(dirname):
         datas = [gflops for subgrid_volume, gflops in sorted(tuples.items())]
         y, yerr_down, yerr_up = percentiles(datas)
 
-        np.savetxt(os.path.join(dirname, util.make_safe_name('extract-solver_iters-{}.tsv'.format(solver))),
+        np.savetxt(os.path.join(dirname, 'extract', util.make_safe_name('extract-solver_iters-{}.tsv'.format(solver))),
                    np.column_stack([x, y, yerr_down, yerr_up]))
 
 
 def convert_to_md_time(dirname, name_in):
-    file_in = os.path.join(dirname, 'extract-md_time.tsv')
+    file_in = os.path.join(dirname, 'extract', 'extract-md_time.tsv')
     data = np.atleast_2d(np.loadtxt(file_in))
 
     if data.shape[1] == 0:
@@ -149,12 +149,12 @@ def convert_to_md_time(dirname, name_in):
     if (isinstance(eq, bool) and not eq) or (isinstance(eq, np.ndarray) and not all(eq)):
         assert False, "Update Numbers must match for {}.\n{}\n{}".format(name_in, str(update_no), str(update_no_2))
 
-    np.savetxt(os.path.join(dirname, 'extract-{}-vs-md_time.tsv'.format(name_in)),
+    np.savetxt(os.path.join(dirname, 'extract', 'extract-{}-vs-md_time.tsv'.format(name_in)),
                np.column_stack([md_time, y]))
 
 
 def convert_time_to_minutes(dirname):
-    file_in = os.path.join(dirname, 'extract-seconds_for_trajectory.tsv')
+    file_in = os.path.join(dirname,'extract',  'extract-seconds_for_trajectory.tsv')
     data = np.atleast_2d(np.loadtxt(file_in))
 
     if data.shape[1] == 0:
@@ -163,7 +163,7 @@ def convert_time_to_minutes(dirname):
     update_no = data[:, 0]
     seconds = data[:, 1]
 
-    np.savetxt(os.path.join(dirname, 'extract-minutes_for_trajectory.tsv'),
+    np.savetxt(os.path.join(dirname,'extract',  'extract-minutes_for_trajectory.tsv'),
                np.column_stack([update_no, seconds / 60]))
 
 
@@ -178,8 +178,8 @@ def delta_delta_h(dirname):
     result = []
 
     try:
-        update_no_ddh, ddh = util.load_columns(os.path.join(dirname, 'extract-DeltaDeltaH.tsv'))
-        update_no_dh, dh = util.load_columns(os.path.join(dirname, 'extract-deltaH.tsv'))
+        update_no_ddh, ddh = util.load_columns(os.path.join(dirname,'extract',  'extract-DeltaDeltaH.tsv'))
+        update_no_dh, dh = util.load_columns(os.path.join(dirname,'extract',  'extract-deltaH.tsv'))
     except ValueError:
         pass
     else:
@@ -188,5 +188,5 @@ def delta_delta_h(dirname):
             print(update_no, '->', j)
             result.append((update_no, ddh[i] / dh[j]))
 
-    np.savetxt(os.path.join(dirname, 'extract-DeltaDeltaH_over_DeltaH.tsv'),
+    np.savetxt(os.path.join(dirname,'extract',  'extract-DeltaDeltaH_over_DeltaH.tsv'),
                result)

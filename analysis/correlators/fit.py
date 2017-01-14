@@ -72,7 +72,7 @@ def fit_and_plot(axes, func, x, y, yerr=None, omit_pre=0, omit_post=0, p0=None,
 
 
 def cosh_fit_decorator(shift):
-    def cosh_fit(x, m, a):
+    def cosh_fit(x, m, a, offset):
         '''
 
         .. math::
@@ -88,7 +88,7 @@ def cosh_fit_decorator(shift):
         y = shift - x
         first = a * np.exp(-x*m)
         second = a * np.exp(-y*m)
-        return first + second
+        return first + second + offset
 
     return cosh_fit
 
