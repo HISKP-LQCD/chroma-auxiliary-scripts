@@ -86,6 +86,12 @@ def parse_logfile_to_shard(logfile):
 
             bucket.append(line)
 
+    if len(bucket_update.keys()) > 0:
+        last_update = max(bucket_update.keys())
+        last_line = bucket_update[last_update][-1]
+        if not last_line.startswith('HMC: total time = '):
+            del bucket_update[last_update]
+
     for line in bucket_before:
         for key, (transform, pattern) in patterns_before.items():
             m = pattern.match(line)

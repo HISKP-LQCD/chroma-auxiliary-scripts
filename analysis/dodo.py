@@ -6,7 +6,9 @@
 import glob
 import itertools
 import os
+import re
 
+import correlators
 import extractors
 import transforms
 import visualizers
@@ -201,3 +203,15 @@ def task_make_plot():
 
         #yield plot_generic(dirname, 't0', 'Update Number', r'$t_0$', 'Wilson Flow Scale Setting')
         #yield plot_generic(dirname, 'w0', 'Update Number', r'$w_0$', 'Wilson Flow Scale Setting')
+
+
+def task_correlators():
+    for dirname in directories:
+        for corr_xml in glob.glob(os.path.join(dirname, 'corr.config-*.out.xml')):
+            config = re.search('config-(\d+)', corr_xml).group(0)
+            corr_tsv = os.path.join(dirname, 'extract-corr.config-{}.tsv'.format(config))
+            yield make_single_transform(dirname,
+                                        correlators.io_extract_pion_corr,
+                                        os.path.basename(corr_xml),
+                                        os.path.basename(corr_tsv))
+

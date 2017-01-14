@@ -89,7 +89,7 @@ def merge_json_shards(filenames, dest):
             data = json.load(f)
 
         for key, val in data.items():
-            assert key not in merged
+            assert key not in merged, key
             merged[key] = val
 
     with open(dest, 'w') as f:
