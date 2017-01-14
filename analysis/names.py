@@ -10,8 +10,8 @@ def _make_dir(filename):
 
 
 def _ensure_dir(function):
-    def f(path_in):
-        path_out = function(path_in)
+    def f(*args, **kwargs):
+        path_out = function(*args, **kwargs)
         _make_dir(path_out)
         return path_out
     return f
@@ -23,3 +23,42 @@ def correlator_tsv(xml_file):
     dirname = os.path.dirname(xml_file)
     corr_tsv = os.path.join(dirname, 'extract', 'corr', 'corr.config-{}.tsv'.format(config))
     return corr_tsv
+
+
+@_ensure_dir
+def wflow_xml_shard_name(xml_file, key):
+    dirname = os.path.dirname(xml_file)
+    basename = os.path.basename(xml_file)
+    return os.path.join(dirname, 'shard', 'wflow', 'shard-{}.{}.tsv'.format(basename, key))
+
+
+@_ensure_dir
+def wflow_tsv(dirname, name):
+    path_out = os.path.join(dirname, 'extract', 'extract-{}.tsv'.format(name))
+    return path_out
+
+
+@_ensure_dir
+def log_shard(logfile):
+    dirname = os.path.dirname(logfile)
+    basename = os.path.basename(logfile)
+    return os.path.join(dirname, 'shard', 'logfile', 'shard-' + basename + '.json')
+
+
+@_ensure_dir
+def log_extract(directory):
+    return os.path.join(directory, 'extract', 'extract-log.json')
+
+
+@_ensure_dir
+def xpath_shard(xml_file, key):
+    dirname = os.path.dirname(xml_file)
+    basename = os.path.basename(xml_file)
+    return os.path.join(dirname, 'shard', 'xmlfile', 'shard-{}-{}.tsv'.format(basename, key))
+
+
+@_ensure_dir
+def xmllog_extract(directory, key):
+    return os.path.join(directory, 'extract', 'extract-{}.tsv'.format(key))
+
+

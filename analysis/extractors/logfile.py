@@ -14,6 +14,8 @@ import re
 import numpy as np
 
 import extractors
+import names
+
 
 patterns_before = {
     'nodes': (int, re.compile(r'  total number of nodes = (\d+)')),
@@ -46,27 +48,6 @@ patterns_resiuals = {
     #'QPhiX Clover BICGSTAB': re.compile(r'QPHIX_CLOVER_BICGSTAB_SOLVER: (\d+) iters,.*'),
     'QPhiX Clover CG': re.compile(r'QPHIX_CLOVER_CG_SOLVER: \|\| r \|\| / \|\| b \|\| = ([\d.e+-]+)'),
 }
-
-
-def main(options):
-    pp = pprint.PrettyPrinter()
-
-    for dirname in options.dirname:
-        results = {}
-
-        for filename in glob.glob(os.path.join(dirname, '*.out.txt')):
-            parse_log_file_to_shards(filename)
-
-
-        json_file = os.path.join(dirname, 'extract-log.json')
-        with open(json_file, 'w') as f:
-            json.dump(results, f, indent=4, sort_keys=True)
-
-
-def get_log_shard_name(logfile):
-    dirname = os.path.dirname(logfile)
-    basename = os.path.basename(logfile)
-    return os.path.join(dirname, 'shard-' + basename + '.json')
 
 
 def parse_logfile_to_shard(logfile):
@@ -109,7 +90,7 @@ def parse_logfile_to_shard(logfile):
         for key, val in common.items():
             results[update_no][key] = val
 
-    shard_file = get_log_shard_name(logfile)
+    shard_file = names.log_shard(logfile)
     with open(shard_file, 'w') as f:
         json.dump(results, f, indent=4, sort_keys=True)
 
@@ -145,23 +126,3 @@ def parse_update_block(lines):
                     update_results['solvers'][solver]['residuals'].append(iters)
 
     return update_results
-    
-
-
-def _parse_args():
-    '''
-    Parses the command line arguments.
-
-    :return: Namespace with arguments.
-    :rtype: Namespace
-    '''
-    parser = argparse.ArgumentParser(description='')
-
-    parser.add_argument('dirname', nargs='+')
-
-    options = parser.parse_args()
-    main(options)
-
-
-if __name__ == '__main__':
-    _parse_args()

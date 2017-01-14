@@ -11,6 +11,7 @@ from lxml import etree
 import numpy as np
 
 import extractors
+import names
 import transforms
 
 
@@ -43,16 +44,10 @@ def process_directory(dirname):
         transforms.convert_to_md_time(dirname, name)
 
 
-def get_xpath_shard_name(xml_file, key):
-    dirname = os.path.dirname(xml_file)
-    basename = os.path.basename(xml_file)
-    return os.path.join(dirname, 'shard-{}-{}.tsv'.format(basename, key))
-
-
 def extractor_to_shard(extractor, xml_file, key):
     extracted = extractor(xml_file)
     update_no_list, number_list = extracted
-    outfile = get_xpath_shard_name(xml_file, key)
+    outfile = names.xpath_shard(xml_file, key)
     np.savetxt(outfile, np.column_stack([update_no_list, number_list]))
 
 

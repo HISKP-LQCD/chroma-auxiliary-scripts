@@ -130,12 +130,6 @@ def visualize(xml_file, root=None):
     fig.savefig(xml_file + '.t2e.pdf')
 
 
-def get_xml_shard_name(xml_file, key):
-    dirname = os.path.dirname(xml_file)
-    basename = os.path.basename(xml_file)
-    return os.path.join(dirname, 'shard-{}.{}.tsv'.format(basename, key))
-
-
 def merge_intersections(paths_in, path_out):
     data = []
     for path_in in paths_in:

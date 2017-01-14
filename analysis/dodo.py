@@ -24,7 +24,7 @@ def task_logfiles_to_shards():
     for directory in directories:
         shard_names = []
         for logfile in glob.glob(os.path.join(directory, 'hmc.slurm-*.out.txt')):
-            shard_name = extractors.logfile.get_log_shard_name(logfile)
+            shard_name = names.log_shard(logfile)
             shard_names.append(shard_name)
 
             yield {
@@ -35,7 +35,7 @@ def task_logfiles_to_shards():
                 'targets': [shard_name],
             }
 
-        merged_name = os.path.join(directory, 'extract-log.json')
+        merged_name = names.log_extract(directory)
 
         yield {
             'actions': [(transforms.merge_json_shards, [shard_names, merged_name])],
@@ -63,7 +63,7 @@ def task_xpath_shards():
             shard_names = []
             for xml_file in itertools.chain(glob.glob(os.path.join(directory, 'hmc.slurm-*.out.xml')),
                                             glob.glob(os.path.join(directory, 'hmc.slurm-*.log.xml'))):
-                shard_name = extractors.xmlfile.get_xpath_shard_name(xml_file, key)
+                shard_name = names.xpath_shard(xml_file, key)
                 shard_names.append(shard_name)
                 yield {
                     'actions': [(extractors.xmlfile.extractor_to_shard, [extractor, xml_file, key])],
@@ -73,7 +73,7 @@ def task_xpath_shards():
                     'targets': [shard_name],
                 }
 
-            merged_name = os.path.join(directory, 'extract-{}.tsv'.format(key))
+            merged_name = names.xmllog_extract(directory, key)
 
             yield {
                 'actions': [(transforms.merge_tsv_shards, [shard_names, merged_name])],
@@ -122,11 +122,11 @@ def task_wflow():
         files_w0 = []
 
         for xml_file in glob.glob(os.path.join(dirname, 'wflow.config-*.out.xml')):
-            file_e = wflow.get_xml_shard_name(xml_file, 'e')
-            file_t2e = wflow.get_xml_shard_name(xml_file, 't2e')
-            file_w = wflow.get_xml_shard_name(xml_file, 'w')
-            file_t0 = wflow.get_xml_shard_name(xml_file, 't0')
-            file_w0 = wflow.get_xml_shard_name(xml_file, 'w0')
+            file_e = names.wflow_xml_shard_name(xml_file, 'e')
+            file_t2e = names.wflow_xml_shard_name(xml_file, 't2e')
+            file_w = names.wflow_xml_shard_name(xml_file, 'w')
+            file_t0 = names.wflow_xml_shard_name(xml_file, 't0')
+            file_w0 = names.wflow_xml_shard_name(xml_file, 'w0')
 
             files_t0.append(file_t0)
             files_w0.append(file_w0)
@@ -153,7 +153,7 @@ def task_wflow():
                                         file_w0)
 
         for name, files in [('t0', files_t0), ('w0', files_w0)]:
-            path_out = os.path.join(dirname, 'extract-{}.tsv'.format(name))
+            path_out = names.wflow_tsv(dirname, name)
             yield {
                 'actions': [(wflow.merge_intersections, [files, path_out])],
                 'name': path_out,
