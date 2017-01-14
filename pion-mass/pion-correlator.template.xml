@@ -73,7 +73,6 @@ pion correlator from that.
         </NamedObject>
       </elem>
 
-      <!--
       <annotation>Smear the propagator at the sink.</annotation>
       <elem>
         <Name>SINK_SMEAR</Name>
@@ -92,7 +91,6 @@ pion correlator from that.
           <smeared_prop_id>pt_src_pt_sink_prop</smeared_prop_id>
         </NamedObject>
       </elem>
-      -->
 
       <!-- Compute the hadron spectrum. This will compute the correlator for all 16 possible Gamma structures. -->
       <elem>
@@ -111,8 +109,8 @@ pion correlator from that.
           <gauge_id>default_gauge_field</gauge_id>
           <sink_pairs>
             <elem>
-              <first_id>pt_src_prop</first_id>
-              <second_id>pt_src_prop</second_id>
+              <first_id>pt_src_pt_sink_prop</first_id>
+              <second_id>pt_src_pt_sink_prop</second_id>
             </elem>
           </sink_pairs>
         </NamedObject>
