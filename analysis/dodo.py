@@ -10,6 +10,7 @@ import re
 
 import correlators
 import extractors
+import names
 import transforms
 import visualizers
 import wflow
@@ -112,8 +113,8 @@ def task_convert_t0_to_md_time():
     for dirname in directories:
         yield make_single_transform(dirname,
                                     transforms.convert_tau0_to_md_time,
-                                    'extract-tau0.tsv',
-                                    'extract-md_time.tsv')
+                                    os.path.join(dirname, 'extract-tau0.tsv'),
+                                    os.path.join(dirname, 'extract-md_time.tsv'))
 
 def task_wflow():
     for dirname in directories:
@@ -132,24 +133,24 @@ def task_wflow():
 
             yield make_single_transform(dirname,
                                         wflow.convert_xml_to_tsv,
-                                        os.path.basename(xml_file),
-                                        os.path.basename(file_e))
+                                        xml_file,
+                                        file_e)
             yield make_single_transform(dirname,
                                         wflow.compute_t2_e,
-                                        os.path.basename(file_e),
-                                        os.path.basename(file_t2e))
+                                        file_e,
+                                        file_t2e)
             yield make_single_transform(dirname,
                                         wflow.compute_w,
-                                        os.path.basename(file_e),
-                                        os.path.basename(file_w))
+                                        file_e,
+                                        file_w)
             yield make_single_transform(dirname,
                                         wflow.compute_intersection,
-                                        os.path.basename(file_t2e),
-                                        os.path.basename(file_t0))
+                                        file_t2e,
+                                        file_t0)
             yield make_single_transform(dirname,
                                         wflow.compute_intersection,
-                                        os.path.basename(file_w),
-                                        os.path.basename(file_w0))
+                                        file_w,
+                                        file_w0)
 
         for name, files in [('t0', files_t0), ('w0', files_w0)]:
             path_out = os.path.join(dirname, 'extract-{}.tsv'.format(name))
@@ -162,12 +163,10 @@ def task_wflow():
 
 
 
-def make_single_transform(dirname, function, file_in, file_out):
-    path_in = os.path.join(dirname, file_in)
-    path_out = os.path.join(dirname, file_out)
+def make_single_transform(dirname, function, path_in, path_out):
     return {
         'actions': [(function, [path_in, path_out])],
-        'name': dirname + '/' + file_out,
+        'name': path_out,
         'file_dep': [path_in],
         'targets': [path_out],
     }
@@ -208,10 +207,9 @@ def task_make_plot():
 def task_correlators():
     for dirname in directories:
         for corr_xml in glob.glob(os.path.join(dirname, 'corr.config-*.out.xml')):
-            config = re.search('config-(\d+)', corr_xml).group(0)
-            corr_tsv = os.path.join(dirname, 'extract-corr.config-{}.tsv'.format(config))
+            corr_tsv = names.correlator_tsv(corr_xml)
             yield make_single_transform(dirname,
                                         correlators.io_extract_pion_corr,
-                                        os.path.basename(corr_xml),
-                                        os.path.basename(corr_tsv))
+                                        corr_xml,
+                                        corr_tsv)
 
