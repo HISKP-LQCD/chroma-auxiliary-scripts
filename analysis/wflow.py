@@ -96,10 +96,31 @@ def compute_t2_e(path_in, path_out):
     np.savetxt(path_out, np.column_stack([t, t**2 * e]))
 
 
+def derive_w(t, e, method='gradient'):
+    eps = t[1] - t[0]
+
+    if method == 'gradient':
+        w = t * np.gradient(t**2 * e, eps)
+    elif method == 'chain-gradient':
+        grad = np.gradient(e, eps)
+        w = t * (2*t * e + t**2 * grad)
+    elif method == 'explicit-asym':
+        grad = (e[1:] - e[:-1]) / eps
+        grad = np.concatenate([grad, [0]])
+        w = t * (2*t * e + t**2 * grad)
+    elif method == 'explicit-sym':
+        grad = (e[2:] - e[:-2]) / (2 * eps)
+        grad = np.concatenate([[0], grad, [0]])
+        w = t * (2*t * e + t**2 * grad)
+    else:
+        raise RuntimeError("Method {} is not supported.".format(method))
+
+    return w
+
+
 def compute_w(path_in, path_out):
     t, e = util.load_columns(path_in)
-    #w = t * np.gradient(t**2 * e, t)
-    w = t * (2*t * e + t**2 * np.gradient(e, t))
+    w = derive_w(t, e)
     np.savetxt(path_out, np.column_stack([t, w]))
 
 
