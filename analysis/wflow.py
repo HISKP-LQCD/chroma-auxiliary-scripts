@@ -16,68 +16,12 @@ import scipy.optimize
 import util
 
 
-def main(options):
-    for xml_file in options.xml:
-        convert_xml_to_tsv(xml_file)
-        compute_t2_e(xml_file)
-
-        t0 = find_root(xml_file + '.t2e.tsv')
-        print('t0:', t0)
-
-        compute_w(xml_file)
-
-        w0 = find_root(xml_file + '.w.tsv')
-        print('w0:', w0)
-
-        visualize(xml_file, root=root)
-
-
-def process_directory(dirname):
-    t0s = []
-    w0s = []
-
-    for xml_file in sorted(glob.glob(os.path.join(dirname, '*.wflow.xml'))):
-        print(xml_file)
-
-        try:
-            convert_xml_to_tsv(xml_file)
-        except etree.XMLSyntaxError as e:
-            print(e)
-            continue
-
-        compute_t2_e(xml_file)
-        compute_w(xml_file)
-
-        try:
-            t0 = find_root(xml_file + '.t2e.tsv')[0]
-            w0 = find_root(xml_file + '.w.tsv')[0]
-        except ValueError as e:
-            print(e)
-            continue
-
-        tree = etree.parse(xml_file)
-        results = tree.xpath('//StartUpdateNum/text()')
-        assert len(results) == 1, results
-        update_no = float(results[0])
-
-        t0s.append((update_no, t0))
-        w0s.append((update_no, w0))
-
-    t0s.sort()
-    w0s.sort()
-
-    print(w0s)
-
-    np.savetxt(os.path.join(dirname, 'extract-t0.tsv'), t0s)
-    np.savetxt(os.path.join(dirname, 'extract-w0.tsv'), w0s)
-
-
-def compute_intersection(path_in, path_out):
+def io_compute_intersection(path_in, path_out):
     root = find_root(path_in)
     np.savetxt(path_out, [root])
 
 
-def convert_xml_to_tsv(path_in, path_out):
+def io_convert_xml_to_tsv(path_in, path_out):
     tree = etree.parse(path_in)
 
     print(path_in)
@@ -91,7 +35,7 @@ def convert_xml_to_tsv(path_in, path_out):
     np.savetxt(path_out, np.column_stack([t, e]))
 
 
-def compute_t2_e(path_in, path_out):
+def io_compute_t2_e(path_in, path_out):
     t, e = util.load_columns(path_in)
     np.savetxt(path_out, np.column_stack([t, t**2 * e]))
 
@@ -118,7 +62,7 @@ def derive_w(t, e, method='gradient'):
     return w
 
 
-def compute_w(path_in, path_out):
+def io_compute_w(path_in, path_out):
     t, e = util.load_columns(path_in)
     w = derive_w(t, e)
     np.savetxt(path_out, np.column_stack([t, w]))

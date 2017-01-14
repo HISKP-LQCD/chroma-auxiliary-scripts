@@ -132,23 +132,23 @@ def task_wflow():
             files_w0.append(file_w0)
 
             yield make_single_transform(dirname,
-                                        wflow.convert_xml_to_tsv,
+                                        wflow.io_convert_xml_to_tsv,
                                         xml_file,
                                         file_e)
             yield make_single_transform(dirname,
-                                        wflow.compute_t2_e,
+                                        wflow.io_compute_t2_e,
                                         file_e,
                                         file_t2e)
             yield make_single_transform(dirname,
-                                        wflow.compute_w,
+                                        wflow.io_compute_w,
                                         file_e,
                                         file_w)
             yield make_single_transform(dirname,
-                                        wflow.compute_intersection,
+                                        wflow.io_compute_intersection,
                                         file_t2e,
                                         file_t0)
             yield make_single_transform(dirname,
-                                        wflow.compute_intersection,
+                                        wflow.io_compute_intersection,
                                         file_w,
                                         file_w0)
 
