@@ -213,7 +213,7 @@ def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (
         xlabel += ' (shifted by {} per curve)'.format(shift_amount)
 
     for i, dirname in enumerate(dirnames):
-        filename = os.path.join(dirname, 'extract-{}.tsv'.format(name))
+        filename = os.path.join(dirname, 'extract', 'extract-{}.tsv'.format(name))
         if not os.path.isfile(filename):
             continue
         data = np.atleast_2d(np.loadtxt(filename))

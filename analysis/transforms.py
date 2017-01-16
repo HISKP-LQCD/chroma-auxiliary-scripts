@@ -153,6 +153,12 @@ def convert_to_md_time(dirname, name_in):
                np.column_stack([md_time, y]))
 
 
+def io_delta_h_to_exp(path_in, path_out):
+    t, delta_h = util.load_columns(path_in)
+    exp = np.exp(- delta_h)
+    np.savetxt(path_out, np.column_stack([t, exp]))
+
+
 def convert_time_to_minutes(dirname):
     file_in = os.path.join(dirname,'extract',  'extract-seconds_for_trajectory.tsv')
     data = np.atleast_2d(np.loadtxt(file_in))
@@ -168,10 +174,16 @@ def convert_time_to_minutes(dirname):
 
 
 def convert_tau0_to_md_time(file_in, file_out):
-    update_no, tau0 = util.load_columns(file_in)
-    md_time = np.cumsum(tau0)
-    assert tau0.shape == md_time.shape
-    np.savetxt(file_out, np.column_stack([update_no, md_time]))
+    result = []
+    try:
+        update_no, tau0 = util.load_columns(file_in)
+    except ValueError as e:
+        print(e)
+    else:
+        md_time = np.cumsum(tau0)
+        assert tau0.shape == md_time.shape
+        result = np.column_stack([update_no, md_time])
+    np.savetxt(file_out, result)
 
 
 def delta_delta_h(dirname):

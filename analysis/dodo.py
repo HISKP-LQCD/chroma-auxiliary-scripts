@@ -98,10 +98,18 @@ def task_convert_delta_delta_h():
         }
 
 
+def task_delta_h_to_exp():
+    for dirname in directories:
+        yield make_single_transform(dirname,
+                                    transforms.io_delta_h_to_exp,
+                                    os.path.join(dirname, 'extract', 'extract-deltaH.tsv'),
+                                    os.path.join(dirname, 'extract', 'extract-exp_deltaH.tsv'))
+
+
 def task_convert_time_to_minutes():
     for dirname in directories:
-        in_files = [os.path.join(dirname, 'extract-seconds_for_trajectory.tsv')]
-        out_files = [os.path.join(dirname, 'extract-minutes_for_trajectory.tsv')]
+        in_files = [os.path.join(dirname, 'extract', 'extract-seconds_for_trajectory.tsv')]
+        out_files = [os.path.join(dirname, 'extract', 'extract-minutes_for_trajectory.tsv')]
         yield {
             'actions': [(transforms.convert_time_to_minutes, [dirname])],
             'name': dirname,
@@ -114,8 +122,8 @@ def task_convert_t0_to_md_time():
     for dirname in directories:
         yield make_single_transform(dirname,
                                     transforms.convert_tau0_to_md_time,
-                                    os.path.join(dirname, 'extract-tau0.tsv'),
-                                    os.path.join(dirname, 'extract-md_time.tsv'))
+                                    os.path.join(dirname, 'extract', 'extract-tau0.tsv'),
+                                    os.path.join(dirname, 'extract', 'extract-md_time.tsv'))
 
 def task_wflow():
     for dirname in directories:
@@ -190,7 +198,7 @@ def task_make_plot():
         yield plot_generic(dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy')
         #yield plot_generic(dirname, 'deltaH-vs-md_time', 'MD Time', r'$\Delta H$', 'MD Energy', transform_delta_h_md_time)
 
-        yield plot_generic(dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory')
+        #yield plot_generic(dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory')
 
         yield plot_generic(dirname, 'n_steps', 'Update Number', r'Step Count (coarsest time scale)', 'Integration Steps')
         #yield plot_generic(dirname, 'n_steps-vs-md_time', 'MD Time', r'Step Count (coarsest time scale)', 'Integration Steps')
@@ -200,6 +208,8 @@ def task_make_plot():
 
         yield plot_generic(dirname, 'DeltaDeltaH', 'Update Number', r'$\Delta \Delta H$', 'Reversibility')
         yield plot_generic(dirname, 'DeltaDeltaH_over_DeltaH', 'Update Number', r'$\Delta \Delta H / \Delta H$', 'Reversibility')
+
+        yield plot_generic(dirname, 'exp_deltaH', 'Update Number', r'$\exp(-\Delta H)$', 'MD EnergeReversibility')
 
         #yield plot_generic(dirname, 't0', 'Update Number', r'$t_0$', 'Wilson Flow Scale Setting')
         #yield plot_generic(dirname, 'w0', 'Update Number', r'$w_0$', 'Wilson Flow Scale Setting')
