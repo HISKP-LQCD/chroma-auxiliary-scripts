@@ -14,7 +14,7 @@ def load_columns(filename, expected_column_count=None):
     num_cols = shape[1]
 
     if num_cols == 0 and expected_column_count is not None:
-        cols = [[] for i in range(expected_column_count)]
+        cols = [np.array([]) for i in range(expected_column_count)]
     else:
         cols = [data2d[:, i] for i in range(num_cols)]
     return cols

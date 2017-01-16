@@ -162,7 +162,7 @@ def convert_to_md_time(dirname, name_in):
 
 
 def io_delta_h_to_exp(path_in, path_out):
-    t, delta_h = util.load_columns(path_in)
+    t, delta_h = util.load_columns(path_in, 2)
     exp = np.exp(- delta_h)
     np.savetxt(path_out, np.column_stack([t, exp]))
 
@@ -184,7 +184,7 @@ def convert_time_to_minutes(dirname):
 def convert_tau0_to_md_time(file_in, file_out):
     result = []
     try:
-        update_no, tau0 = util.load_columns(file_in)
+        update_no, tau0 = util.load_columns(file_in, 2)
     except ValueError as e:
         print(e)
     else:
@@ -198,8 +198,8 @@ def delta_delta_h(dirname):
     result = []
 
     try:
-        update_no_ddh, ddh = util.load_columns(os.path.join(dirname,'extract',  'extract-DeltaDeltaH.tsv'))
-        update_no_dh, dh = util.load_columns(os.path.join(dirname,'extract',  'extract-deltaH.tsv'))
+        update_no_ddh, ddh = util.load_columns(os.path.join(dirname,'extract',  'extract-DeltaDeltaH.tsv'), 2)
+        update_no_dh, dh = util.load_columns(os.path.join(dirname,'extract',  'extract-deltaH.tsv'), 2)
     except ValueError:
         pass
     else:
