@@ -18,10 +18,6 @@ import transforms
 import util
 
 
-def set_y_limits_delta_h(ax):
-    ax.set_ylim(-1, 1)
-
-
 def plot_solver_data(path_in, path_out, ylabel, title='Solver Data', log_scale=False):
     fig, ax = util.make_figure()
 
@@ -150,16 +146,6 @@ def plot_perf_vs_sublattice(dirnames):
 
     pl.savefig('plot-gflops-vs-subgrid_volume.pdf')
     pl.savefig('plot-gflops-vs-subgrid_volume.png')
-
-
-def transform_delta_h(x, y):
-    sel = x > 10
-    return x[sel], y[sel]
-
-
-def transform_delta_h_md_time(x, y):
-    sel = x > 0.1
-    return x[sel], y[sel]
 
 
 def plot_generic(path_in, path_out, xlabel, ylabel, title, use_auto_ylim=False):
