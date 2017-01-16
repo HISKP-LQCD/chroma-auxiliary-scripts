@@ -9,7 +9,6 @@ import json
 import os
 import pprint
 import re
-import subprocess
 
 import matplotlib.pyplot as pl
 import numpy as np
@@ -17,46 +16,6 @@ import numpy as np
 import names
 import transforms
 import util
-
-
-def main(options):
-    for dirname in options.dirname:
-        transforms.delta_delta_h(dirname)
-
-        transforms.convert_solver_list(dirname,
-                                       transforms.gflops_per_node_converter, 'gflops_per_node')
-        transforms.convert_solver_list(dirname,
-                                       transforms.iteration_converter, 'iters')
-        transforms.convert_solver_list(dirname,
-                                       transforms.residual_converter, 'residuals')
-
-    plot_solver_data(options.dirname, 'iters', 'Solver Iterations', 'Iterations')
-    plot_solver_data(options.dirname, 'gflops_per_node', 'GFLOP/s per Rank', 'Performance')
-    plot_solver_data(options.dirname, 'residuals', 'Residuals', 'Residuals', log_scale=True)
-
-    plot_generic(options.dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 1.0)', 'Plaquette', shift=options.shift, shift_amount=options.shift_amount)
-    plot_generic(options.dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 1.0)', 'Plaquette', shift=options.shift, shift_amount=options.shift_amount)
-
-    plot_generic(options.dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy', transform_delta_h, shift=options.shift, shift_amount=options.shift_amount)
-    plot_generic(options.dirname, 'deltaH-vs-md_time', 'MD Time', r'$\Delta H$', 'MD Energy', transform_delta_h_md_time, shift=options.shift, shift_amount=options.shift_amount)
-
-    plot_generic(options.dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy (Zoom)', ax_transform=set_y_limits_delta_h, outname='deltaH-narrow', shift=options.shift, shift_amount=options.shift_amount)
-
-    plot_generic(options.dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory', shift=options.shift, shift_amount=options.shift_amount)
-
-    plot_generic(options.dirname, 'n_steps', 'Update Number', r'Step Count (coarsest time scale)', 'Integration Steps', shift=options.shift, shift_amount=options.shift_amount)
-    plot_generic(options.dirname, 'n_steps-vs-md_time', 'MD Time', r'Step Count (coarsest time scale)', 'Integration Steps', shift=options.shift, shift_amount=options.shift_amount)
-
-    plot_generic(options.dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance', shift=options.shift, shift_amount=options.shift_amount)
-    plot_generic(options.dirname, 'tau0', 'Update Number', r'MD Step Size', 'MD Step Size', shift=options.shift, shift_amount=options.shift_amount)
-
-    plot_generic(options.dirname, 'DeltaDeltaH', 'Update Number', r'$\Delta \Delta H$', 'Reversibility', shift=options.shift, shift_amount=options.shift_amount)
-    plot_generic(options.dirname, 'DeltaDeltaH_over_DeltaH', 'Update Number', r'$\Delta \Delta H / \Delta H$', 'Reversibility', shift=options.shift, shift_amount=options.shift_amount)
-
-    plot_generic(options.dirname, 't0', 'Update Number', r'$t_0$', 'Wilson Flow Scale Setting', shift=options.shift, shift_amount=options.shift_amount)
-    plot_generic(options.dirname, 'w0', 'Update Number', r'$w_0$', 'Wilson Flow Scale Setting', shift=options.shift, shift_amount=options.shift_amount)
-
-    subprocess.check_call(['pdfunite'] + sorted(glob.glob('plot-*.pdf')) + [options.united_name])
 
 
 def set_y_limits_delta_h(ax):
