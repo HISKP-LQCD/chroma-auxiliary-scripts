@@ -87,9 +87,9 @@ def task_xpath_shards():
 
 def task_convert_delta_delta_h():
     for dirname in directories:
-        in_files = [os.path.join(dirname, 'extract-DeltaDeltaH.tsv'),
-                    os.path.join(dirname, 'extract-deltaH.tsv')]
-        out_file = os.path.join(dirname, 'extract-DeltaDeltaH_over_DeltaH.tsv')
+        in_files = [os.path.join(dirname, 'extract', 'extract-DeltaDeltaH.tsv'),
+                    os.path.join(dirname,'extract',  'extract-deltaH.tsv')]
+        out_file = os.path.join(dirname,'extract',  'extract-DeltaDeltaH_over_DeltaH.tsv')
         yield {
             'actions': [(transforms.delta_delta_h, [dirname])],
             'name': dirname,
