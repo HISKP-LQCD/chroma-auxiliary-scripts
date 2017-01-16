@@ -181,8 +181,16 @@
   <MCControl><!--[[[-->
 
     <Cfg>
+      <!-- Use the following block for a start from a fresh configuration -->
       <cfg_type>WEAK_FIELD</cfg_type>
       <cfg_file>DUMMY</cfg_file>
+
+      <!-- Use the following block for a start from an existing configuration -->
+      <!--
+      <cfg_type>SZINQIO</cfg_type>
+      <cfg_file>cfg/cfg.config-00000.lime</cfg_file>
+      <parallel_io>false</parallel_io>
+      -->
     </Cfg>
 
     <RNG>
@@ -199,12 +207,16 @@
     <NProductionUpdates>10000</NProductionUpdates>
     <NUpdatesThisRun>1</NUpdatesThisRun>
 
+    <SaveInterval>1</SaveInterval>
+    <SavePrefix>cfg/cfg</SavePrefix>
+    <SaveVolfmt>SINGLEFILE</SaveVolfmt>
+    <ParallelIO>false</ParallelIO>
+
     <ReproCheckP>false</ReproCheckP>
     <ReproCheckFrequency>1</ReproCheckFrequency>
-
-    <SaveInterval>1</SaveInterval>
-    <SavePrefix>Mpi270-L24</SavePrefix>
-    <SaveVolfmt>SINGLEFILE</SaveVolfmt>
+    <ReverseCheckP>true</ReverseCheckP>
+    <ReverseCheckFrequency>20</ReverseCheckFrequency>
+    <MonitorForces>true</MonitorForces><InlineMeasurements>
 
     <InlineMeasurements>
       <elem>
