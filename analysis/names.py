@@ -70,3 +70,8 @@ def plot(dirname, name):
 @_ensure_dir
 def pion_mass(dirname):
     return os.path.join(dirname, 'extract', 'extract-Mpi.pdf')
+
+
+@_ensure_dir
+def json_extract(dirname, name):
+    return os.path.join(dirname, 'extract', 'extract-{}.json'.format(name))

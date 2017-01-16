@@ -7,6 +7,7 @@ import collections
 import glob
 import json
 import os
+import pprint
 import re
 import subprocess
 
@@ -62,23 +63,21 @@ def set_y_limits_delta_h(ax):
     ax.set_ylim(-1, 1)
 
 
-def plot_solver_data(dirnames, key, ylabel, title='Solver Data', log_scale=False):
+def plot_solver_data(path_in, path_out, ylabel, title='Solver Data', log_scale=False):
     fig, ax = util.make_figure()
 
-    for dirname in dirnames:
-        files = glob.glob(os.path.join(dirname, 'extract-solver-*-{}.tsv'.format(key)))
+    with open(path_in) as f:
+        data = json.load(f)
 
-        for f in sorted(files):
-            x, y, yerr_down, yerr_up = util.load_columns(f)
+    for solver, (x, y, yerr_down, yerr_up) in data.items():
+        x = np.array(x)
+        y = np.array(y)
+        yerr_down = np.array(yerr_down)
+        yerr_up = np.array(yerr_up)
 
-            m = re.search(r'extract-solver-(.+?)-{}.tsv'.format(key), f)
-            if not m:
-                continue
-
-            solver_name = m.group(1).replace('_', ' ')
-
-            label = '{}/{}'.format(os.path.basename(os.path.realpath(dirname)), solver_name)
-            ax.errorbar(x, y, (yerr_down, yerr_up), marker='o', linestyle='none', label=label)
+        label = solver
+        p = ax.plot(x, y, label=label)
+        ax.fill_between(x, y - yerr_down, y + yerr_up, alpha=0.3, color=p[0].get_color())
 
     ax.set_title(title)
     ax.set_xlabel('Update Number')
@@ -100,8 +99,7 @@ def plot_solver_data(dirnames, key, ylabel, title='Solver Data', log_scale=False
             ax.set_ylim(start, end)
 
     util.dandify_figure(fig)
-
-    fig.savefig('plot-solver-{}-vs-update_no.pdf'.format(key))
+    fig.savefig(path_out)
 
 
 def plot_perf(dirnames):

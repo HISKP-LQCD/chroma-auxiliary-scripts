@@ -49,12 +49,26 @@ def task_logfiles_to_shards():
 
 def task_transform_solver_data():
     for directory in directories:
-        for converter, outname in [(transforms.gflops_per_node_converter, 'gflops_per_node'), (transforms.iteration_converter, 'iters'), (transforms.residual_converter, 'residuals')]:
+        for converter, outname, ylabel, log_scale in [
+            (transforms.gflops_per_node_converter, 'gflops_per_node', 'Gflop/s per Node', False),
+            (transforms.iteration_converter, 'iters', 'Iterations', False),
+            (transforms.residual_converter, 'residuals', 'Residuals', True),
+        ]:
             yield {
                 'actions': [(transforms.convert_solver_list, [directory, converter, outname])],
                 'name': directory + '/' + outname,
                 'file_dep': [names.log_extract(directory)],
-                'targets': [],
+                'targets': [names.json_extract(directory, outname)],
+            }
+
+            path_in = names.json_extract(directory, outname)
+            path_out = names.plot(directory, 'solver_' + outname)
+
+            yield {
+                'actions': [(visualizers.plot_solver_data, [path_in, path_out, converter, ylabel, log_scale])],
+                'name': path_out,
+                'file_dep': [path_in],
+                'targets': [path_out],
             }
 
 

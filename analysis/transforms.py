@@ -7,9 +7,11 @@ import collections
 import glob
 import json
 import os
+import pprint
 
 import numpy as np
 
+import names
 import util
 
 
@@ -72,6 +74,7 @@ def convert_solver_list(dirname, converter, outname):
 
             results[solver].append([float(update_no)] + result)
 
+    to_json = {}
 
     for solver, solver_results in results.items():
         if len(solver_results) > 0:
@@ -79,6 +82,11 @@ def convert_solver_list(dirname, converter, outname):
                 dirname, 'extract',
                 'extract-solver-{}-{}.tsv'.format(util.make_safe_name(solver), outname)),
                 solver_results)
+
+            to_json[solver] = list(zip(*sorted(solver_results)))
+
+    with open(names.json_extract(dirname, outname), 'w') as f:
+        json.dump(to_json, f, indent=4, sort_keys=True)
 
 
 def merge_json_shards(filenames, dest):
