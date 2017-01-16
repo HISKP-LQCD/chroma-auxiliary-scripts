@@ -196,37 +196,56 @@ def make_single_transform(dirname, function, path_in, path_out):
 
 
 def plot_generic(dirname, name, *args, **kwargs):
-    return {
-        'actions': [(visualizers.plot_generic, [[dirname], name] + list(args), kwargs)],
-        'name': dirname + '/' + name,
-        'file_dep': [os.path.join(dirname, 'extract', 'extract-{}.tsv'.format(name))],
-        'targets': [names.plot(dirname, name)],
+    path_in = names.tsv_extract(dirname, name)
+    path_out = names.plot(dirname, name)
+
+    yield {
+        'actions': [(visualizers.plot_generic, [path_in, path_out] + list(args), kwargs)],
+        'name': path_out,
+        'file_dep': [path_in],
+        'targets': [path_out],
+    }
+
+    path_out = names.plot(dirname, name + '_autoy')
+    kwargs = dict(kwargs)
+    kwargs['use_auto_ylim'] = True
+
+    yield {
+        'actions': [(visualizers.plot_generic, [path_in, path_out] + list(args), kwargs)],
+        'name': path_out,
+        'file_dep': [path_in],
+        'targets': [path_out],
     }
 
 
 def task_make_plot():
+    tasks = []
     for dirname in directories:
-        yield plot_generic(dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 1.0)', 'Plaquette')
-        #yield plot_generic(dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 1.0)', 'Plaquette')
+        tasks.append(plot_generic(dirname, 'w_plaq', 'Update Number', 'Plaquette (cold is 1.0)', 'Plaquette'))
+        #tasks.append(plot_generic(dirname, 'w_plaq-vs-md_time', 'MD Time', 'Plaquette (cold is 1.0)', 'Plaquette'))
 
-        yield plot_generic(dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy')
-        #yield plot_generic(dirname, 'deltaH-vs-md_time', 'MD Time', r'$\Delta H$', 'MD Energy', transform_delta_h_md_time)
+        tasks.append(plot_generic(dirname, 'deltaH', 'Update Number', r'$\Delta H$', 'MD Energy'))
+        #tasks.append(plot_generic(dirname, 'deltaH-vs-md_time', 'MD Time', r'$\Delta H$', 'MD Energy', transform_delta_h_md_time))
 
-        #yield plot_generic(dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory')
+        tasks.append(plot_generic(dirname, 'minutes_for_trajectory', 'Update Number', r'Minutes', 'Time for Trajectory'))
 
-        yield plot_generic(dirname, 'n_steps', 'Update Number', r'Step Count (coarsest time scale)', 'Integration Steps')
-        #yield plot_generic(dirname, 'n_steps-vs-md_time', 'MD Time', r'Step Count (coarsest time scale)', 'Integration Steps')
+        tasks.append(plot_generic(dirname, 'n_steps', 'Update Number', r'Step Count (coarsest time scale)', 'Integration Steps'))
+        #tasks.append(plot_generic(dirname, 'n_steps-vs-md_time', 'MD Time', r'Step Count (coarsest time scale)', 'Integration Steps'))
 
-        yield plot_generic(dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance')
-        yield plot_generic(dirname, 'tau0', 'Update Number', r'MD Step Size', 'MD Step Size')
+        tasks.append(plot_generic(dirname, 'md_time', 'Update Number', r'MD Time', 'MD Distance'))
+        tasks.append(plot_generic(dirname, 'tau0', 'Update Number', r'MD Step Size', 'MD Step Size'))
 
-        yield plot_generic(dirname, 'DeltaDeltaH', 'Update Number', r'$\Delta \Delta H$', 'Reversibility')
-        yield plot_generic(dirname, 'DeltaDeltaH_over_DeltaH', 'Update Number', r'$\Delta \Delta H / \Delta H$', 'Reversibility')
+        tasks.append(plot_generic(dirname, 'DeltaDeltaH', 'Update Number', r'$\Delta \Delta H$', 'Reversibility'))
+        tasks.append(plot_generic(dirname, 'DeltaDeltaH_over_DeltaH', 'Update Number', r'$\Delta \Delta H / \Delta H$', 'Reversibility'))
 
-        yield plot_generic(dirname, 'exp_deltaH', 'Update Number', r'$\exp(-\Delta H)$', 'MD EnergeReversibility')
+        tasks.append(plot_generic(dirname, 'exp_deltaH', 'Update Number', r'$\exp(-\Delta H)$', 'MD EnergeReversibility'))
 
-        #yield plot_generic(dirname, 't0', 'Update Number', r'$t_0$', 'Wilson Flow Scale Setting')
-        #yield plot_generic(dirname, 'w0', 'Update Number', r'$w_0$', 'Wilson Flow Scale Setting')
+        tasks.append(plot_generic(dirname, 't0', 'Update Number', r'$t_0$', 'Wilson Flow Scale Setting'))
+        tasks.append(plot_generic(dirname, 'w0', 'Update Number', r'$w_0$', 'Wilson Flow Scale Setting'))
+
+    for task in tasks:
+        for subtask in task:
+            yield subtask
 
 
 def task_correlators():

@@ -75,3 +75,8 @@ def pion_mass(dirname):
 @_ensure_dir
 def json_extract(dirname, name):
     return os.path.join(dirname, 'extract', 'extract-{}.json'.format(name))
+
+
+@_ensure_dir
+def tsv_extract(dirname, name):
+    return os.path.join(dirname, 'extract', 'extract-{}.tsv'.format(name))

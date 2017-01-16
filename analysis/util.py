@@ -7,13 +7,16 @@ import matplotlib.pyplot as pl
 import numpy as np
 
 
-def load_columns(filename):
+def load_columns(filename, expected_column_count=None):
     data = np.loadtxt(filename)
     data2d = np.atleast_2d(data)
     shape = data2d.shape
     num_cols = shape[1]
 
-    cols = [data2d[:, i] for i in range(num_cols)]
+    if num_cols == 0 and expected_column_count is not None:
+        cols = [[] for i in range(expected_column_count)]
+    else:
+        cols = [data2d[:, i] for i in range(num_cols)]
     return cols
 
 

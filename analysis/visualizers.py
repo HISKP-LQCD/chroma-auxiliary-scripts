@@ -162,40 +162,32 @@ def transform_delta_h_md_time(x, y):
     return x[sel], y[sel]
 
 
-def plot_generic(dirnames, name, xlabel, ylabel, title, transform=lambda x, y: (x, y), outname=None, ax_transform=None, shift=False, shift_amount=0.1):
+def plot_generic(path_in, path_out, xlabel, ylabel, title, use_auto_ylim=False):
     fig = pl.figure()
     ax = fig.add_subplot(1, 1, 1)
 
-    if shift:
-        xlabel += ' (shifted by {} per curve)'.format(shift_amount)
+    x, y = util.load_columns(path_in, 2)
 
-    for i, dirname in enumerate(dirnames):
-        filename = os.path.join(dirname, 'extract', 'extract-{}.tsv'.format(name))
-        if not os.path.isfile(filename):
-            continue
-        data = np.atleast_2d(np.loadtxt(filename))
-        if data.shape[1] == 0:
-            continue
-        label = os.path.basename(os.path.realpath(dirname))
-        x = data[:, 0]
-        y = data[:, 1]
-        x, y = transform(x, y)
-        if shift:
-            x = np.array(x) + shift_amount * i
-        ax.plot(x, y, marker='o', label=label, markersize=2)
+    if len(x) > 0:
+        ax.plot(x, y, marker='o', markersize=2)
 
         ax.set_title(title)
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
 
-        if ax_transform is not None:
-            ax_transform(ax)
-
+        if use_auto_ylim:
+            ax.set_ylim(get_auto_ylim(y))
         util.dandify_axes(ax)
         util.dandify_figure(fig)
 
-        if outname is None:
-            outname = name
+    pl.savefig(path_out)
 
 
-        pl.savefig(names.plot(dirname, outname))
+def get_auto_ylim(y):
+    ymin = np.percentile(y, 20)
+    ymax = np.percentile(y, 80)
+    spread = ymax - ymin
+    margin = 2 * spread
+    ymin -= margin
+    ymax += margin
+    return ymin, ymax
