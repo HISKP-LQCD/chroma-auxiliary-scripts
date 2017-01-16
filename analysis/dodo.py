@@ -53,7 +53,7 @@ def task_transform_solver_data():
             yield {
                 'actions': [(transforms.convert_solver_list, [directory, converter, outname])],
                 'name': directory + '/' + outname,
-                'file_dep': [os.path.join(directory, 'extract-log.json')],
+                'file_dep': [names.log_extract(directory)],
                 'targets': [],
             }
 
