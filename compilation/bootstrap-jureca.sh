@@ -33,6 +33,7 @@ if (( $# == 0 )); then
     echo "usage: $0 BASE"
 fi
 
+mkdir -p "$1"
 pushd "$1"
 basedir="$PWD"
 popd
@@ -137,6 +138,11 @@ clone-if-needed() {
     fi
 }
 
+# If the user has not given a variable `SMP` in the environment, use as many
+# processes to compile as there are cores in the system.
+make_smp_template="-j $(nproc)"
+make_smp_flags="${SMP-$make_smp_template}"
+
 # Runs `make && make install` with appropriate flags that make compilation
 # parallel on multiple cores. A sentinel file is created such that `make` is
 # not invoked once it has correctly built.
@@ -150,11 +156,6 @@ make-make-install() {
         popd
     fi
 }
-
-# If the user has not given a variable `SMP` in the environment, use as many
-# processes to compile as there are cores in the system.
-make_smp_template="-j $(nproc)"
-make_smp_flags="${SMP-$make_smp_template}"
 
 # Prints a large heading such that it is clear where one is in the compilation
 # process. This is not needed but occasionally helpful.
@@ -388,5 +389,8 @@ if ! [[ -f Makefile ]]; then
 fi
 make-make-install
 popd
+
+echo
+echo "That took $SECONDS seconds."
 
 # vim: spell
