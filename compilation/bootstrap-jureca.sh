@@ -62,10 +62,10 @@ case $compiler in
         cxx_name=mpiicpc
         color_flags=""
         openmp_flags="-fopenmp"
-        base_flags="-O2"
+        base_flags="-xAVX2 -O2"
         cxx11_flags="--std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
-        qphix_flags="-xAVX -qopt-report -qopt-report-phase=vec -restrict"
+        qphix_flags="-qopt-report -qopt-report-phase=vec -restrict"
         # QPhiX can make use of the Intel “C Extended Array Notation”, this
         # gets enabled here.
         qphix_configure="--enable-cean"
@@ -326,7 +326,7 @@ if ! [[ -f Makefile ]]; then
         $qphix_configure \
         --disable-testing \
         --enable-proc=AVX2 \
-        --enable-soalen=4 \
+        --enable-soalen=2 \
         --enable-clover \
         --enable-openmp \
         --enable-mm-malloc \
@@ -375,7 +375,7 @@ if ! [[ -f Makefile ]]; then
         --enable-precision=double \
         --enable-qdp-alignment=128 \
         --enable-sse2 \
-        --enable-qphix-solver-arch=avx \
+        --enable-qphix-solver-arch=avx2 \
         --with-gmp="$EBROOTGMP" \
         --with-libxml2="$prefix/bin/xml2-config" \
         --with-qdp="$prefix" \
