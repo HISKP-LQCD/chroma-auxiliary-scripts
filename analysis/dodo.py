@@ -122,14 +122,12 @@ def task_delta_h_to_exp():
 
 def task_convert_time_to_minutes():
     for dirname in directories:
-        in_files = [os.path.join(dirname, 'extract', 'extract-seconds_for_trajectory.tsv')]
-        out_files = [os.path.join(dirname, 'extract', 'extract-minutes_for_trajectory.tsv')]
-        yield {
-            'actions': [(transforms.convert_time_to_minutes, [dirname])],
-            'name': dirname,
-            'file_dep': in_files,
-            'targets': out_files,
-        }
+        path_in = os.path.join(dirname, 'extract', 'extract-seconds_for_trajectory.tsv')
+        path_out = os.path.join(dirname, 'extract', 'extract-minutes_for_trajectory.tsv')
+        yield make_single_transform(dirname,
+                                    transforms.io_time_to_minutes,
+                                    path_in,
+                                    path_out)
 
 
 def task_convert_t0_to_md_time():
