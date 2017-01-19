@@ -32,7 +32,10 @@ set -x
 if (( $# == 0 )); then
     echo "usage: $0 BASE"
 fi
-basedir="$PWD/$1"
+
+pushd "$1"
+basedir="$PWD"
+popd
 
 # Set all locale to C, such that compiler error messages are all in English.
 # This makes debugging way easier.
