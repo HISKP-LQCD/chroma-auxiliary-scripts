@@ -311,7 +311,8 @@ popd
 
 repo=qphix
 print-fancy-heading $repo
-clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
+#clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
+clone-if-needed https://github.com/martin-ueding/qphix.git $repo devel
 
 pushd $repo
 cflags="$base_cflags $openmp_flags $qphix_flags"
