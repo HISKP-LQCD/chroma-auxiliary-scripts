@@ -26,7 +26,7 @@ Wilson flow.
                     <gauge_out>flowed_gauge_field</gauge_out>
                 </NamedObject>
 
-                <xml_file>{{ xml_out_file }}</xml_file>
+                <xml_file>wflow.config-{{ number }}.out.xml</xml_file>
             </elem>
         </InlineMeasurements>
     </Param>
