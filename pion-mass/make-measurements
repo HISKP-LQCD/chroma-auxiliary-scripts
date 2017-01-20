@@ -54,7 +54,7 @@ def main():
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader(os.path.dirname(__file__))
     )
-    chroma_template = env.get_template('pion-correlator.template.xml')
+    chroma_template = env.get_template(options.template + '.template.xml')
     slurm_template = jinja2.Template(jobscript_text)
 
     chroma_inputs = []
@@ -81,9 +81,7 @@ def main():
             f.write(chroma_rendered)
 
     for i, chunk in enumerate(chunks(chroma_inputs, options.package)):
-        slurm_rendered = slurm_template.render(
-            chroma_inputs=chunk,
-        )
+        slurm_rendered = slurm_template.render(chroma_inputs=chunk)
 
         filename_slurm_input = 'corr.{}.slurm.sh'.format(i)
 
@@ -99,9 +97,15 @@ def _parse_args():
     :return: Namespace with arguments.
     :rtype: Namespace
     '''
-    parser = argparse.ArgumentParser(description='')
+    parser = argparse.ArgumentParser(
+        description='''
+        Takes a USQCD Chroma measurement XML template file and generates one
+        file per configuration that is to be measured. Also SLURM job scripts
+        are created to start all those jobs.
+        ''')
+    parser.add_argument('template', choices=['corr', 'wflow'], help='Template for the measurement task to use')
     parser.add_argument('gauge_config', nargs='+', help='LIME files to smear')
-    parser.add_argument('--package', type=int, default=50)
+    parser.add_argument('--package', type=int, default=50, help='The number of measurements that should be performed in one SLURM job (default: %(default)s)')
     options = parser.parse_args()
 
     return options
