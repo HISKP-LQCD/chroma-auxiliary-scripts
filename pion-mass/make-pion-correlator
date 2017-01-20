@@ -52,7 +52,7 @@ def main():
     options = _parse_args()
 
     env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(".")
+        loader=jinja2.FileSystemLoader(os.path.dirname(__file__))
     )
     chroma_template = env.get_template('pion-correlator.template.xml')
     slurm_template = jinja2.Template(jobscript_text)
