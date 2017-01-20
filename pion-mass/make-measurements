@@ -17,7 +17,7 @@ jobscript_text = r'''#!/bin/bash
 #SBATCH --time=02:00:00
 #SBATCH --partition=devel
 #SBATCH --cpus-per-task=24
-#SBATCH --output=corr.slurm-%j.out.txt
+#SBATCH --output={{ template }}.slurm-%j.out.txt
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ueding@hiskp.uni-bonn.de
 
@@ -86,7 +86,9 @@ def main():
             f.write(chroma_rendered)
 
     for i, chunk in enumerate(chunks(chroma_inputs, options.package)):
-        slurm_rendered = slurm_template.render(chroma_inputs=chunk)
+        slurm_rendered = slurm_template.render(
+            chroma_inputs=chunk,
+            template=options.template)
 
         filename_slurm_input = '{}.{}.slurm.sh'.format(options.template, i)
 
