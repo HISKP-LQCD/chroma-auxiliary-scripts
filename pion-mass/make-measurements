@@ -60,6 +60,7 @@ def main():
     chroma_inputs = []
 
     for gauge_config in options.gauge_config:
+        assert os.path.isfile(gauge_config)
         print('Working on {} …'.format(gauge_config))
         basename = os.path.basename(gauge_config)
         dirname = os.path.dirname(gauge_config)
@@ -83,7 +84,7 @@ def main():
     for i, chunk in enumerate(chunks(chroma_inputs, options.package)):
         slurm_rendered = slurm_template.render(chroma_inputs=chunk)
 
-        filename_slurm_input = '{}.{}.slurm.sh'.format(options.template, ki)
+        filename_slurm_input = '{}.{}.slurm.sh'.format(options.template, i)
 
         print('Writing {} …'.format(filename_slurm_input))
         with open(filename_slurm_input, 'w') as f:
