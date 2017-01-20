@@ -5,6 +5,7 @@
 
 import argparse
 import os
+import re
 import subprocess
 
 import jinja2
@@ -34,6 +35,9 @@ srun ~/jureca-local-icc/bin/chroma \
 '''
 
 
+config_pattern = re.compile('(.+?)_cfg_(\d+)\.lime$')
+
+
 def chunks(l, n):
     '''
     Yield successive n-sized chunks from l.
@@ -61,12 +65,13 @@ def main():
         dirname = os.path.dirname(gauge_config)
         base, ext = os.path.splitext(basename)
 
-        filename_xml = '{}.corr.xml'.format(base)
-        filename_chroma_input = '{}.corr.chroma-ini.xml'.format(base)
+        prefix, number = config_pattern.search(gauge_config).groups()
+
+        filename_chroma_input = 'corr.config-{}.chroma-ini.xml'.format(number)
 
         chroma_rendered = chroma_template.render(
             config_in_file=gauge_config,
-            xml_out_file=filename_xml,
+            number=number,
         )
 
         chroma_inputs.append(filename_chroma_input)

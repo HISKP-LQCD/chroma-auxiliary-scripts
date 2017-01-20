@@ -18,7 +18,8 @@ import util
 
 def io_compute_intersection(path_in, path_out):
     root = find_root(path_in)
-    np.savetxt(path_out, [root])
+    result = np.sqrt(root)
+    np.savetxt(path_out, [result])
 
 
 def io_convert_xml_to_tsv(path_in, path_out):
@@ -31,7 +32,6 @@ def io_convert_xml_to_tsv(path_in, path_out):
 
     t = np.fromstring(wflow_step, sep=' ')
     e = np.fromstring(wflow_gactij, sep=' ')
-    #e *= 8
     np.savetxt(path_out, np.column_stack([t, e]))
 
 

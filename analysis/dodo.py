@@ -142,7 +142,7 @@ def task_wflow():
         files_t0 = []
         files_w0 = []
 
-        for xml_file in glob.glob(os.path.join(dirname, 'wflow.config-*.out.xml')):
+        for xml_file in glob.glob(os.path.join(dirname, 'wflow', 'wflow.config-*.out.xml')):
             file_e = names.wflow_xml_shard_name(xml_file, 'e')
             file_t2e = names.wflow_xml_shard_name(xml_file, 't2e')
             file_w = names.wflow_xml_shard_name(xml_file, 'w')

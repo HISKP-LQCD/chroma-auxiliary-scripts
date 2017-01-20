@@ -57,8 +57,8 @@ pion correlator from that.
           <InvertParam>
             <invType>QPHIX_CLOVER_INVERTER</invType>
             <SolverType>CG</SolverType>
-            <MaxIter>1000</MaxIter>
-            <RsdTarget>1e-12</RsdTarget>
+            <MaxIter>10000</MaxIter>
+            <RsdTarget>1e-9</RsdTarget>
             <CloverParams>
               <Mass>-0.0960</Mass>
               <clovCoeff>1.0</clovCoeff>
@@ -69,7 +69,48 @@ pion correlator from that.
         <NamedObject>
           <gauge_id>default_gauge_field</gauge_id>
           <source_id>pt_source</source_id>
-          <prop_id>pt_src_prop</prop_id>
+          <prop_id>light_pt_src_prop</prop_id>
+        </NamedObject>
+      </elem>
+
+      <elem>
+        <Name>PROPAGATOR</Name>
+        <Frequency>1</Frequency>
+        <Param>
+          <version>10</version>
+          <quarkSpinType>FULL</quarkSpinType>
+          <obsvP>false</obsvP>
+          <FermionAction>
+            <FermAct>CLOVER</FermAct>
+            <Mass>-0.057</Mass>
+            <clovCoeff>1.0</clovCoeff>
+            <FermState>
+              <Name>STOUT_FERM_STATE</Name>
+              <rho>0.11</rho>
+              <orthog_dir>-1</orthog_dir>
+              <n_smear>6</n_smear>
+              <FermionBC>
+                <FermBC>SIMPLE_FERMBC</FermBC>
+                <boundary>1 1 1 -1</boundary>
+              </FermionBC>
+            </FermState>
+          </FermionAction>
+          <InvertParam>
+            <invType>QPHIX_CLOVER_INVERTER</invType>
+            <SolverType>CG</SolverType>
+            <MaxIter>10000</MaxIter>
+            <RsdTarget>1e-9</RsdTarget>
+            <CloverParams>
+              <Mass>-0.0960</Mass>
+              <clovCoeff>1.0</clovCoeff>
+            </CloverParams>
+            <AntiPeriodicT>true</AntiPeriodicT>
+          </InvertParam>
+        </Param>
+        <NamedObject>
+          <gauge_id>default_gauge_field</gauge_id>
+          <source_id>pt_source</source_id>
+          <prop_id>strange_pt_src_prop</prop_id>
         </NamedObject>
       </elem>
 
@@ -87,8 +128,27 @@ pion correlator from that.
         </Param>
         <NamedObject>
           <gauge_id>default_gauge_field</gauge_id>
-          <prop_id>pt_src_prop</prop_id>
-          <smeared_prop_id>pt_src_pt_sink_prop</smeared_prop_id>
+          <prop_id>light_pt_src_prop</prop_id>
+          <smeared_prop_id>light_pt_src_pt_sink_prop</smeared_prop_id>
+        </NamedObject>
+      </elem>
+
+      <annotation>Smear the propagator at the sink.</annotation>
+      <elem>
+        <Name>SINK_SMEAR</Name>
+        <Frequency>1</Frequency>
+        <Param>
+          <version>5</version>
+          <Sink>
+            <version>2</version>
+            <SinkType>POINT_SINK</SinkType>
+            <j_decay>3</j_decay>
+          </Sink>
+        </Param>
+        <NamedObject>
+          <gauge_id>default_gauge_field</gauge_id>
+          <prop_id>strange_pt_src_prop</prop_id>
+          <smeared_prop_id>strange_pt_src_pt_sink_prop</smeared_prop_id>
         </NamedObject>
       </elem>
 
@@ -109,13 +169,39 @@ pion correlator from that.
           <gauge_id>default_gauge_field</gauge_id>
           <sink_pairs>
             <elem>
-              <first_id>pt_src_pt_sink_prop</first_id>
-              <second_id>pt_src_pt_sink_prop</second_id>
+              <first_id>light_pt_src_pt_sink_prop</first_id>
+              <second_id>light_pt_src_pt_sink_prop</second_id>
             </elem>
           </sink_pairs>
         </NamedObject>
-        <xml_file>{{ xml_out_file }}</xml_file>
+        <xml_file>corr.config-{{ number }}.pion.xml</xml_file>
       </elem>
+
+      <!-- Compute the hadron spectrum. This will compute the correlator for all 16 possible Gamma structures. -->
+      <elem>
+        <Name>HADRON_SPECTRUM</Name>
+        <Frequency>1</Frequency>
+        <Param>
+          <version>1</version>
+          <MesonP>true</MesonP>
+          <CurrentP>false</CurrentP>
+          <BaryonP>false</BaryonP>
+          <time_rev>false</time_rev>
+          <mom2_max>0</mom2_max>
+          <avg_equiv_mom>true</avg_equiv_mom>
+        </Param>
+        <NamedObject>
+          <gauge_id>default_gauge_field</gauge_id>
+          <sink_pairs>
+            <elem>
+              <first_id>light_pt_src_pt_sink_prop</first_id>
+              <second_id>strange_pt_src_pt_sink_prop</second_id>
+            </elem>
+          </sink_pairs>
+        </NamedObject>
+        <xml_file>corr.config-{{ number }}.kaon.xml</xml_file>
+      </elem>
+
     </InlineMeasurements>
   </Param>
 </chroma>
