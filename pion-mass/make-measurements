@@ -67,7 +67,7 @@ def main():
 
         prefix, number = config_pattern.search(gauge_config).groups()
 
-        filename_chroma_input = 'corr.config-{}.chroma-ini.xml'.format(number)
+        filename_chroma_input = '{}.config-{}.chroma-ini.xml'.format(options.template, number)
 
         chroma_rendered = chroma_template.render(
             config_in_file=gauge_config,
@@ -83,7 +83,7 @@ def main():
     for i, chunk in enumerate(chunks(chroma_inputs, options.package)):
         slurm_rendered = slurm_template.render(chroma_inputs=chunk)
 
-        filename_slurm_input = 'corr.{}.slurm.sh'.format(i)
+        filename_slurm_input = '{}.{}.slurm.sh'.format(options.template, ki)
 
         print('Writing {} …'.format(filename_slurm_input))
         with open(filename_slurm_input, 'w') as f:
