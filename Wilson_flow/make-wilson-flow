@@ -5,6 +5,7 @@
 
 import argparse
 import os
+import re
 import subprocess
 
 import jinja2
@@ -30,6 +31,9 @@ srun ~/jureca-local-icc/bin/chroma \
         -i "{{ chroma_input }}" \
         -by 8 -bz 8 -c 24 -sy 1 -sz 1 -pxy 1 -pxyz 0 -minct 2
 '''
+
+
+config_pattern = re.compile('(.+?)_cfg_(\d+)\.lime$')
 
 
 def main():
