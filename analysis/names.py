@@ -18,10 +18,10 @@ def _ensure_dir(function):
 
 
 @_ensure_dir
-def correlator_tsv(xml_file):
+def correlator_tsv(xml_file, meson):
     config = re.search('config-(\d+)', xml_file).group(0)
     dirname = os.path.dirname(xml_file)
-    corr_tsv = os.path.join(dirname, 'extract', 'corr', 'corr.config-{}.tsv'.format(config))
+    corr_tsv = os.path.join(dirname, 'extract', 'corr', 'corr.config-{}.{}.tsv'.format(config, meson))
     return corr_tsv
 
 

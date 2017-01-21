@@ -65,6 +65,9 @@ def io_extract_mass(paths_in, path_out):
     print('val', b_fit_param.val)
     print('err', b_fit_param.err)
 
+    np.savetxt(path_out,
+               np.column_stack([b_fit_param.cen, b_fit_param.val, b_fit_param.err]))
+
 
 def unwrap_correlator_values(boot_correlators, index):
     return [

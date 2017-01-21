@@ -248,20 +248,21 @@ def task_make_plot():
 
 def task_correlators():
     for dirname in directories:
-        corr_tsv_files = []
-        for corr_xml in glob.glob(os.path.join(dirname, 'corr.config-*.out.xml')):
-            corr_tsv = names.correlator_tsv(corr_xml)
-            corr_tsv_files.append(corr_tsv)
-            yield make_single_transform(dirname,
-                                        correlators.io_extract_pion_corr,
-                                        corr_xml,
-                                        corr_tsv)
-        
-        if len(corr_tsv_files) > 0:
-            path_pion_mass = names.pion_mass(dirname)
-            yield {
-                'actions': [(correlators.analysis.io_extract_mass, [corr_tsv_files, path_pion_mass])],
-                'name': dirname,
-                'file_dep': corr_tsv_files,
-                'targets': [path_pion_mass],
-            }
+        for meson in ['pion', 'kaon']:
+            corr_tsv_files = []
+            for corr_xml in glob.glob(os.path.join(dirname, 'corr', 'corr.config-*.{}.xml'.format(meson))):
+                corr_tsv = names.correlator_tsv(corr_xml, meson)
+                corr_tsv_files.append(corr_tsv)
+                yield make_single_transform(dirname,
+                                            correlators.io_extract_pion_corr,
+                                            corr_xml,
+                                            corr_tsv)
+            
+            if len(corr_tsv_files) > 0:
+                path_pion_mass = names.tsv_extract(dirname, meson + '_mass')
+                yield {
+                    'actions': [(correlators.analysis.io_extract_mass, [corr_tsv_files, path_pion_mass])],
+                    'name': path_pion_mass,
+                    'file_dep': corr_tsv_files,
+                    'targets': [path_pion_mass],
+                }

@@ -42,5 +42,3 @@ def io_extract_pion_corr(path_in, path_out):
 
             np.savetxt(path_out, np.column_stack([t, re, im]))
             return
-
-
