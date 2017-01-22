@@ -64,7 +64,7 @@ def main():
     chroma_inputs = []
 
     for gauge_config in options.gauge_config:
-        assert os.path.isfile(gauge_config)
+        assert os.path.isfile(gauge_config), 'File {} must exist.'.format(gauge_config)
         print('Working on {} …'.format(gauge_config))
         basename = os.path.basename(gauge_config)
         dirname = os.path.dirname(gauge_config)
