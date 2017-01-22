@@ -2,7 +2,7 @@
 
 import numpy as np
 
-import correlators.bootstrap
+import bootstrap
 
 
 def effective_mass(data, delta_t=1):
@@ -25,13 +25,12 @@ def effective_mass(data, delta_t=1):
     return m
 
 
-def effective_mass_cosh(sets, dt=1):
+def effective_mass_cosh(val, dt=1):
     r'''
     .. math::
 
         \operatorname{arcosh} \left(\frac{C(t-1)+C(t+1)}{2C(t)}\right)
     '''
-    val = correlators.bootstrap.average_arrays(sets)
     frac = (val[:-2*dt] + val[2*dt:]) / val[dt:-dt] / 2
     m_eff = np.arccosh(frac)
     return m_eff

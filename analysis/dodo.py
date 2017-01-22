@@ -266,3 +266,11 @@ def task_correlators():
                     'file_dep': corr_tsv_files,
                     'targets': [path_pion_mass],
                 }
+
+                path_effective_mass = names.tsv_extract(dirname, meson + '_effective_mass')
+                yield {
+                    'actions': [(correlators.analysis.io_effective_mass, [corr_tsv_files, path_effective_mass])],
+                    'name': path_effective_mass,
+                    'file_dep': corr_tsv_files,
+                    'targets': [path_effective_mass],
+                }

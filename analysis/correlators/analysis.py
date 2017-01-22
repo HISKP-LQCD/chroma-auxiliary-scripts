@@ -16,17 +16,34 @@ import bootstrap
 import correlators.corrfit
 import correlators.fit
 import correlators.loader
+import correlators.transform
 import util
 
 
 LOGGER = logging.getLogger(__name__)
 
 
+def io_effective_mass(paths_in, path_out):
+    twopts_orig = correlators.loader.folded_list_loader(paths_in)
+    sample_count = 3 * len(twopts_orig)
+    b_twopts = bootstrap.Boot(bootstrap.make_dist_draw(twopts_orig, sample_count))
+    b_effective = bootstrap.Boot([
+        correlators.transform.effective_mass_cosh(bootstrap.average_arrays(twopts))
+        for twopts in b_twopts.dist
+    ])
+    t = np.arange(1, len(twopts_orig[0]) - 1, dtype=float)
+    print(t)
+    print(b_effective.cen)
+    print(b_effective.err)
+    np.savetxt(path_out,
+               np.column_stack([t, b_effective.cen, b_effective.err]))
+
+
+
 def io_extract_mass(paths_in, path_out):
     twopts_orig = correlators.loader.folded_list_loader(paths_in)
 
-    sample_count = len(twopts_orig)
-    sample_count = 10
+    sample_count = 3 * len(twopts_orig)
 
     b_twopts = bootstrap.Boot(bootstrap.make_dist_draw(twopts_orig, sample_count))
 
@@ -34,7 +51,7 @@ def io_extract_mass(paths_in, path_out):
         correlators.corrfit.correlation_matrix(twopts)
         for twopts in b_twopts.dist])
 
-    omit_pre = 6
+    omit_pre = 7
 
     b_inv_corr_mat = bootstrap.Boot([
         corr_matrix[omit_pre:, omit_pre:].getI()
@@ -60,13 +77,14 @@ def io_extract_mass(paths_in, path_out):
     ax.set_yscale('log')
     util.save_figure(fig, 'test-corr.pdf')
 
-    print(b_fit_param)
-    print('cen', b_fit_param.cen)
-    print('val', b_fit_param.val)
-    print('err', b_fit_param.err)
+    print('cen', b_fit_param.cen[0])
+    print('val', b_fit_param.val[0])
+    print('err', b_fit_param.err[0])
+
+    print('len', len(twopts_orig), len(b_fit_param.dist))
 
     np.savetxt(path_out,
-               np.column_stack([b_fit_param.cen, b_fit_param.val, b_fit_param.err]))
+               np.column_stack([b_fit_param.cen[0], b_fit_param.val[0], b_fit_param.err[0]]))
 
 
 def unwrap_correlator_values(boot_correlators, index):
@@ -104,11 +122,9 @@ def perform_fits(time, corr_val, corr_err, inv_corr_mat, fit_function, p0,
         fit_function, used_x, used_y, inv_corr_mat, p0=fit_param,
     )
 
-    print(fit_param, fit_param_corr)
 
     dof = len(used_x) - 1 - len(fit_param_corr)
     p_value = 1 - scipy.stats.chi2.cdf(chi_sq, dof)
-    print(chi_sq, p_value)
 
 
     return fit_param_corr
