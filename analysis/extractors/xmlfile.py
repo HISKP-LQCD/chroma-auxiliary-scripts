@@ -51,13 +51,13 @@ def extractor_to_shard(extractor, xml_file, key):
     np.savetxt(outfile, np.column_stack([update_no_list, number_list]))
 
 
-def make_xpath_extractor(xpath):
+def make_xpath_extractor(xpath, transform=float):
     def extractor(xml_file):
-        return extract_xpath_from_all(xml_file, xpath)
+        return extract_xpath_from_all(xml_file, xpath, transform)
     return extractor
 
 
-def make_single_xpath_extractor(xpath):
+def make_single_xpath_extractor(xpath, transform=float):
     def extractor(xml_file):
         update_no_list = []
         number_list = []
@@ -71,7 +71,7 @@ def make_single_xpath_extractor(xpath):
             print(e)
         else:
             if len(tree.xpath('//doHMC')) >= 0:
-                number = float(tree.xpath(xpath)[0])
+                number = transform(tree.xpath(xpath)[0])
 
                 updates = tree.xpath('//Update')
 
@@ -95,7 +95,7 @@ def make_single_xpath_extractor(xpath):
     return extractor
 
 
-def extract_xpath_from_all(xml_file, xpath):
+def extract_xpath_from_all(xml_file, xpath, transform=float):
     update_no_list = []
     number_list = []
 
@@ -117,7 +117,7 @@ def extract_xpath_from_all(xml_file, xpath):
                 print("No measurements of {} in XML file {}".format(xpath, xml_file))
                 continue
 
-            number = float(matches[0])
+            number = transform(matches[0])
 
             if update_no in update_no_list:
                 # This number is already extracted for that update. Make sure
@@ -143,4 +143,5 @@ bits = {
     'seconds_for_trajectory': make_xpath_extractor('.//seconds_for_trajectory/text()'),
     'tau0': make_single_xpath_extractor('//hmc/Input/Params/HMCTrj/MDIntegrator/tau0/text()'),
     'n_steps': make_single_xpath_extractor('//hmc/Input/Params/HMCTrj/MDIntegrator/Integrator/n_steps/text()'),
+    'AcceptP': make_xpath_extractor('.//AcceptP/text()', lambda x: x == 'true'),
 }
