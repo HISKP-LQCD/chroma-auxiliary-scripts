@@ -241,6 +241,11 @@ def task_make_plot():
         tasks.append(plot_generic(dirname, 't0', 'Update Number', r'$t_0$', 'Wilson Flow Scale Setting'))
         tasks.append(plot_generic(dirname, 'w0', 'Update Number', r'$w_0$', 'Wilson Flow Scale Setting'))
 
+        tasks.append(plot_generic(dirname, 'AcceptP', 'Update Number', r'Accepted', 'Acceptance Rate'))
+        tasks.append(plot_generic(dirname, 'AcceptP-running_mean_100', 'Update Number', r'Running mean (100 step window)', 'Acceptance Rate'))
+
+        path_out = names.tsv_extract(dirname, 'AcceptP-running_mean_100')
+
     for task in tasks:
         for subtask in task:
             yield subtask
@@ -274,3 +279,13 @@ def task_correlators():
                     'file_dep': corr_tsv_files,
                     'targets': [path_effective_mass],
                 }
+
+
+def task_running_mean():
+    for dirname in directories:
+        path_in = names.tsv_extract(dirname, 'AcceptP')
+        path_out = names.tsv_extract(dirname, 'AcceptP-running_mean_100')
+        yield make_single_transform(dirname,
+                                    transforms.io_running_mean,
+                                    path_in,
+                                    path_out)

@@ -10,6 +10,7 @@ import os
 import pprint
 
 import numpy as np
+import pandas as pd
 
 import names
 import util
@@ -17,6 +18,16 @@ import util
 
 PERCENTILE_LOW = 50 - 34.13
 PERCENTILE_HIGH = 50 + 34.13
+
+
+def chunks(l, n):
+    '''
+    Yield successive n-sized chunks from l.
+
+    http://stackoverflow.com/a/312464
+    '''
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
 
 
 def get_multiple_percentiles(datas):
@@ -110,18 +121,27 @@ def merge_dict_2(base, add):
             base[key1][key2] += val2
 
 
+def unique_rows(a):
+    '''
+    http://stackoverflow.com/a/31097277
+    '''
+    a = np.ascontiguousarray(a)
+    unique_a = np.unique(a.view([('', a.dtype)]*a.shape[1]))
+    return unique_a.view(a.dtype).reshape((unique_a.shape[0], a.shape[1]))
+
+
 def merge_tsv_shards(shard_names, merged_name):
     all_data = [
         data
         for data in map(np.atleast_2d, map(np.loadtxt, shard_names))
         if data.shape[1] > 0]
 
-    print(all_data)
     if len(all_data) == 0:
         merged = []
     else:
         merged = np.row_stack(all_data)
         merged = util.sort_by_first_column(merged)
+        merged = unique_rows(merged)
 
     np.savetxt(merged_name, merged)
 
@@ -201,3 +221,14 @@ def delta_delta_h(dirname):
 
     np.savetxt(os.path.join(dirname,'extract',  'extract-DeltaDeltaH_over_DeltaH.tsv'),
                result)
+
+
+def io_running_mean(path_in, path_out, window=100):
+    x = pd.read_table(path_in, header=None, squeeze=True, names=['y'], sep=' ')
+    r = x.rolling(window)
+    rolling_mean = r.mean().dropna()
+    rolling_mean.to_csv(path_out, sep='\t')
+
+
+if __name__ == '__main__':
+    io_running_mean('/home/mu/Dokumente/Studium/Master_Science_Physik/Masterarbeit/Runs/0106-Mpi660-L16-T32/extract/extract-AcceptP.tsv', 'test.tsv')

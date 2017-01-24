@@ -45,7 +45,7 @@ def make_dist(val, err, n=50):
         for v, e in zip(val, err):
             dist.append([random.gauss(v, e) for i in range(n)])
         dist = [val] + list(zip(*dist))
-        dist = map(np.array, dist)
+        dist = np.array(list(map(np.array, dist)))
 
     else:
         raise RuntimeError('Unsupported type for make_dist')
