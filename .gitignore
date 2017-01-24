@@ -15,3 +15,10 @@ analysis/analysis.kdev4
 cp-pacs-ensemble/hmc-cp-pacs.ini.xml
 cp-pacs-ensemble/hmc-cp-pacs.ini.yml
 cp-pacs-ensemble/output
+analysis/physical_point/GMOR.pdf
+analysis/physical_point/ampi-sq-vs-aml.tsv
+analysis/physical_point/mpi-sq-vs-aml.tsv
+analysis/physical_point/mpi-vs-aml-band.tsv
+analysis/physical_point/mpi-vs-aml-data.tsv
+analysis/physical_point/mpi-vs-aml-fit.tsv
+analysis/test.tsv
