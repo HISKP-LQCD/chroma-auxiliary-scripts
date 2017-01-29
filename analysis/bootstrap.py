@@ -10,6 +10,9 @@ class Boot(object):
     def __init__(self, dist):
         self.dist = dist
 
+    def __iter__(self):
+        return iter(self.dist)
+
     def __str__(self):
         return str(self.dist)
 
