@@ -30,7 +30,6 @@ def wflow_xml_shard_name(xml_file, key):
     dirname = os.path.dirname(xml_file)
     basename = os.path.basename(xml_file)
     name = os.path.join(dirname, 'shard', 'wflow', 'shard-{}.{}.tsv'.format(basename, key))
-    print(name)
     return name
 
 
