@@ -24,9 +24,13 @@ def gmor_pion(aml, aB, aml_cr):
     return 2 * aB * (aml + aml_cr)
 
 
+def linear(x, a, b):
+    return a * x + b
+
+
 def main():
     options = _parse_args()
-    R = 1000
+    R = 300
 
     # Read in the data from the paper.
     a_inv_val = 1616
@@ -35,6 +39,8 @@ def main():
     aml, ams, l, t, trajectories, ampi_val, ampi_err, amk_val, amk_err, f_k_f_pi_val, f_k_f_pi_err = util.load_columns('physical_point/gmor.txt')
     ampi_dist = bootstrap.make_dist(ampi_val, ampi_err, n=R)
     amk_dist = bootstrap.make_dist(amk_val, amk_err, n=R)
+    mpi_dist = [ampi * a_inv for ampi, a_inv in zip(ampi_dist, a_inv_dist)]
+    mk_dist = [amk * a_inv for amk, a_inv in zip(amk_dist, a_inv_dist)]
 
     # Convert the data in lattice units into physical units.
     mpi_dist = [a_inv * ampi for ampi, a_inv in zip(ampi_dist, a_inv_dist)]
@@ -54,9 +60,21 @@ def main():
     print('aB =', siunitx(aB_val, aB_err))
     print('am_cr =', siunitx(amcr_val, amcr_err))
 
+    diff_dist = [np.sqrt(2) * np.sqrt(mk**2 - 0.5 * mpi**2)
+                 for mpi, mk in zip(mpi_dist, mk_dist)]
+    diff_val, diff_avg, diff_err = bootstrap.average_and_std_arrays(diff_dist)
+
+    popt_dist = [op.curve_fit(linear, mpi, diff)[0]
+                 for mpi, diff in zip(mpi_dist, diff_dist)]
+    fit_x = np.linspace(np.min(mpi_dist), np.max(mpi_dist), 100)
+    fit_y_dist = [linear(fit_x, *popt)
+                  for popt in popt_dist]
+    fit_y_val, fit_y_avg, fit_y_err = bootstrap.average_and_std_arrays(fit_y_dist)
+
     # Physical meson masses from FLAG paper.
     mpi_phys_dist = bootstrap.make_dist(134.8, 0.3, R)
     mk_phys_dist = bootstrap.make_dist(494.2, 0.3, R)
+    mpi_phys_val, mpi_phys_avg, mpi_phys_err = bootstrap.average_and_std_arrays(mpi_phys_dist)
     ampi_phys_dist = [mpi_phys / a_inv
                       for a_inv, mpi_phys in zip(a_inv_dist, mpi_phys_dist)]
     amk_phys_dist = [mk_phys / a_inv
@@ -65,6 +83,50 @@ def main():
     amk_phys_val, amk_phys_avg, amk_phys_err = bootstrap.average_and_std_arrays(amk_phys_dist)
     print('aM_pi phys =', siunitx(ampi_phys_val, ampi_phys_err))
     print('aM_k phys =', siunitx(amk_phys_val, amk_phys_err))
+
+    new_b_dist = [np.sqrt(mk_phys**2 - 0.5 * mpi_phys**2) - popt[0] * mpi_phys
+                  for mpi_phys, mk_phys, popt in zip(mpi_phys_dist, mk_phys_dist, popt_dist)]
+
+    diff_sqrt_phys_dist = [np.sqrt(mk_phys**2 - 0.5 * mpi_phys**2)
+                           for mpi_phys, mk_phys in zip(mpi_phys_dist, mk_phys_dist)]
+    diff_sqrt_phys_val, diff_sqrt_phys_avg, diff_sqrt_phys_err = bootstrap.average_and_std_arrays(diff_sqrt_phys_dist)
+
+    ex_x = np.linspace(120, 700, 100)
+    ex_y_dist = [linear(ex_x, popt[0], b)
+                 for popt, b in zip(popt_dist, new_b_dist)]
+    ex_y_val, ex_y_avg, ex_y_err = bootstrap.average_and_std_arrays(ex_y_dist)
+
+    ams_art_dist = [
+        linear(mpi, popt[0], b)**2 / a_inv**2 / aB - amcr
+        for mpi, popt, b, a_inv, aB, amcr in zip(mpi_dist, popt_dist, new_b_dist, a_inv_dist, aB_dist, amcr_dist)]
+    ams_art_val, ams_art_avg, ams_art_err = bootstrap.average_and_std_arrays(ams_art_dist)
+    print('a m_s with artifacts', siunitx(ams_art_val, ams_art_err))
+
+    fig, ax = util.make_figure()
+    ax.fill_between(fit_x, fit_y_val + fit_y_err, fit_y_val - fit_y_err, color='red', alpha=0.2)
+    ax.plot(fit_x, fit_y_val, label='Fit', color='red')
+    ax.fill_between(ex_x, ex_y_val + ex_y_err, ex_y_val - ex_y_err, color='orange', alpha=0.2)
+    ax.plot(ex_x, ex_y_val, label='Extrapolation', color='orange')
+    ax.errorbar(mpi_val, diff_val, xerr=mpi_err, yerr=diff_err, linestyle='none', label='Data (Dürr 2010)')
+    ax.errorbar([mpi_phys_val], [diff_sqrt_phys_val], xerr=[mpi_phys_err], yerr=[diff_sqrt_phys_err], label='Physical Point (Aoki)')
+    util.save_figure(fig, 'test')
+
+    np.savetxt('artifact-bmw-data.tsv',
+               np.column_stack([mpi_val, diff_val, mpi_err, diff_err]))
+    np.savetxt('artifact-bmw-fit.tsv',
+               np.column_stack([fit_x, fit_y_val]))
+    np.savetxt('artifact-bmw-band.tsv',
+               bootstrap.pgfplots_error_band(fit_x, fit_y_val, fit_y_err))
+    np.savetxt('artifact-phys-data.tsv',
+               np.column_stack([[mpi_phys_val], [diff_sqrt_phys_val], [mpi_phys_err], [diff_sqrt_phys_err]]))
+    np.savetxt('artifact-phys-fit.tsv',
+               np.column_stack([ex_x, ex_y_val]))
+    np.savetxt('artifact-phys-band.tsv',
+               bootstrap.pgfplots_error_band(ex_x, ex_y_val, ex_y_err))
+    np.savetxt('artifact-ms.tsv',
+               np.column_stack([mpi_val, ams_art_val, mpi_err, ams_art_err]))
+
+    exit()
 
     # Compute the strange quark mass that is needed to obtain a physical meson
     # mass difference, ignoring lattice artifacts.
