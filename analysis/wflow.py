@@ -16,6 +16,15 @@ import scipy.optimize
 import util
 
 
+mev_fm = 197.3269788
+'http://physics.nist.gov/cgi-bin/cuu/Value?hbcmevf'
+
+w0_cont_fm = 0.1755
+'Borsani-2012-High_precision_scale_setting_in_LQCD'
+
+w0_cont_mev = mev_fm / w0_cont_fm
+
+
 def io_compute_intersection(path_in, path_out):
     root = find_root(path_in)
     result = np.sqrt(root)
@@ -147,3 +156,11 @@ def merge_intersections(paths_in, path_out):
         a = util.sort_by_first_column(a)
 
     np.savetxt(path_out, a)
+
+
+def io_w0_to_a(path_in, path_out):
+    update, w0_a = util.load_columns(path_in, 2)
+    a_fm = w0_cont_fm / w0_a
+    a_mev = mev_fm / a_fm
+    np.savetxt(path_out, np.column_stack([update, a_mev]))
+    

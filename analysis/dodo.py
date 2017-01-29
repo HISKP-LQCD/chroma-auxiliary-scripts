@@ -182,6 +182,10 @@ def task_wflow():
                 'targets': [path_out],
             }
 
+        yield make_single_transform(dirname,
+                                    wflow.io_w0_to_a,
+                                    names.tsv_extract(dirname, 'w0'),
+                                    names.tsv_extract(dirname, 'a_mev_from_w0'))
 
 
 def make_single_transform(dirname, function, path_in, path_out):
