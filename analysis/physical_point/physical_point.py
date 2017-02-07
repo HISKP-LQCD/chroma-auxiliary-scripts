@@ -60,6 +60,15 @@ def main():
     print('aB =', siunitx(aB_val, aB_err))
     print('am_cr =', siunitx(amcr_val, amcr_err))
 
+    ams_paper = -0.057
+    ams_phys = ams_paper + amcr_val
+    ams_red = 0.9 * ams_phys
+    ams_bare_red = ams_red - amcr_val
+
+    print(ams_paper, ams_phys, ams_red, ams_bare_red)
+
+    exit()
+
     diff_dist = [np.sqrt(2) * np.sqrt(mk**2 - 0.5 * mpi**2)
                  for mpi, mk in zip(mpi_dist, mk_dist)]
     diff_val, diff_avg, diff_err = bootstrap.average_and_std_arrays(diff_dist)
@@ -125,8 +134,6 @@ def main():
                bootstrap.pgfplots_error_band(ex_x, ex_y_val, ex_y_err))
     np.savetxt('artifact-ms.tsv',
                np.column_stack([mpi_val, ams_art_val, mpi_err, ams_art_err]))
-
-    exit()
 
     # Compute the strange quark mass that is needed to obtain a physical meson
     # mass difference, ignoring lattice artifacts.
