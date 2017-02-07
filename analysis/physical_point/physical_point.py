@@ -67,6 +67,13 @@ def main():
 
     print(ams_paper, ams_phys, ams_red, ams_bare_red)
 
+    print()
+    print('Mass preconditioning masses:')
+
+    amlq = aml + amcr_val
+    for i in range(3):
+        print(amlq * 10**i - amcr_val)
+
     exit()
 
     diff_dist = [np.sqrt(2) * np.sqrt(mk**2 - 0.5 * mpi**2)
