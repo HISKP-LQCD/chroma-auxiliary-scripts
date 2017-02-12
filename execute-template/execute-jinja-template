@@ -1,14 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
 import json
 import math
+import os
 import subprocess
 
 import jinja2
+
+class RelEnvironment(jinja2.Environment):
+    """
+    Override join_path() to enable relative template paths.
+
+    http://stackoverflow.com/a/8530761/653152
+    """
+    def join_path(self, template, parent):
+        return os.path.join(os.path.dirname(parent), template)
 
 
 def main():
@@ -19,7 +29,7 @@ def main():
         destination_filename = options.template + '.ini.xml'
     else:
         template_filename = options.template
-        desitnation_filename = options.destination
+        destination_filename = options.destination
 
     if options.json is None:
         template_args = {}
@@ -36,7 +46,11 @@ def main():
     # Rendering LaTeX document with values.
     with open(destination_filename, "w") as f:
         f.write(template.render(**template_args))
-    subprocess.check_call(['vim', '-c', 'norm gg=G', '-c', 'wq', destination_filename])
+
+    if options.format == 'vim':
+        subprocess.check_call(['vim', '-c', 'norm gg=G', '-c', 'wq', destination_filename])
+    elif options.format == 'clang':
+        subprocess.check_call(['clang-format', '-i', destination_filename])
 
 
 def _parse_args():
@@ -73,6 +87,7 @@ def _parse_args():
         (http://json.org/) dict/hash like this: {"var1": 10, "some_list": [4,
         5, 6], "some_dict": {"I": "me", "you": "you", "he": "him"}}
         ''')
+    parser.add_argument('--format', default='none', choices=['none', 'vim', 'clang'])
     options = parser.parse_args()
 
     return options
