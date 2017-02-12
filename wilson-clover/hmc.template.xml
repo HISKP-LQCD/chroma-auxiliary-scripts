@@ -3,13 +3,14 @@
 {# Jinja 2 (http://jinja.pocoo.org/) macros and variables. [[[ -#}
 
 {% set clovCoeff = '1.0' -%}
-{% set mass_light = '-0.070' -%}
-{% set mass_strange = '-0.040' -%}
+{% set mass_light = '-0.1265' -%}
+{% set prec_light = ['-0.1265', '-0.06873701', '0.5088929'] %}
+{% set mass_strange = '-0.065' -%}
 {% set residual_fine = '1e-9' -%}
 {% set residual_coarse = '1e-6' -%}
 {% set beta = (3.3 * 5.0/3.0) -%}
-{% set l_xyz = 16 -%}
-{% set l_t = 32 -%}
+{% set l_xyz = 32 -%}
+{% set l_t = 96 -%}
 
 {%- macro boundary_conditions() -%}
   <FermionBC>
@@ -214,8 +215,10 @@
 
     <ReproCheckP>false</ReproCheckP>
     <ReproCheckFrequency>1</ReproCheckFrequency>
-    <ReverseCheckP>true</ReverseCheckP>
+
+    <ReverseCheckP>false</ReverseCheckP>
     <ReverseCheckFrequency>20</ReverseCheckFrequency>
+
     <MonitorForces>true</MonitorForces><InlineMeasurements>
 
     <InlineMeasurements>
@@ -251,13 +254,14 @@
         </NamedObject>
       </elem><!--]]]-->
 
-      {{ hasenbusch_det_ratio(mass_light, mass_strange, 'fine::light_det_ratio_1', residual_fine) }}
+      {{ hasenbusch_det_ratio(prec_light[0], prec_light[1], 'fine::light_det_ratio_1', residual_fine) }}
+      {{ hasenbusch_det_ratio(prec_light[0], prec_light[1], 'coarse::light_det_ratio_1', residual_coarse) }}
 
-      {{ hasenbusch_det_ratio(mass_light, mass_strange, 'coarse::light_det_ratio_1', residual_coarse) }}
+      {{ hasenbusch_det_ratio(prec_light[1], prec_light[2], 'fine::light_det_ratio_2', residual_fine) }}
+      {{ hasenbusch_det_ratio(prec_light[1], prec_light[2], 'coarse::light_det_ratio_2', residual_coarse) }}
 
-      {{ hasenbusch_det(mass_strange, 'fine::light_det', residual_fine) }}
-
-      {{ hasenbusch_det(mass_strange, 'coarse::light_det', residual_coarse) }}
+      {{ hasenbusch_det(prec_light[2], 'fine::light_det', residual_fine) }}
+      {{ hasenbusch_det(prec_light[2], 'coarse::light_det', residual_coarse) }}
 
       <!-- (light_log_det) log(det(T_ee)): up, down {{ mass_light }} [[[ -->
       <elem>
@@ -275,7 +279,6 @@
       </elem><!--]]]-->
 
       {{ strange_det(mass_strange, 'fine::strange_det', residual_fine) }}
-
       {{ strange_det(mass_strange, 'coarse::strange_det', residual_coarse) }}
 
       <!-- (strange_log_det) log(det(T_ee)): strange {{ mass_strange }} [[[ -->
@@ -300,6 +303,7 @@
         <elem>gauge</elem>
         <elem>fine::light_det</elem>
         <elem>fine::light_det_ratio_1</elem>
+        <elem>fine::light_det_ratio_2</elem>
         <elem>light_log_det</elem>
         <elem>fine::strange_det</elem>
         <elem>strange_log_det</elem>
@@ -317,6 +321,10 @@
           <copyTo>coarse::light_det_ratio_1</copyTo>
         </elem>
         <elem>
+          <copyFrom>fine::light_det_ratio_2</copyFrom>
+          <copyTo>coarse::light_det_ratio_2</copyTo>
+        </elem>
+        <elem>
           <copyFrom>fine::strange_det</copyFrom>
           <copyTo>coarse::strange_det</copyTo>
         </elem>
@@ -324,25 +332,32 @@
       <tau0>1.0</tau0>
       <Integrator>
         <Name>LCM_STS_MIN_NORM_2</Name>
-        <n_steps>20</n_steps>
+        <n_steps>1</n_steps>
         <monomial_ids>
-          <elem>coarse::light_det_ratio_1</elem>
+          <elem>coarse::light_det_ratio_2</elem>
         </monomial_ids>
         <SubIntegrator>
           <Name>LCM_STS_MIN_NORM_2</Name>
           <n_steps>1</n_steps>
           <monomial_ids>
-            <elem>coarse::light_det</elem>
-            <elem>light_log_det</elem>
+            <elem>coarse::light_det_ratio_1</elem>
             <elem>coarse::strange_det</elem>
-            <elem>strange_log_det</elem>
           </monomial_ids>
           <SubIntegrator>
             <Name>LCM_STS_MIN_NORM_2</Name>
             <n_steps>1</n_steps>
             <monomial_ids>
-              <elem>gauge</elem>
+              <elem>light_log_det</elem>
+              <elem>strange_log_det</elem>
+              <elem>coarse::light_det</elem>
             </monomial_ids>
+            <SubIntegrator>
+              <Name>LCM_STS_MIN_NORM_2</Name>
+              <n_steps>1</n_steps>
+              <monomial_ids>
+                <elem>gauge</elem>
+              </monomial_ids>
+            </SubIntegrator>
           </SubIntegrator>
         </SubIntegrator>
       </Integrator>
