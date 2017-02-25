@@ -3,14 +3,14 @@
 {# Jinja 2 (http://jinja.pocoo.org/) macros and variables. [[[ -#}
 
 {% set clovCoeff = '1.0' -%}
-{% set mass_light = '-0.1265' -%}
-{% set prec_light = ['-0.1265', '-0.06873701', '0.5088929'] %}
-{% set mass_strange = '-0.065' -%}
+{% set mass_light = '-0.0960' -%}
+{% set prec_light = ['-0.0960', '-0.057'] %}
+{% set mass_strange = '-0.057' -%}
 {% set residual_fine = '1e-9' -%}
 {% set residual_coarse = '1e-6' -%}
 {% set beta = (3.3 * 5.0/3.0) -%}
-{% set l_xyz = 32 -%}
-{% set l_t = 96 -%}
+{% set l_xyz = 8 -%}
+{% set l_t = 8 -%}
 
 {% set action_pfe_norm = '0.155599823000314' -%}
 {% set action_pfe_res = ['0.000520383284200624', '0.00102660572124056', '0.00181178793402857', '0.00321671030885498', '0.00577691086696587', '0.0104481579630266', '0.0189694277532285', '0.0345269234349506', '0.0630140232665876', '0.11554658170993', '0.21397301598633', '0.404952046467655', '0.804682609571783', '1.78771947718812', '5.1998544047142', '33.2821966055558'] -%}
@@ -152,17 +152,17 @@
         <AntiPeriodicT>true</AntiPeriodicT>
       </InvertParam>
       <RationalApprox>
-              <ratApproxType>READ_COEFFS</ratApproxType>
-              <PFECoeffs>
-                <norm>{{ action_pfe_norm }}</norm>
-                <res>{{ action_pfe_res|join(' ') }}</res>
-                <pole>{{ action_pfe_pole|join(' ') }}</pole>
-              </PFECoeffs>
-              <IPFECoeffs>
-                <norm>{{ action_ipfe_norm }}</norm>
-                <res>{{ action_ipfe_res|join(' ') }}</res>
-                <pole>{{ action_ipfe_pole|join(' ') }}</pole>
-              </IPFECoeffs>
+        <ratApproxType>READ_COEFFS</ratApproxType>
+        <PFECoeffs>
+          <norm>{{ action_pfe_norm }}</norm>
+          <res>{{ action_pfe_res|join(' ') }}</res>
+          <pole>{{ action_pfe_pole|join(' ') }}</pole>
+        </PFECoeffs>
+        <IPFECoeffs>
+          <norm>{{ action_ipfe_norm }}</norm>
+          <res>{{ action_ipfe_res|join(' ') }}</res>
+          <pole>{{ action_ipfe_pole|join(' ') }}</pole>
+        </IPFECoeffs>
       </RationalApprox>
     </ActionApprox>
     <ForceApprox>
@@ -179,17 +179,17 @@
         <AntiPeriodicT>true</AntiPeriodicT>
       </InvertParam>
       <RationalApprox>
-              <ratApproxType>READ_COEFFS</ratApproxType>
-              <PFECoeffs>
-                <norm>{{ force_pfe_norm }}</norm>
-                <res>{{ force_pfe_res[begin:end]|join(' ') }}</res>
-                <pole>{{ force_pfe_pole[begin:end]|join(' ') }}</pole>
-              </PFECoeffs>
-              <IPFECoeffs>
-                <norm>{{ force_ipfe_norm }}</norm>
-                <res>{{ force_ipfe_res[begin:end]|join(' ') }}</res>
-                <pole>{{ force_ipfe_pole[begin:end]|join(' ') }}</pole>
-              </IPFECoeffs>
+        <ratApproxType>READ_COEFFS</ratApproxType>
+        <PFECoeffs>
+          <norm>{{ force_pfe_norm }}</norm>
+          <res>{{ force_pfe_res[begin:end]|join(' ') }}</res>
+          <pole>{{ force_pfe_pole[begin:end]|join(' ') }}</pole>
+        </PFECoeffs>
+        <IPFECoeffs>
+          <norm>{{ force_ipfe_norm }}</norm>
+          <res>{{ force_ipfe_res[begin:end]|join(' ') }}</res>
+          <pole>{{ force_ipfe_pole[begin:end]|join(' ') }}</pole>
+        </IPFECoeffs>
       </RationalApprox>
     </ForceApprox>
   </Action>
@@ -230,7 +230,7 @@
     </RNG>
 
     <StartUpdateNum>0</StartUpdateNum>
-    <NWarmUpUpdates>100</NWarmUpUpdates>
+    <NWarmUpUpdates>10</NWarmUpUpdates>
     <NProductionUpdates>10000</NProductionUpdates>
     <NUpdatesThisRun>1</NUpdatesThisRun>
 
@@ -245,7 +245,7 @@
     <ReverseCheckP>false</ReverseCheckP>
     <ReverseCheckFrequency>20</ReverseCheckFrequency>
 
-    <MonitorForces>true</MonitorForces><InlineMeasurements>
+    <MonitorForces>true</MonitorForces>
 
     <InlineMeasurements>
       <elem>
@@ -283,11 +283,8 @@
       {{ hasenbusch_det_ratio(prec_light[0], prec_light[1], 'fine::light_det_ratio_1', residual_fine) }}
       {{ hasenbusch_det_ratio(prec_light[0], prec_light[1], 'coarse::light_det_ratio_1', residual_coarse) }}
 
-      {{ hasenbusch_det_ratio(prec_light[1], prec_light[2], 'fine::light_det_ratio_2', residual_fine) }}
-      {{ hasenbusch_det_ratio(prec_light[1], prec_light[2], 'coarse::light_det_ratio_2', residual_coarse) }}
-
-      {{ hasenbusch_det(prec_light[2], 'fine::light_det', residual_fine) }}
-      {{ hasenbusch_det(prec_light[2], 'coarse::light_det', residual_coarse) }}
+      {{ hasenbusch_det(prec_light[1], 'fine::light_det', residual_fine) }}
+      {{ hasenbusch_det(prec_light[1], 'coarse::light_det', residual_coarse) }}
 
       <!-- (light_log_det) log(det(T_ee)): up, down {{ mass_light }} [[[ -->
       <elem>
@@ -330,7 +327,6 @@
         <elem>gauge</elem>
         <elem>fine::light_det</elem>
         <elem>fine::light_det_ratio_1</elem>
-        <elem>fine::light_det_ratio_2</elem>
         <elem>light_log_det</elem>
         <elem>fine::strange_det</elem>
         <elem>strange_log_det</elem>
@@ -348,10 +344,6 @@
           <copyTo>coarse::light_det_ratio_1</copyTo>
         </elem>
         <elem>
-          <copyFrom>fine::light_det_ratio_2</copyFrom>
-          <copyTo>coarse::light_det_ratio_2</copyTo>
-        </elem>
-        <elem>
           <copyFrom>fine::strange_det</copyFrom>
           <copyTo>coarse::strange_det_small</copyTo>
         </elem>
@@ -363,33 +355,26 @@
       <tau0>1.0</tau0>
       <Integrator>
         <Name>LCM_STS_MIN_NORM_2</Name>
-        <n_steps>1</n_steps>
+        <n_steps>10</n_steps>
         <monomial_ids>
-          <elem>coarse::light_det_ratio_2</elem>
+          <elem>coarse::light_det_ratio_1</elem>
+          <elem>coarse::strange_det_small</elem>
+          <elem>coarse::strange_det_large</elem>
         </monomial_ids>
         <SubIntegrator>
           <Name>LCM_STS_MIN_NORM_2</Name>
           <n_steps>1</n_steps>
           <monomial_ids>
-            <elem>coarse::light_det_ratio_1</elem>
-            <elem>coarse::strange_det_small</elem>
-            <elem>coarse::strange_det_large</elem>
+            <elem>light_log_det</elem>
+            <elem>strange_log_det</elem>
+            <elem>coarse::light_det</elem>
           </monomial_ids>
           <SubIntegrator>
             <Name>LCM_STS_MIN_NORM_2</Name>
             <n_steps>1</n_steps>
             <monomial_ids>
-              <elem>light_log_det</elem>
-              <elem>strange_log_det</elem>
-              <elem>coarse::light_det</elem>
+              <elem>gauge</elem>
             </monomial_ids>
-            <SubIntegrator>
-              <Name>LCM_STS_MIN_NORM_2</Name>
-              <n_steps>1</n_steps>
-              <monomial_ids>
-                <elem>gauge</elem>
-              </monomial_ids>
-            </SubIntegrator>
           </SubIntegrator>
         </SubIntegrator>
       </Integrator>
