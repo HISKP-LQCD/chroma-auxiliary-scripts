@@ -338,6 +338,36 @@ make-make-install
 popd
 
 ###############################################################################
+#                             GNU Multi Precision                             #
+###############################################################################
+
+repo=gmp-6.1.2
+
+url=https://gmplib.org/download/gmp/gmp-6.1.2.tar.lz
+
+if ! [[ -d "$repo" ]];
+then
+    wget "$url"
+    tar -xf "${url##*/}"
+fi
+
+pushd "$repo"
+cflags="$base_cflags"
+cxxflags="$base_cxxflags"
+autoreconf-if-needed
+popd
+
+mkdir -p "$build/$repo"
+pushd "$build/$repo"
+if ! [[ -f Makefile ]]; then
+    $sourcedir/$repo/configure $base_configure \
+        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+fi
+make-make-install
+popd
+
+
+###############################################################################
 #                                   Chroma                                    #
 ###############################################################################
 
@@ -366,7 +396,7 @@ if ! [[ -f Makefile ]]; then
         --enable-qdp-alignment=128 \
         --enable-sse2 \
         --enable-qphix-solver-arch=avx2 \
-        --with-gmp="$EBROOTGMP" \
+        --with-gmp="$prefix" \
         --with-libxml2="$prefix/bin/xml2-config" \
         --with-qdp="$prefix" \
         --with-qphix-solver="$prefix" \
