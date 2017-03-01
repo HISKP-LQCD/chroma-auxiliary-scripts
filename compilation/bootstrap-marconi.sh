@@ -171,6 +171,7 @@ print-fancy-heading() {
 # make much sense. Perhaps one has to split up the `autoreconf` call into the
 # parts that make it up. Using this weird dance, it works somewhat reliably.
 autotools-dance() {
+    libtoolize
     automake --add-missing --copy || autoreconf -f || automake --add-missing --copy
     autoreconf -f
 }
@@ -341,11 +342,25 @@ popd
 #                             GNU Multi Precision                             #
 ###############################################################################
 
+# The GNU MP library is not present on the Marconi system. Therefore it has to
+# be compiled from source.
+
 repo=gmp
+print-fancy-heading $repo
 
 if ! [[ -d "$repo" ]];
 then
-    hg clone https://gmplib.org/repo/ "$repo"
+    # The upstream website only has a download as an LZMA compressed file. The
+    # CentOS does not provide an `lzip` command. Also, there is no module
+    # available that would supply it. Building `lzip` from source seems like a
+    # waste of effort. Therefore I have just repacked that on my local machine
+    # and uploaded to my webspace.
+    url=http://bulk.martin-ueding.de/gmp-6.1.2.tar.gz
+    #url=https://gmplib.org/download/gmp/gmp-6.1.2.tar.lz
+
+    wget "$url"
+    tar -xf "${url##*/}"
+    mv gmp-6.1.2 gmp
 fi
 
 pushd "$repo"
