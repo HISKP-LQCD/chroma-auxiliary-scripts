@@ -341,14 +341,11 @@ popd
 #                             GNU Multi Precision                             #
 ###############################################################################
 
-repo=gmp-6.1.2
-
-url=https://gmplib.org/download/gmp/gmp-6.1.2.tar.lz
+repo=gmp
 
 if ! [[ -d "$repo" ]];
 then
-    wget "$url"
-    tar -xf "${url##*/}"
+    hg clone https://gmplib.org/repo/ "$repo"
 fi
 
 pushd "$repo"
