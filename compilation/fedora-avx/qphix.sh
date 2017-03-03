@@ -2,7 +2,7 @@ repo=qphix
 
 print-fancy-heading $repo
 
-clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
+clone-if-needed https://github.com/martin-ueding/qphix.git $repo ndtm
 
 pushd $repo
 cflags="$base_cflags $openmp_flags $qphix_flags"
@@ -15,12 +15,11 @@ pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
     $sourcedir/$repo/configure $base_configure \
         $qphix_configure \
-        --disable-testing \
         --enable-proc=AVX \
         --enable-soalen=2 \
         --enable-clover \
         --enable-openmp \
-        --enable-mm-malloc \
+        --disable-mm-malloc \
         --enable-parallel-arch=scalar \
         --with-qdp="$prefix" \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"

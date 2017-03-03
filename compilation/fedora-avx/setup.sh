@@ -13,13 +13,24 @@ case $compiler in
         qphix_flags="-Drestrict=__restrict__"
         qphix_configure=""
         ;;
+    clang)
+        cc_name=clang
+        cxx_name=clang++
+        color_flags=""
+        openmp_flags=""
+        base_flags="-O2 -mavx"
+        cxx11_flags="--std=c++11"
+        disable_warnings_flags="-Wno-all -Wno-pedantic"
+        qphix_flags="-Drestrict=__restrict__"
+        qphix_configure=""
+        ;;
     *)
         echo "This compiler is not supported by this script. Choose another one."
         exit 1
         ;;
 esac
 
-playground=/home/mu/Dokumente/Studium/Master_Science_Physik/Masterarbeit/US_QCD/playground
+playground=/home/mu/Dokumente/Studium/Master_Science_Physik/Masterarbeit/US_QCD/playground-$compiler
 
 prefix="$playground/local-$compiler"
 mkdir -p "$prefix"

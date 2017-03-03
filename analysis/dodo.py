@@ -188,9 +188,9 @@ def task_wflow():
                                     names.tsv_extract(dirname, 'a_mev_from_w0'))
 
 
-def make_single_transform(dirname, function, path_in, path_out):
+def make_single_transform(dirname, function, path_in, path_out, **kwargs):
     return {
-        'actions': [(function, [path_in, path_out])],
+        'actions': [(function, [path_in, path_out], kwargs)],
         'name': path_out,
         'file_dep': [path_in],
         'targets': [path_out],
@@ -247,6 +247,7 @@ def task_make_plot():
 
         tasks.append(plot_generic(dirname, 'AcceptP', 'Update Number', r'Accepted', 'Acceptance Rate'))
         tasks.append(plot_generic(dirname, 'AcceptP-running_mean_100', 'Update Number', r'Running mean (100 step window)', 'Acceptance Rate'))
+        tasks.append(plot_generic(dirname, 'AcceptP-running_mean_10', 'Update Number', r'Running mean (10 step window)', 'Acceptance Rate'))
 
         path_out = names.tsv_extract(dirname, 'AcceptP-running_mean_100')
 
@@ -287,9 +288,11 @@ def task_correlators():
 
 def task_running_mean():
     for dirname in directories:
-        path_in = names.tsv_extract(dirname, 'AcceptP')
-        path_out = names.tsv_extract(dirname, 'AcceptP-running_mean_100')
-        yield make_single_transform(dirname,
-                                    transforms.io_running_mean,
-                                    path_in,
-                                    path_out)
+        for window in [100, 10]:
+            path_in = names.tsv_extract(dirname, 'AcceptP')
+            path_out = names.tsv_extract(dirname, 'AcceptP-running_mean_{}'.format(window))
+            yield make_single_transform(dirname,
+                                        transforms.io_running_mean,
+                                        path_in,
+                                        path_out,
+                                        window=window)

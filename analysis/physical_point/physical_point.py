@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#,!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # Copyright © 2017 Martin Ueding <dev@martin-ueding.de>
@@ -72,7 +72,10 @@ def main():
 
     amlq = aml + amcr_val
     for i in range(3):
-        print(amlq * 10**i - amcr_val)
+        amprec = amlq * 10**i - amcr_val
+        kappa = 1 / (amprec * 2 + 8)
+        print('a m_prec:', amprec)
+        print('κ', kappa)
 
     exit()
 
