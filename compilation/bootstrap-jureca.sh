@@ -28,7 +28,7 @@ set -e
 set -u
 set -x
 
-# Force the user specify a directory where everything should be put into.
+# Force the user to specify a directory where everything should be put into.
 if (( $# == 0 )); then
     echo "usage: $0 BASE"
 fi
@@ -316,11 +316,11 @@ popd
 repo=qphix
 print-fancy-heading $repo
 #clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
-clone-if-needed https://github.com/martin-ueding/qphix.git $repo devel
+clone-if-needed https://github.com/martin-ueding/qphix.git $repo qphix-tmf
 
 pushd $repo
 cflags="$base_cflags $openmp_flags $qphix_flags"
-cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
+cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags -diag-disable 1224"
 autoreconf-if-needed
 popd
 
@@ -336,21 +336,16 @@ if ! [[ -f Makefile ]]; then
         --enable-openmp \
         --enable-mm-malloc \
         --enable-parallel-arch=parscalar \
+        --enable-twisted-mass --enable-tm-clover \
+        --enable-ndtm --enable-ndtm-clover \
         --with-qdp="$prefix" \
         --with-qmp="$prefix" \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
+make-make-install
+popd
 
-# In the current version, the tests to do not build. This is not a problem as
-# they are not needed to run Chroma. Compiling and installing the include files
-# and libraries is enough.
-pushd include
-make-make-install
-popd
-pushd lib
-make-make-install
-popd
-popd
+exit 0
 
 ###############################################################################
 #                                   Chroma                                    #
