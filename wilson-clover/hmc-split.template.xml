@@ -363,16 +363,16 @@
       <tau0>1.0</tau0>
       <Integrator>
         <Name>LCM_STS_MIN_NORM_2</Name>
-        <n_steps>1</n_steps>
+        <n_steps>15</n_steps>
         <monomial_ids>
           <elem>coarse::light_det_ratio_2</elem>
+          <elem>coarse::strange_det_small</elem>
         </monomial_ids>
         <SubIntegrator>
           <Name>LCM_STS_MIN_NORM_2</Name>
           <n_steps>1</n_steps>
           <monomial_ids>
             <elem>coarse::light_det_ratio_1</elem>
-            <elem>coarse::strange_det_small</elem>
             <elem>coarse::strange_det_large</elem>
           </monomial_ids>
           <SubIntegrator>
