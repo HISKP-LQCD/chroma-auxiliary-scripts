@@ -184,7 +184,7 @@ autotools-dance() {
 # the directory names do not have anything funny in them, the parsing of the
 # output can work.
 autoreconf-if-needed() {
-    if ! [[ -f configure ]]; then
+    if ! [[ -f configure ]] || [[ configure.ac -nt configure ]]; then
         if [[ -f .gitmodules ]]; then
             for module in $(git submodule foreach --quiet --recursive pwd | tac); do
                 pushd "$module"
@@ -310,7 +310,7 @@ popd
 repo=qphix
 print-fancy-heading $repo
 # clone-if-needed https://github.com/plabus/qphix.git $repo qphix-tmf
-clone-if-needed https://github.com/martin-ueding/qphix.git $repo ndtm
+clone-if-needed https://github.com/martin-ueding/qphix.git $repo ndtm-working-slow-version
 
 pushd $repo
 cflags="$base_cflags $openmp_flags $qphix_flags"
@@ -318,25 +318,29 @@ cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
 autoreconf-if-needed
 popd
 
-mkdir -p "$build/$repo"
-pushd "$build/$repo"
-if ! [[ -f Makefile ]]; then
-    $sourcedir/$repo/configure $base_configure \
-        $qphix_configure \
-        --disable-testing \
-        --enable-proc=AVX512 \
-        --enable-soalen=16 \
-        --enable-clover \
-        --enable-tm-clover \
-        --enable-openmp \
-        --enable-mm-malloc \
-        --enable-parallel-arch=parscalar \
-        --with-qdp="$prefix" \
-        --with-qmp="$prefix" \
-        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
-fi
-make-make-install
-popd
+for soalen in 1 2 4 8 16; do
+    builddir="$build/$repo-soalen$soalen"
+    mkdir -p "$builddir"
+    pushd "$builddir"
+    if ! [[ -f Makefile ]]; then
+        $sourcedir/$repo/configure $base_configure \
+            $qphix_configure \
+            --disable-testing \
+            --enable-proc=AVX512 \
+            --enable-soalen=$soalen \
+            --enable-clover \
+            --enable-openmp \
+            --enable-mm-malloc \
+            --enable-parallel-arch=parscalar \
+            --with-qdp="$prefix" \
+            --with-qmp="$prefix" \
+            CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+    fi
+    make-make-install
+    popd
+done
+
+exit 0
 
 ###############################################################################
 #                             GNU Multi Precision                             #
