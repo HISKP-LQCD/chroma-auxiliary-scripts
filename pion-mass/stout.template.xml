@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!--
+Input file for `chroma` that will load in an unsmeared configuration file,
+smear it, and then stores it to disk.
+-->
+<chroma>
+    <!-- Load the configuration. -->
+    <Cfg>
+        <cfg_type>SCIDAC</cfg_type>
+        <cfg_file>{{ config_in_file }}</cfg_file>
+    </Cfg>
+    <Param>
+        <nrow>16 16 16 32</nrow>
+        <InlineMeasurements>
+            <!-- Measure the plaquette -->
+            <elem>
+                <Name>PLAQUETTE</Name>
+                <Frequency>1</Frequency>
+                <Param>
+                    <version>2</version>
+                </Param>
+                <NamedObject>
+                    <gauge_id>default_gauge_field</gauge_id>
+                </NamedObject>
+                <xml_file>{{ xml_out_file }}</xml_file>
+            </elem>
+            <!-- Perform the smearing. -->
+            <elem>
+                <Name>LINK_SMEAR</Name>
+                <Frequency>1</Frequency>
+                <Param>
+                    <LinkSmearingType>STOUT_SMEAR</LinkSmearingType>
+                    <version>3</version>
+                    <smear_dirs>1 1 1 1</smear_dirs>
+                    <link_smear_fact>1.1</link_smear_fact>
+                    <link_smear_num>6</link_smear_num>
+                </Param>
+
+                <NamedObject>
+                    <gauge_id>default_gauge_field</gauge_id>
+                    <linksmear_id>smeared_id</linksmear_id>
+                </NamedObject>
+
+                <xml_file>stout.config-{{ number }}.out.xml</xml_file>
+            </elem>
+            <!-- Store the smeared configuration to disk. -->
+            <elem>
+                <Name>QIO_WRITE_NAMED_OBJECT</Name>
+                <Frequency>1</Frequency>
+                <NamedObject>
+                    <object_id>smeared_id</object_id>
+                    <object_type>Multi1dLatticeColorMatrixD</object_type>
+                </NamedObject>
+                <File>
+                    <xml_file>stout.config-{{ number }}.lime</xml_file>
+                    <file_volfmt>SINGLEFILE</file_volfmt>
+                </File>
+            </elem>
+        </InlineMeasurements>
+    </Param>
+</chroma>

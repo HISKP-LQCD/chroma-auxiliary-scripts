@@ -178,6 +178,7 @@ print-fancy-heading() {
 # make much sense. Perhaps one has to split up the `autoreconf` call into the
 # parts that make it up. Using this weird dance, it works somewhat reliably.
 autotools-dance() {
+    aclocal
     automake --add-missing --copy || autoreconf -f || automake --add-missing --copy
     autoreconf -f
 }
@@ -194,7 +195,6 @@ autoreconf-if-needed() {
         if [[ -f .gitmodules ]]; then
             for module in $(git submodule foreach --quiet --recursive pwd | tac); do
                 pushd "$module"
-                aclocal
                 autotools-dance
                 popd
             done

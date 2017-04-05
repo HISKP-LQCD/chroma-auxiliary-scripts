@@ -20,6 +20,10 @@ def load_columns(filename, expected_column_count=None):
     return cols
 
 
+def save_columns(filename, *cols):
+    np.savetxt(filename, np.column_stack(cols))
+
+
 def dandify_axes(ax):
     ax.grid(True)
     ax.margins(0.05)

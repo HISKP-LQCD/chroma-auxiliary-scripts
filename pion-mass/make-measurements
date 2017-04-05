@@ -110,7 +110,7 @@ def _parse_args():
         file per configuration that is to be measured. Also SLURM job scripts
         are created to start all those jobs.
         ''')
-    parser.add_argument('template', choices=['corr', 'wflow'], help='Template for the measurement task to use')
+    parser.add_argument('template', choices=['corr', 'stout', 'wflow'], help='Template for the measurement task to use')
     parser.add_argument('gauge_config', nargs='+', help='LIME files to smear')
     parser.add_argument('--package', type=int, default=50, help='The number of measurements that should be performed in one SLURM job (default: %(default)s)')
     options = parser.parse_args()
