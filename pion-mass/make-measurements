@@ -13,10 +13,10 @@ import jinja2
 jobscript_text = r'''#!/bin/bash 
 
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --time=02:00:00
-#SBATCH --partition=devel
-#SBATCH --cpus-per-task=24
+#SBATCH --ntasks-per-node=2
+#SBATCH --time=06:00:00
+#SBATCH --partition=batch
+#SBATCH --cpus-per-task=12
 #SBATCH --output={{ template }}.slurm-%j.out.txt
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ueding@hiskp.uni-bonn.de
@@ -34,7 +34,7 @@ export KMP_AFFINITY=compact,0
 {% for chroma_input in chroma_inputs %}
 srun ~/jureca-local-icc/bin/chroma \
         -i "{{ chroma_input }}" \
-        -by 8 -bz 8 -c 24 -sy 1 -sz 1 -pxy 1 -pxyz 0 -minct 2
+        -by 8 -bz 8 -c 12 -sy 1 -sz 1 -pxy 1 -pxyz 0 -minct 1
 {% endfor %}
 '''
 
@@ -77,6 +77,8 @@ def main():
         chroma_rendered = chroma_template.render(
             config_in_file=gauge_config,
             number=number,
+            L=options.L,
+            T=options.T,
         )
 
         chroma_inputs.append(filename_chroma_input)
@@ -111,6 +113,8 @@ def _parse_args():
         are created to start all those jobs.
         ''')
     parser.add_argument('template', choices=['corr', 'stout', 'wflow'], help='Template for the measurement task to use')
+    parser.add_argument('L', type=int)
+    parser.add_argument('T', type=int)
     parser.add_argument('gauge_config', nargs='+', help='LIME files to smear')
     parser.add_argument('--package', type=int, default=50, help='The number of measurements that should be performed in one SLURM job (default: %(default)s)')
     options = parser.parse_args()
