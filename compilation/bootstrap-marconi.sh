@@ -171,6 +171,7 @@ print-fancy-heading() {
 # make much sense. Perhaps one has to split up the `autoreconf` call into the
 # parts that make it up. Using this weird dance, it works somewhat reliably.
 autotools-dance() {
+    libtoolize
     automake --add-missing --copy || autoreconf -f || automake --add-missing --copy
     autoreconf -f
 }
@@ -183,7 +184,7 @@ autotools-dance() {
 # the directory names do not have anything funny in them, the parsing of the
 # output can work.
 autoreconf-if-needed() {
-    if ! [[ -f configure ]]; then
+    if ! [[ -f configure ]] || [[ configure.ac -nt configure ]]; then
         if [[ -f .gitmodules ]]; then
             for module in $(git submodule foreach --quiet --recursive pwd | tac); do
                 pushd "$module"
@@ -309,7 +310,7 @@ popd
 repo=qphix
 print-fancy-heading $repo
 # clone-if-needed https://github.com/plabus/qphix.git $repo qphix-tmf
-clone-if-needed https://github.com/martin-ueding/qphix.git $repo ndtm
+clone-if-needed https://github.com/martin-ueding/qphix.git $repo ndtm-working-slow-version
 
 pushd $repo
 cflags="$base_cflags $openmp_flags $qphix_flags"
@@ -317,35 +318,53 @@ cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
 autoreconf-if-needed
 popd
 
-mkdir -p "$build/$repo"
-pushd "$build/$repo"
-if ! [[ -f Makefile ]]; then
-    $sourcedir/$repo/configure $base_configure \
-        $qphix_configure \
-        --disable-testing \
-        --enable-proc=AVX512 \
-        --enable-soalen=16 \
-        --enable-clover \
-        --enable-tm-clover \
-        --enable-openmp \
-        --enable-mm-malloc \
-        --enable-parallel-arch=parscalar \
-        --with-qdp="$prefix" \
-        --with-qmp="$prefix" \
-        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
-fi
-make-make-install
-popd
+for soalen in 1 2 4 8 16; do
+    builddir="$build/$repo-soalen$soalen"
+    mkdir -p "$builddir"
+    pushd "$builddir"
+    if ! [[ -f Makefile ]]; then
+        $sourcedir/$repo/configure $base_configure \
+            $qphix_configure \
+            --disable-testing \
+            --enable-proc=AVX512 \
+            --enable-soalen=$soalen \
+            --enable-clover \
+            --enable-openmp \
+            --enable-mm-malloc \
+            --enable-parallel-arch=parscalar \
+            --with-qdp="$prefix" \
+            --with-qmp="$prefix" \
+            CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+    fi
+    make-make-install
+    popd
+done
+
+exit 0
 
 ###############################################################################
 #                             GNU Multi Precision                             #
 ###############################################################################
 
+# The GNU MP library is not present on the Marconi system. Therefore it has to
+# be compiled from source.
+
 repo=gmp
+print-fancy-heading $repo
 
 if ! [[ -d "$repo" ]];
 then
-    hg clone https://gmplib.org/repo/ "$repo"
+    # The upstream website only has a download as an LZMA compressed file. The
+    # CentOS does not provide an `lzip` command. Also, there is no module
+    # available that would supply it. Building `lzip` from source seems like a
+    # waste of effort. Therefore I have just repacked that on my local machine
+    # and uploaded to my webspace.
+    url=http://bulk.martin-ueding.de/gmp-6.1.2.tar.gz
+    #url=https://gmplib.org/download/gmp/gmp-6.1.2.tar.lz
+
+    wget "$url"
+    tar -xf "${url##*/}"
+    mv gmp-6.1.2 gmp
 fi
 
 pushd "$repo"
