@@ -10,7 +10,7 @@ smear it, and then stores it to disk.
         <cfg_file>{{ config_in_file }}</cfg_file>
     </Cfg>
     <Param>
-        <nrow>24 24 24 96</nrow>
+        <nrow>{{ L }} {{ L }} {{ L }} {{ T }}</nrow>
         <InlineMeasurements>
             <!-- Measure the plaquette -->
             <elem>
