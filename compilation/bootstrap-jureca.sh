@@ -178,9 +178,10 @@ print-fancy-heading() {
 # make much sense. Perhaps one has to split up the `autoreconf` call into the
 # parts that make it up. Using this weird dance, it works somewhat reliably.
 autotools-dance() {
-    aclocal
-    automake --add-missing --copy || autoreconf -f || automake --add-missing --copy
-    autoreconf -f
+    #aclocal
+    #automake --add-missing --copy || autoreconf -f || automake --add-missing --copy
+    #autoreconf -f
+    autoreconf -vif
 }
 
 # Invokes the various commands that are needed to update the GNU Autotools
@@ -337,15 +338,12 @@ if ! [[ -f Makefile ]]; then
         --enable-mm-malloc \
         --enable-parallel-arch=parscalar \
         --enable-twisted-mass --enable-tm-clover \
-        --enable-ndtm --enable-ndtm-clover \
         --with-qdp="$prefix" \
         --with-qmp="$prefix" \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
 popd
-
-exit 0
 
 ###############################################################################
 #                                   Chroma                                    #
