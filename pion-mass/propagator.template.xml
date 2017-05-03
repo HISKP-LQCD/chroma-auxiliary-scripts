@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<!--
+Input file for `chroma` that will load in a configuration file and compute a
+pion correlator from that.
+-->
+<chroma>
+  <!-- Load the configuration. -->
+  <Cfg>
+    <cfg_type>SCIDAC</cfg_type>
+    <cfg_file>{{ config_in_file }}</cfg_file>
+  </Cfg>
+  <Param>
+    <nrow>16 16 16 32</nrow>
+    <InlineMeasurements>
+      <!-- Create a single source. -->
+      <elem>
+        <Name>MAKE_SOURCE</Name>
+        <Frequency>1</Frequency>
+        <Param>
+          <version>6</version>
+          <Source>
+            <version>2</version>
+            <SourceType>POINT_SOURCE</SourceType>
+            <j_decay>3</j_decay>
+            <t_srce>0 0 0 0</t_srce>
+          </Source>
+        </Param>
+        <NamedObject>
+          <gauge_id>default_gauge_field</gauge_id>
+          <source_id>pt_source</source_id>
+        </NamedObject>
+      </elem>
+
+      <!-- The kinetic operator needs to be inverted to give the propagator. For this to be an up/down quark, the same parameters as in the HMC must be given here. -->
+      <elem>
+        <Name>PROPAGATOR</Name>
+        <Frequency>1</Frequency>
+        <Param>
+          <version>10</version>
+          <quarkSpinType>FULL</quarkSpinType>
+          <obsvP>false</obsvP>
+          <FermionAction>
+            <FermAct>CLOVER</FermAct>
+            <Mass>-0.0960</Mass>
+            <clovCoeff>1.0</clovCoeff>
+            <FermState>
+              <Name>STOUT_FERM_STATE</Name>
+              <rho>0.11</rho>
+              <orthog_dir>-1</orthog_dir>
+              <n_smear>6</n_smear>
+              <FermionBC>
+                <FermBC>SIMPLE_FERMBC</FermBC>
+                <boundary>1 1 1 -1</boundary>
+              </FermionBC>
+            </FermState>
+          </FermionAction>
+          <InvertParam>
+            <invType>QPHIX_CLOVER_INVERTER</invType>
+            <SolverType>CG</SolverType>
+            <MaxIter>10000</MaxIter>
+            <RsdTarget>1e-9</RsdTarget>
+            <CloverParams>
+              <Mass>-0.0960</Mass>
+              <clovCoeff>1.0</clovCoeff>
+            </CloverParams>
+            <AntiPeriodicT>true</AntiPeriodicT>
+          </InvertParam>
+        </Param>
+        <NamedObject>
+          <gauge_id>default_gauge_field</gauge_id>
+          <source_id>pt_source</source_id>
+          <prop_id>light_pt_src_prop</prop_id>
+        </NamedObject>
+      </elem>
+
+      <elem>
+        <Name>QIO_WRITE_NAMED_OBJECT</Name>
+        <Frequency>1</Frequency>
+        <NamedObject>
+          <object_id>light_pt_src_prop</object_id>
+          <object_type>LatticePropagator</object_type>
+        </NamedObject>
+        <File>
+          <file_name>light-prop.lime</file_name>
+          <file_volfmt>SINGLEFILE</file_volfmt>
+        </File>
+      </elem>
+    </InlineMeasurements>
+  </Param>
+</chroma>
+<!-- vim: set sw=2 et : -->
