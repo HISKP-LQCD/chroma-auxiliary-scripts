@@ -12,16 +12,24 @@ do
     basename="${run##*/}"
     dirname="${run%/*}"
 
-    echo $arg
+    echo "== $arg =="
 
+    echo "Deleting configurations"
     pushd "$run" > /dev/null
-    rm -f ./*.lime hmc core.*
+    rm -f hmc core.*
+    find . -name '*.lime' | sort | less
+    echo "Is that okay?"
+    read
+    find . -name '*.lime' -delete
     popd > /dev/null
 
     pushd "$dirname" > /dev/null
-    archive="$basename.tar.gz" 
-    tar -czf "$archive" "$basename"
-    mv "$archive" "$dest"
+    archive="$basename.tar" 
+    echo "Archiving remaining files ..."
+    tar -cf "$archive" "$basename"
+    echo "Compressing archive ..."
+    gzip -1 "$archive"
+    mv "$archive.gz" "$dest"
     popd > /dev/null
 
     rm -rf "$run"
