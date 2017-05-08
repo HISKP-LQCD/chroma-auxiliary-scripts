@@ -1,0 +1,32 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -N {{ name }}
+#PBS -l walltime=00:30:00
+#PBS -l select={{ nodes }}:ncpus=68:mem=93GB:mcdram=cache:numa=quadrant
+{# #PBS -A Pra13_3304 #}
+#PBS -A INF17_lqcd123_1
+#PBS -q knlroute
+#PBS -m abe
+#PBS -M ueding@hiskp.uni-bonn.de
+
+date -Iseconds
+
+module load autoload intel intelmpi
+
+export I_MPI_DEBUG=4
+export KMP_AFFINITY=verbose,compact,granularity=threads
+export KMP_HW_SUBSET={{ cores_per_rank }}c,{{ threads }}t
+
+mpirun -np {{ nodes * ranks_per_node }} \
+    ~/benchmark/build-icc/qphix-soalen8/tests/time_clov_noqdp \
+    -x {{ lattice }} -y {{ lattice }} -z {{ lattice }} -t {{ 2 * lattice }} \
+    -by 4 -bz 4 \
+    -pxy 1 -pxyz 0 \
+    -c {{ cores_per_rank }} \
+    -sy 1 -sz {{ threads }} \
+    -minct 1 \
+    -compress12 \
+    -geom {{ geom|join(' ') }} \
+    -i 100 \
+    -prec s \
+    -dslash | tee out-{{ name }}.txt
