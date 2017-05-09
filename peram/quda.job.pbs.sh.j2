@@ -8,7 +8,7 @@
 #PBS -j oe
 
 rundir={{ '%s%04d/rnd_vec_%02d'|format(rundir, i, rv) }}
-exe={{ exec }}
+exe={{ exe }}
 outfile={{ outfile }}
 infile={{ laphin }}
 export QUDA_RESOURCE_PATH={{ quda_rsc_path }}
