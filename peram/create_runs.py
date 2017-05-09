@@ -17,14 +17,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('conf_start', type=int)
     parser.add_argument('conf_end', type=int)
-    parser.add_argument('conf_step', type=int, nargs='?', default=8)
-    parser.add_argument('--email', default='')
-    parser.add_argument('--evdir', default='/hiskp2/eigensystems/0120-Mpi270-L24-T96/hyp_062_062_3/nev_120')
-    parser.add_argument('--gconfbase', default='/hiskp2/gauges/0120_Mpi270_L24_T96/stout_smeared/conf')
-    parser.add_argument('--exe', default='/hadron/bartek/bin/peram_gen/peram_gen.multigpu.hybrid.quda-v0.7.2.openmpi')
-    parser.add_argument('--jobname', default='sWC_A2p1_Mpi270_L24T96_s')
-    parser.add_argument('--rundir', default='/hiskp2/ueding/peram_generation/sWC_A2p1_Mpi270_L24T96/${flavour}/cnfg')
-    parser.add_argument('--quda_rsc_path', default='/hadron/ueding/quda_rsc_path/')
+    parser.add_argument('conf_step', type=int, nargs='?', default=8, help='default: %(default)s')
+    parser.add_argument('--email', default='', help='default: %(default)s')
+    parser.add_argument('--evdir', default='/hiskp2/eigensystems/0120-Mpi270-L24-T96/hyp_062_062_3/nev_120', help='default: %(default)s')
+    parser.add_argument('--gconfbase', default='/hiskp2/gauges/0120_Mpi270_L24_T96/stout_smeared/conf', help='default: %(default)s')
+    parser.add_argument('--exe', default='/hadron/bartek/bin/peram_gen/peram_gen.multigpu.hybrid.quda-v0.7.2.openmpi', help='default: %(default)s')
+    parser.add_argument('--jobname', default='sWC_A2p1_Mpi270_L24T96', help='default: %(default)s')
+    parser.add_argument('--rundir', default='/hiskp2/ueding/peram_generation/sWC_A2p1_Mpi270_L24T96/${flavour}/cnfg', help='default: %(default)s')
+    parser.add_argument('--quda_rsc_path', default='/hadron/ueding/quda_rsc_path/', help='default: %(default)s')
     options = parser.parse_args()
 
     # Set up Jinja.
@@ -41,6 +41,8 @@ def main():
             cfg_dir = os.path.join(flavor, 'cnfg{:04d}'.format(cfg_id))
             os.makedirs(os.path.join(cfg_dir, 'outputs'), exist_ok=True)
             rundir = os.path.join(options.rundir, flavor, 'cnfg')
+
+            jobname = '{}_{}'.format(options.jobname, quarktype)
 
             for rv, seed in enumerate(seeds):
                 rv_dir = os.path.join(cfg_dir, 'rnd_vec_{:02d}'.format(rv))
@@ -61,7 +63,7 @@ def main():
 
                 with open(os.path.join(rv_dir, jscr), 'w') as f:
                     f.write(template_pbs.render(
-                        jobname=options.jobname,
+                        jobname=jobname,
                         i=cfg_id,
                         email_address=options.email,
                         rv=rv,
