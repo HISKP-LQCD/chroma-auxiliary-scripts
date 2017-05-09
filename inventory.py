@@ -10,13 +10,15 @@ import os
 import re
 
 
-regex_cfg = r'_cfg_(\d+)\.lime'
+regex_cfg = r'_cfg_(\d+)\.lime|conf\.(\d+)'
+regex_stout = r'stout.config-(\d+)\.lime|conf\.(\d+)'
 regex_wflow = r'wflow.config-(\d+)\.out\.xml'
-regex_stout = r'stout.config-(\d+)\.lime'
 regex_eigenvalues = r'eigenvalues.(\d+).095'
+regex_eigenvectors = r'eigenvectors.(\d+).095'
+regex_phases = r'phases.(\d+).095'
 
 
-Ensemble = collections.namedtuple('Ensemble', ('name', 'gauges', 'stout', 'eigenvalues'))
+Ensemble = collections.namedtuple('Ensemble', ('name', 'gauges', 'stout', 'eigenvalues', 'perambulators'))
 
 
 def main():
@@ -26,26 +28,32 @@ def main():
         Ensemble(
             'L = 24 Forward Replica',
             ('/work/hbn28/hbn28e/0120-Mpi270-L24-T96/cfg',),
-            ('/work/hbn28/hbn28e/0120-Mpi270-L24-T96/stout',),
-            ('/work/hbn28/hbn284/eigensystems/0120-Mpi270-L24-T96',),
+            ('/work/hbn28/hbn28e/0120-Mpi270-L24-T96/stout',
+             '/hiskp2/gauges/0120-Mpi270-L24-T96/stout_smeared',),
+            ('/work/hbn28/hbn284/eigensystems/0120-Mpi270-L24-T96',
+             '/hiskp2/eigensystems/0120-Mpi270-L24-T96/hyp_062_062_3/nev_120'),
+            ('/hiskp2/ueding/peram_generation/sWC_A2p1_Mpi270_L24T96',),
         ),
         Ensemble(
             'L = 24 Backward Replica',
             ('/work/hbn28/hbn28e/0122-Mpi270-L24-T96-backwards/cfg',),
             ('/work/hbn28/hbn28e/0122-Mpi270-L24-T96-backwards/stout',),
             ('/work/hbn28/hbn284/eigensystems/0122-Mpi270-L24-T96-backwards',),
+            (),
         ),
         Ensemble(
             'L = 32 Forward Replica',
             ('/work/hbn28/hbn28e/0121-Mpi270-L32-T96/cfg',),
             ('/work/hbn28/hbn28e/0121-Mpi270-L32-T96/stout',),
             ('/work/hbn28/hbn284/eigensystems/0121-Mpi270-L32-T96',),
+            (),
         ),
         Ensemble(
             'L = 32 Backward Replica',
             ('/work/hbn28/hbn28e/0123-Mpi270-L32-T96-backwards/cfg',),
             ('/work/hbn28/hbn28e/0123-Mpi270-L32-T96-backwards/stout',),
             ('/work/hbn28/hbn284/eigensystems/0123-Mpi270-L32-T96-backwards',),
+            (),
         ),
     ]
 
@@ -59,11 +67,13 @@ def do_ensemble(ensemble):
     do_type('Gauge (Raw)', ensemble.gauges, regex_cfg)
     do_type('Gauge (Stout)', ensemble.stout, regex_stout)
     do_type('Eigenvalues', ensemble.eigenvalues, regex_eigenvalues)
+    do_type('Eigenvectors', ensemble.eigenvalues, regex_eigenvectors)
+    do_type('Phases', ensemble.eigenvalues, regex_phases)
+    do_perambulator(ensemble.perambulators)
     print()
 
 
 def do_type(name, directories, regex):
-
     for directory in directories:
         if not os.path.isdir(directory):
             continue
@@ -71,11 +81,43 @@ def do_type(name, directories, regex):
         files = os.listdir(directory)
 
         matches = [re.search(regex, filename) for filename in files]
-        numbers = sorted([int(m.group(1)) for m in matches if m])
+        numbers = sorted([int(list(filter(lambda x: x is not None, m.groups()))[0]) for m in matches if m])
         ranges = list(get_ranges(numbers))
         strides = list(get_strides(ranges))
         #print(name, ', '.join(['{}..{}'.format(*r) for r in ranges]))
         print('  {:15s} {}'.format(name, ', '.join([format_stride(r) for r in strides])))
+
+
+def do_perambulator(ensemble_paths):
+    print('  Perambulators')
+    for ensemble_path in ensemble_paths:
+        for flavor in ['light', 'strange']:
+            flavor_path = os.path.join(ensemble_path, flavor)
+            for cfg_dir in sorted(os.listdir(flavor_path)):
+                rv_avail = []
+                m = re.search(r'cnfg(\d+)', cfg_dir)
+                if not m:
+                    continue
+                cfg = int(m.group(1))
+                cfg_path = os.path.join(flavor_path, cfg_dir)
+                for rv_dir in sorted(os.listdir(cfg_path)):
+                    m = re.search(r'rnd_vec_(\d+)', rv_dir)
+                    if not m:
+                        continue
+                    rv = int(m.group(1))
+                    rv_path = os.path.join(cfg_path, rv_dir)
+                    for filename in sorted(os.listdir(rv_path)):
+                        m = re.search(r'perambulator\.rndvec', filename)
+                        if m:
+                            rv_avail.append(rv)
+
+                if len(rv_avail) > 0:
+                    ranges = list(get_ranges(rv_avail))
+                    strides = list(get_strides(ranges))
+                    formatted = [format_stride(r) for r in strides]
+                    print('    {:4d}   {}'.format(cfg, ', '.join(formatted)))
+
+
 
 
 def format_stride(stride):
@@ -96,6 +138,10 @@ def get_ranges(i):
 
 
 def get_strides(ranges):
+    if len(ranges) == 1:
+        yield ranges[0][0], ranges[0][1], 1
+        return
+
     for length, groups in itertools.groupby(ranges, lambda x: x[1] - x[0]):
         groups = list(groups)
         if length != 0:
