@@ -115,7 +115,7 @@ def do_perambulator(ensemble_paths):
                     ranges = list(get_ranges(rv_avail))
                     strides = list(get_strides(ranges))
                     formatted = [format_stride(r) for r in strides]
-                    print('                  {:4d}   {}'.format(cfg, ', '.join(formatted)))
+                    print('                 {:4d}   {}'.format(cfg, ', '.join(formatted)))
 
 
 
