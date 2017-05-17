@@ -353,6 +353,8 @@ for soalen in 1 2 4 8 16; do
             --enable-proc=AVX512 \
             --enable-soalen=$soalen \
             --enable-clover \
+            --enable-twisted-mass \
+            --enable-tm-clover \
             --enable-openmp \
             --enable-mm-malloc \
             --enable-parallel-arch=parscalar \
@@ -364,7 +366,7 @@ for soalen in 1 2 4 8 16; do
     popd
 done
 
-exit 0
+exit
 
 ###############################################################################
 #                             GNU Multi Precision                             #
@@ -435,7 +437,7 @@ if ! [[ -f Makefile ]]; then
         --enable-precision=double \
         --enable-qdp-alignment=128 \
         --enable-sse2 \
-        --enable-qphix-solver-arch=avx2 \
+        --enable-qphix-solver-arch=avx512 \
         --with-gmp="$prefix" \
         --with-libxml2="$prefix/bin/xml2-config" \
         --with-qdp="$prefix" \
