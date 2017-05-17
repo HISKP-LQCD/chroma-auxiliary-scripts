@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#SBATCH --nodes={{ nodes }}
+#SBATCH --ntasks-per-node={{ ranks_per_node }}
+#SBATCH --time=00:15:00
+#SBATCH --partition=batch
+#SBATCH --cpus-per-task={{ cores_per_rank }}
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ueding@hiskp.uni-bonn.de
+#SBATCH --output=out-{{ name }}.txt
+
+module load Intel
+module load IntelMPI
+
+# Set the approprite OpenMP variables for thread count and binding.
+export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
+export KMP_AFFINITY=compact,0
+
+srun ~/jureca-build-icc/qphix/tests/time_clov_noqdp \
+    -x {{ lattice }} -y {{ lattice }} -z {{ lattice }} -t {{ 2 * lattice }} \
+    -by 8 -bz 8 \
+    -pxy 1 -pxyz 0 \
+    -c {{ cores_per_rank }} \
+    -sy 1 -sz 1 \
+    -minct {{ ranks_per_node }} \
+    -compress12 \
+    -geom {{ geom|join(' ') }} \
+    -i 1000 \
+    -prec s \
+    -dslash

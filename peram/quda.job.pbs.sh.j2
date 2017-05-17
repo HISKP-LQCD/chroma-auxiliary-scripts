@@ -1,0 +1,21 @@
+#PBS -N {{ '%s_%04d_%d'|format(jobname, i, rv) }}
+#PBS -l walltime=24:00:00,mem=35gb
+#PBS -l nodes=1:ppn=4:gpus=4
+{% if email_address != '' %}
+#PBS -M {{ email_address }}
+#PBS -m abe
+{% endif %}
+#PBS -j oe
+
+rundir={{ '%s%04d/rnd_vec_%02d'|format(rundir, i, rv) }}
+exe={{ exe }}
+outfile={{ outfile }}
+infile={{ laphin }}
+export QUDA_RESOURCE_PATH={{ quda_rsc_path }}
+
+cd ${rundir}
+date > ${outfile}
+mpirun.openmpi -x QUDA_RESOURCE_PATH -x OMP_NUM_THREADS=1 -np 4 -npersocket 2 \
+${exe} -LapHsin ${infile} | tee -a ${outfile}
+date >> ${outfile}
+

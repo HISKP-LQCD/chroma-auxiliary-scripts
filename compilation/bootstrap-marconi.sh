@@ -26,12 +26,40 @@
 
 set -e
 set -u
-set -x
 
 # Force the user specify a directory where everything should be put into.
-if (( $# == 0 )); then
-    echo "usage: $0 BASE"
+if (( $# == 0 )) || [[ ${1:0:1} = - ]]; then
+    cat <<EOF
+This is a script to install Chroma, QPhiX, QDP++, QMP, and their dependencies
+on the Intel Knights Landing based supercomputer “Marconi A2” hosted by CINECA
+in Casalecchio di Reno, Italy.
+
+Usage: $0 BASE
+
+BASE is the directory where everthing is downloaded, compiled, and installed.
+After this script ran though, you will have the following directories:
+
+BASE/build-icc/qmp
+BASE/build-icc/qphix
+BASE/build-icc/qdpxx
+BASE/build-icc/chroma
+BASE/build-icc/libxml2
+
+BASE/local-icc/include
+BASE/local-icc/bin
+BASE/local-icc/lib
+BASE/local-icc/share
+
+BASE/sources/qmp
+BASE/sources/qphix
+BASE/sources/qdpxx
+BASE/sources/chroma
+BASE/sources/libxml2
+EOF
+    exit 1
 fi
+
+set -x
 
 mkdir -p "$1"
 pushd "$1"
