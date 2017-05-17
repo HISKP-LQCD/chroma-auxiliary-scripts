@@ -171,9 +171,10 @@ print-fancy-heading() {
 # make much sense. Perhaps one has to split up the `autoreconf` call into the
 # parts that make it up. Using this weird dance, it works somewhat reliably.
 autotools-dance() {
-    libtoolize
-    automake --add-missing --copy || autoreconf -f || automake --add-missing --copy
-    autoreconf -f
+    #libtoolize
+    #automake --add-missing --copy || autoreconf -f || automake --add-missing --copy
+    #autoreconf -f
+    autoreconf -fiv
 }
 
 # Invokes the various commands that are needed to update the GNU Autotools
@@ -310,7 +311,7 @@ popd
 repo=qphix
 print-fancy-heading $repo
 # clone-if-needed https://github.com/plabus/qphix.git $repo qphix-tmf
-clone-if-needed https://github.com/martin-ueding/qphix.git $repo ndtm-working-slow-version
+clone-if-needed https://github.com/martin-ueding/qphix.git $repo twisted
 
 pushd $repo
 cflags="$base_cflags $openmp_flags $qphix_flags"
@@ -329,6 +330,8 @@ for soalen in 1 2 4 8 16; do
             --enable-proc=AVX512 \
             --enable-soalen=$soalen \
             --enable-clover \
+            --enable-twisted-mass \
+            --enable-tm-clover \
             --enable-openmp \
             --enable-mm-malloc \
             --enable-parallel-arch=parscalar \
@@ -340,7 +343,7 @@ for soalen in 1 2 4 8 16; do
     popd
 done
 
-exit 0
+exit
 
 ###############################################################################
 #                             GNU Multi Precision                             #
@@ -411,7 +414,7 @@ if ! [[ -f Makefile ]]; then
         --enable-precision=double \
         --enable-qdp-alignment=128 \
         --enable-sse2 \
-        --enable-qphix-solver-arch=avx2 \
+        --enable-qphix-solver-arch=avx512 \
         --with-gmp="$prefix" \
         --with-libxml2="$prefix/bin/xml2-config" \
         --with-qdp="$prefix" \
