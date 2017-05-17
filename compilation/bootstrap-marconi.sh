@@ -199,9 +199,8 @@ print-fancy-heading() {
 # make much sense. Perhaps one has to split up the `autoreconf` call into the
 # parts that make it up. Using this weird dance, it works somewhat reliably.
 autotools-dance() {
-    libtoolize
-    automake --add-missing --copy || autoreconf -f || automake --add-missing --copy
-    autoreconf -f
+    aclocal
+    autoreconf -vif
 }
 
 # Invokes the various commands that are needed to update the GNU Autotools
@@ -216,13 +215,11 @@ autoreconf-if-needed() {
         if [[ -f .gitmodules ]]; then
             for module in $(git submodule foreach --quiet --recursive pwd | tac); do
                 pushd "$module"
-                aclocal
                 autotools-dance
                 popd
             done
         fi
 
-        aclocal
         autotools-dance
     fi
 }
@@ -337,8 +334,7 @@ popd
 
 repo=qphix
 print-fancy-heading $repo
-# clone-if-needed https://github.com/plabus/qphix.git $repo qphix-tmf
-clone-if-needed https://github.com/martin-ueding/qphix.git $repo ndtm-working-slow-version
+clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
 
 pushd $repo
 cflags="$base_cflags $openmp_flags $qphix_flags"
