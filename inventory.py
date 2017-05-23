@@ -94,6 +94,8 @@ def do_perambulator(ensemble_paths):
     for ensemble_path in ensemble_paths:
         for flavor in ['light', 'strange']:
             flavor_path = os.path.join(ensemble_path, flavor)
+            if not os.path.isdir(flavor_path):
+                continue
             for cfg_dir in sorted(os.listdir(flavor_path)):
                 rv_avail = []
                 m = re.search(r'cnfg(\d+)', cfg_dir)
