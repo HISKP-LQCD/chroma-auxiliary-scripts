@@ -38,7 +38,8 @@ def main():
             'L = 24 Backward Replica',
             ('/work/hbn28/hbn28e/0122-Mpi270-L24-T96-backwards/cfg',),
             ('/work/hbn28/hbn28e/0122-Mpi270-L24-T96-backwards/stout',),
-            ('/work/hbn28/hbn284/eigensystems/0122-Mpi270-L24-T96-backwards',),
+            ('/work/hbn28/hbn284/eigensystems/sWC_A2p1_Mpi270_L24T96_backwards',
+             '/hiskp2/eigensystems/sWC_A2p1_Mpi270_L24T96_backwards',),
             (),
         ),
         Ensemble(
