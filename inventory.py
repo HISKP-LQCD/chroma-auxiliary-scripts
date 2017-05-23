@@ -5,6 +5,7 @@
 
 import argparse
 import collections
+import glob
 import itertools
 import os
 import re
@@ -91,9 +92,10 @@ def do_type(name, directories, regex):
 
 
 def do_perambulator(ensemble_paths):
-    print('  Perambulators')
     for ensemble_path in ensemble_paths:
         for flavor in ['light', 'strange']:
+            perams = []
+
             flavor_path = os.path.join(ensemble_path, flavor)
             if not os.path.isdir(flavor_path):
                 continue
@@ -104,7 +106,8 @@ def do_perambulator(ensemble_paths):
                     continue
                 cfg = int(m.group(1))
                 cfg_path = os.path.join(flavor_path, cfg_dir)
-                for rv_dir in sorted(os.listdir(cfg_path)):
+                rv_dirs = list(sorted(glob.glob(os.path.join(cfg_path, 'rnd_vec_*'))))
+                for rv_dir in rv_dirs:
                     m = re.search(r'rnd_vec_(\d+)', rv_dir)
                     if not m:
                         continue
@@ -115,11 +118,14 @@ def do_perambulator(ensemble_paths):
                         if m:
                             rv_avail.append(rv)
 
-                if len(rv_avail) > 0:
-                    ranges = list(get_ranges(rv_avail))
-                    strides = list(get_strides(ranges))
-                    formatted = [format_stride(r) for r in strides]
-                    print('                 {:4d}   {}'.format(cfg, ', '.join(formatted)))
+                if len(rv_avail) == len(rv_dirs):
+                    perams.append(cfg)
+
+            ranges = list(get_ranges(perams))
+            strides = list(get_strides(ranges))
+            formatted = [format_stride(r) for r in strides]
+
+            print('  {:15s} {}'.format('Peram. ' + flavor, ', '.join(formatted)))
 
 
 
