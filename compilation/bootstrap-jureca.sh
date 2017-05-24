@@ -68,7 +68,7 @@ case $compiler in
         base_flags="-xAVX2 -O2"
         cxx11_flags="--std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
-        qphix_flags="-qopt-report -qopt-report-phase=vec -restrict"
+        qphix_flags="-restrict"
         # QPhiX can make use of the Intel “C Extended Array Notation”, this
         # gets enabled here.
         qphix_configure="--enable-cean"
@@ -117,7 +117,7 @@ PATH=$prefix/bin:$PATH
 
 base_cxxflags="$base_flags"
 base_cflags="$base_flags"
-base_configure="--prefix=$prefix --disable-shared --enable-static CC=$(which $cc_name) CXX=$(which $cxx_name)"
+base_configure="--prefix=$prefix CC=$(which $cc_name) CXX=$(which $cxx_name)"
 
 # Clones a git repository if the directory does not exist. It does not call
 # `git pull`. After cloning, it deletes the `configure` and `Makefile` that are
@@ -328,7 +328,7 @@ pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
     $sourcedir/$repo/configure $base_configure \
         $qphix_configure \
-        --disable-testing \
+        --enable-testing \
         --enable-proc=AVX2 \
         --enable-soalen=2 \
         --enable-clover \
