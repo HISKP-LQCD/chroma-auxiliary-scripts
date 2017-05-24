@@ -42,58 +42,47 @@ popd
 # This makes debugging way easier.
 export LC_ALL=C
 
-# Load the appropriate modules and output the present versions.
-set +x
-module list
-set -x
-
-if [[ -z "${COMPILER-}" ]]; then
-    # Check whether we are on Hazel Hen.
-    if [[ "$(hostname -f)" =~ [^.]*\.hww\.de ]]; then
-        : We are on Hazel Hen
-        compiler=cray
-        host=hazelhen
-    elif [[ "$(hostname -f)" =~ [^.]*\.jureca ]]; then
-        : We are on JURECA
-        compiler=icc
-        host=jureca
-    else
-        set +x
-        echo "This machine is neither JURECA nor Hazel Hen. It is not clear which compiler to use. Set the environment variable 'COMPILER' to 'cray', 'icc' or 'gcc'."
-        exit 1
-    fi
+if [[ "$(hostname -f)" =~ [^.]*\.hww\.de ]]; then
+    host=hazelhen
+elif [[ "$(hostname -f)" =~ [^.]*\.jureca ]]; then
+    host=jureca
+else
+    set +x
+    echo "This machine is neither JURECA nor Hazel Hen. It is not clear which compiler to use. Set the environment variable 'COMPILER' to 'cray', 'icc' or 'gcc'."
+    exit 1
 fi
 
+compiler="${COMPILER-icc}"
 
 # Set up the chosen compiler.
 case $compiler in
-    cray)
-        set +x
-        module load PrgEnv-cray/5.2.82
-        module load cray-mpich/7.5.5
-        set -x
-        cc_name=cc
-        cxx_name=CC
-        color_flags=""
-        openmp_flags="-openmp"
-        base_flags="-O2"
-        cxx11_flags="--std=c++11"
-        disable_warnings_flags=""
-        qphix_flags=""
-        qphix_configure=""
-        ;;
     icc)
-        set +x
-        module load Intel/2017.2.174-GCC-5.4.0
-        module load IntelMPI/2017.2.174
-        module list
-        set -x
-        cc_name=mpiicc
-        cxx_name=mpiicpc
+        case "$host" in
+            jureca)
+                set +x
+                module load Intel/2017.2.174-GCC-5.4.0
+                module load IntelMPI/2017.2.174
+                module list
+                set -x
+                cc_name=mpiicc
+                cxx_name=mpiicpc
+                ;;
+            hazelhen)
+                set +x
+                module swap PrgEnv-cray PrgEnv-intel
+                module load intel/17.0.2.174
+                module list
+                set -x
+                cc_name=cc
+                cxx_name=CC
+                ;;
+        esac
+
         color_flags=""
         openmp_flags="-fopenmp"
         base_flags="-xAVX2 -O2"
-        cxx11_flags="--std=c++11"
+        c99_flags="-std=c99"
+        cxx11_flags="-std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
         qphix_flags="-restrict"
         # QPhiX can make use of the Intel “C Extended Array Notation”, this
@@ -111,6 +100,7 @@ case $compiler in
         color_flags="-fdiagnostics-color=auto"
         openmp_flags="-fopenmp"
         base_flags="-O2 -finline-limit=50000 -fmax-errors=1 $color_flags -mavx2"
+        c99_flags="--std=c99"
         cxx11_flags="--std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
         qphix_flags="-Drestrict=__restrict__"
@@ -143,8 +133,16 @@ mkdir -p "$build"
 PATH=$prefix/bin:$PATH
 
 base_cxxflags="$base_flags"
-base_cflags="$base_flags"
+base_cflags="$base_flags $c99_flags"
 base_configure="--prefix=$prefix CC=$(which $cc_name) CXX=$(which $cxx_name)"
+
+# The “huge pages” are used on Hazel Hen. This leads to the inability to run
+# execute programs on the login nodes that are compiled with the MPI compiler
+# wrapper. Autotools need to be told that it cross compiles such that the
+# `./configure` script won't try to execute the test programs.
+if [[ "$host" = hazelhen ]]; then
+    base_configure="$base_configure --host=x86_64-linux-gnu"
+fi
 
 # Clones a git repository if the directory does not exist. It does not call
 # `git pull`. After cloning, it deletes the `configure` and `Makefile` that are
@@ -199,17 +197,6 @@ print-fancy-heading() {
     fi
 }
 
-# I have not fully understood this here. I *feel* that there is some cyclic
-# dependency between `automake --add-missing` and the `autoreconf`. It does not
-# make much sense. Perhaps one has to split up the `autoreconf` call into the
-# parts that make it up. Using this weird dance, it works somewhat reliably.
-autotools-dance() {
-    #aclocal
-    #automake --add-missing --copy || autoreconf -f || automake --add-missing --copy
-    #autoreconf -f
-    autoreconf -vif
-}
-
 # Invokes the various commands that are needed to update the GNU Autotools
 # build system. Since the submodules are also Autotools projects, these
 # commands need to be invoked from the bottom up, recursively. The regular `git
@@ -222,13 +209,13 @@ autoreconf-if-needed() {
         if [[ -f .gitmodules ]]; then
             for module in $(git submodule foreach --quiet --recursive pwd | tac); do
                 pushd "$module"
-                autotools-dance
+                autoreconf -vif
                 popd
             done
         fi
 
         aclocal
-        autotools-dance
+        autoreconf -vif
     fi
 }
 
