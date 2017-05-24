@@ -10,7 +10,7 @@ pion correlator from that.
     <cfg_file>{{ config_in_file }}</cfg_file>
   </Cfg>
   <Param>
-    <nrow>16 16 16 32</nrow>
+    <nrow>{{ L }} {{ L }} {{ L }} {{ T }}</nrow>
     <InlineMeasurements>
       <!-- Create a single source. -->
       <elem>
@@ -60,7 +60,7 @@ pion correlator from that.
             <MaxIter>10000</MaxIter>
             <RsdTarget>1e-9</RsdTarget>
             <CloverParams>
-              <Mass>-0.0960</Mass>
+              <Mass>-0.1265</Mass>
               <clovCoeff>1.0</clovCoeff>
             </CloverParams>
             <AntiPeriodicT>true</AntiPeriodicT>
@@ -82,7 +82,7 @@ pion correlator from that.
           <obsvP>false</obsvP>
           <FermionAction>
             <FermAct>CLOVER</FermAct>
-            <Mass>-0.057</Mass>
+            <Mass>-0.065</Mass>
             <clovCoeff>1.0</clovCoeff>
             <FermState>
               <Name>STOUT_FERM_STATE</Name>
