@@ -44,17 +44,44 @@ export LC_ALL=C
 
 # Load the appropriate modules and output the present versions.
 set +x
-module load Autotools
 module list
 set -x
 
-# The best compiler for JURECA is the Intel C++. You can choose a different
-# compiler setting the environment `COMPILER` variable when calling this
-# script.
-compiler=${COMPILER-icc}
+if [[ -z "${COMPILER-}" ]]; then
+    # Check whether we are on Hazel Hen.
+    if [[ "$(hostname -f)" =~ [^.]*\.hww\.de ]]; then
+        : We are on Hazel Hen
+        compiler=cray
+        host=hazelhen
+    elif [[ "$(hostname -f)" =~ [^.]*\.jureca ]]; then
+        : We are on JURECA
+        compiler=icc
+        host=jureca
+    else
+        set +x
+        echo "This machine is neither JURECA nor Hazel Hen. It is not clear which compiler to use. Set the environment variable 'COMPILER' to 'cray', 'icc' or 'gcc'."
+        exit 1
+    fi
+fi
+
 
 # Set up the chosen compiler.
 case $compiler in
+    cray)
+        set +x
+        module load PrgEnv-cray/5.2.82
+        module load cray-mpich/7.5.5
+        set -x
+        cc_name=cc
+        cxx_name=CC
+        color_flags=""
+        openmp_flags="-openmp"
+        base_flags="-O2"
+        cxx11_flags="--std=c++11"
+        disable_warnings_flags=""
+        qphix_flags=""
+        qphix_configure=""
+        ;;
     icc)
         set +x
         module load Intel/2017.2.174-GCC-5.4.0
@@ -235,49 +262,55 @@ popd
 #                                   libxml2                                   #
 ###############################################################################
 
-repo=libxml2
-print-fancy-heading $repo
-clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
+if [[ "$host" = jureca ]]; then
+    repo=libxml2
+    print-fancy-heading $repo
+    clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
 
-pushd $repo
-cflags="$base_cflags"
-cxxflags="$base_cxxflags"
-if ! [[ -f configure ]]; then
-    mkdir -p m4
-    pushd m4
-    ln -fs /usr/share/aclocal/pkg.m4 .
+    pushd $repo
+    cflags="$base_cflags"
+    cxxflags="$base_cxxflags"
+    if ! [[ -f configure ]]; then
+        mkdir -p m4
+        pushd m4
+        ln -fs /usr/share/aclocal/pkg.m4 .
+        popd
+        NOCONFIGURE=yes ./autogen.sh
+    fi
     popd
-    NOCONFIGURE=yes ./autogen.sh
-fi
-popd
 
-mkdir -p "$build/$repo"
-pushd "$build/$repo"
-if ! [[ -f Makefile ]]; then
-    $sourcedir/$repo/configure $base_configure \
-        --without-zlib \
-        --without-python \
-        --without-readline \
-        --without-threads \
-        --without-history \
-        --without-reader \
-        --without-writer \
-        --with-output \
-        --without-ftp \
-        --without-http \
-        --without-pattern \
-        --without-catalog \
-        --without-docbook \
-        --without-iconv \
-        --without-schemas \
-        --without-schematron \
-        --without-modules \
-        --without-xptr \
-        --without-xinclude \
-        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+    mkdir -p "$build/$repo"
+    pushd "$build/$repo"
+    if ! [[ -f Makefile ]]; then
+        $sourcedir/$repo/configure $base_configure \
+            --without-zlib \
+            --without-python \
+            --without-readline \
+            --without-threads \
+            --without-history \
+            --without-reader \
+            --without-writer \
+            --with-output \
+            --without-ftp \
+            --without-http \
+            --without-pattern \
+            --without-catalog \
+            --without-docbook \
+            --without-iconv \
+            --without-schemas \
+            --without-schematron \
+            --without-modules \
+            --without-xptr \
+            --without-xinclude \
+            CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+    fi
+    make-make-install
+    popd
+    
+    libxml="$prefix/bin/xml2-config"
+else
+    libxml="/usr/include/libxml2"
 fi
-make-make-install
-popd
 
 ###############################################################################
 #                                    QDP++                                    #
@@ -302,7 +335,7 @@ if ! [[ -f Makefile ]]; then
         --enable-parallel-arch=parscalar \
         --enable-parallel-io \
         --enable-precision=double \
-        --with-libxml2="$prefix/bin/xml2-config" \
+        --with-libxml2="$libxml" \
         --with-qmp="$prefix" \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
