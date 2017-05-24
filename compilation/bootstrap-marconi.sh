@@ -349,7 +349,7 @@ for soalen in 1 2 4 8 16; do
     if ! [[ -f Makefile ]]; then
         $sourcedir/$repo/configure $base_configure \
             $qphix_configure \
-            --disable-testing \
+            --enable-testing \
             --enable-proc=AVX512 \
             --enable-soalen=$soalen \
             --enable-clover \
