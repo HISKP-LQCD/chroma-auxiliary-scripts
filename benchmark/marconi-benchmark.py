@@ -38,6 +38,7 @@ meas_regexes = [
     r'(?P<usec_iter>[\d+-e]+) usec/iteration',
     r'Performance: (?P<gflops_total>[\d+-e]+) GFLOPS total',
     r'(?P<gflops_node>[\d+-e]+) GFLOPS / node',
+    r'CG GFLOPS=(?P<cg_gflops>[\d+-e]+)',
 ]
 
 
@@ -81,6 +82,10 @@ def main():
                 mode = 'M'
                 continue
 
+            if line.startswith('Initializing CG Solver'):
+                mode = 'CG'
+                continue
+
             if mode == 'meta':
                 for regex in general_regexes:
                     m = re.search(regex, line)
@@ -115,6 +120,10 @@ def main():
 
                         meta['gflops_total_val'] = mean
                         meta['gflops_total_err'] = err
+
+                    if key == 'cg_gflops':
+                        meta['cg_gflops_val'] = mean
+                        meta['cg_gflops_err'] = err
 
 
             meta['ranks'] = product([int(meta['geom' + str(i)])
