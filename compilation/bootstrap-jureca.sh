@@ -185,7 +185,7 @@ Unfortunately outgoing HTTPS connections as needed for “git clone” are block
 by the firewall. You will have to download the repository yourself. Execute the
 following commands:
 
-    cd "$pwd"
+    cd "$PWD"
     git clone "$url" --recursive -b "$branch"
     rm -f configure Makefile
 EOF
@@ -231,7 +231,7 @@ print-fancy-heading() {
     echo "######################################################################"
     set -x
 
-    if [[ -d "$sourcedir/$repo" ]]; then
+    if [[ -d "$sourcedir/$repo/.git" ]]; then
         pushd "$sourcedir/$repo"
         git branch
         popd
@@ -416,48 +416,13 @@ print-fancy-heading $repo
 
 case "$host" in
     hazelhen)
-        # The upstream website only has a download as an LZMA compressed file. The
-        # CentOS does not provide an `lzip` command. Also, there is no module
-        # available that would supply it. Building `lzip` from source seems like a
-        # waste of effort. Therefore I have just repacked that on my local machine
-        # and uploaded to my webspace.
-        url=http://bulk.martin-ueding.de/gmp-6.1.2.tar.gz
-        #url=https://gmplib.org/download/gmp/gmp-6.1.2.tar.lz
-
-        if ! [[ -f "${url##*/}" ]]; then
-            cat<<EOF
-The sources for GMP could not be found in "$pwd". Unfortunately, outbound HTTP
-connections are blocked by the firewall. You will have to download the sources
-yourself by executing the following commands:
-
-    cd "$pwd"
-    wget "$url"
-EOF
-        fi
-        if ! [[ -d "$repo" ]]; then
-            tar -xf "${url##*/}"
-            mv gmp-6.1.2 gmp
-        fi
-
-        pushd "$repo"
-        cflags="$base_cflags"
-        cxxflags="$base_cxxflags"
-        autoreconf-if-needed
-        popd
-
-        mkdir -p "$build/$repo"
-        pushd "$build/$repo"
-        if ! [[ -f Makefile ]]; then
-            $sourcedir/$repo/configure $base_configure \
-                CFLAGS="$cflags" CXXFLAGS="$cxxflags"
-        fi
-        make-make-install
-        popd
+        gmp="-lgmp"
         ;;
     jureca)
         set +x
         module load GMP
         set -x
+        gmp="$EBROOTGMP"
         ;;
 esac
 
@@ -487,7 +452,7 @@ if ! [[ -f Makefile ]]; then
         --enable-qdp-alignment=128 \
         --enable-sse2 \
         --enable-qphix-solver-arch=avx2 \
-        --with-gmp="$prefix" \
+        --with-gmp="$gmp" \
         --with-libxml2="$prefix/bin/xml2-config" \
         --with-qdp="$prefix" \
         --with-qphix-solver="$prefix" \
