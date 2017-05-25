@@ -44,18 +44,31 @@ export LC_ALL=C
 
 if [[ "$(hostname -f)" =~ [^.]*\.hww\.de ]]; then
     host=hazelhen
+    compiler="${COMPILER-gcc}"
 elif [[ "$(hostname -f)" =~ [^.]*\.jureca ]]; then
     host=jureca
+    compiler="${COMPILER-icc}"
 else
     set +x
     echo "This machine is neither JURECA nor Hazel Hen. It is not clear which compiler to use. Set the environment variable 'COMPILER' to 'cray', 'icc' or 'gcc'."
     exit 1
 fi
 
-compiler="${COMPILER-icc}"
 
 # Set up the chosen compiler.
 case $compiler in
+    cray)
+        cc_name=cc
+        cxx_name=CC
+        color_flags=""
+        openmp_flags=""
+        base_flags="-O2 -hcpu=haswell"
+        c99_flags="-hstd=c99"
+        cxx11_flags="-hstd=c++11"
+        disable_warnings_flags=""
+        qphix_flags=""
+        qphix_configure=""
+        ;;
     icc)
         case "$host" in
             jureca)
@@ -83,23 +96,35 @@ case $compiler in
         base_flags="-xAVX2 -O2"
         c99_flags="-std=c99"
         cxx11_flags="-std=c++11"
-        disable_warnings_flags="-Wno-all -Wno-pedantic"
+        disable_warnings_flags="-Wno-all -Wno-pedantic -diag-disable 1224"
         qphix_flags="-restrict"
         # QPhiX can make use of the Intel “C Extended Array Notation”, this
         # gets enabled here.
         qphix_configure="--enable-cean"
         ;;
     gcc)
-        set +x
-        module load GCC
-        module load ParaStationMPI
-        module list
-        set -x
-        cc_name=mpicc
-        cxx_name=mpic++
+        case "$host" in
+            jureca)
+                set +x
+                module load GCC
+                module load ParaStationMPI
+                module list
+                set -x
+                cc_name=mpicc
+                cxx_name=mpic++
+                ;;
+            hazelhen)
+                set +x
+                module swap PrgEnv-cray PrgEnv-gnu
+                module list
+                set -x
+                cc_name=cc
+                cxx_name=CC
+                ;;
+        esac
         color_flags="-fdiagnostics-color=auto"
         openmp_flags="-fopenmp"
-        base_flags="-O2 -finline-limit=50000 -fmax-errors=1 $color_flags -mavx2"
+        base_flags="-O2 -finline-limit=50000 $color_flags -mavx2"
         c99_flags="--std=c99"
         cxx11_flags="--std=c++11"
         disable_warnings_flags="-Wno-all -Wno-pedantic"
@@ -152,14 +177,30 @@ clone-if-needed() {
     local dir="$2"
     local branch="$3"
 
-    if ! [[ -d "$dir" ]]
-    then
-        git clone "$url" --recursive -b "$branch"
+    case "$host" in
+        hazelhen)
+            cat<<EOF
+The git repository for “$dir” could not be found, it has to be cloned.
+Unfortunately outgoing HTTPS connections as needed for “git clone” are blocked
+by the firewall. You will have to download the repository yourself. Execute the
+following commands:
 
-        pushd "$dir"
-        rm -f configure Makefile
-        popd
-    fi
+    cd "$pwd"
+    git clone "$url" --recursive -b "$branch"
+    rm -f configure Makefile
+EOF
+            ;;
+        *)
+            if ! [[ -d "$dir" ]]
+            then
+                git clone "$url" --recursive -b "$branch"
+
+                pushd "$dir"
+                rm -f configure Makefile
+                popd
+            fi
+            ;;
+    esac
 }
 
 # If the user has not given a variable `SMP` in the environment, use as many
@@ -339,7 +380,7 @@ clone-if-needed https://github.com/JeffersonLab/qphix.git $repo master
 
 pushd $repo
 cflags="$base_cflags $openmp_flags $qphix_flags"
-cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags -diag-disable 1224"
+cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
 autoreconf-if-needed
 popd
 
@@ -364,6 +405,63 @@ make-make-install
 popd
 
 ###############################################################################
+#                             GNU Multi Precision                             #
+###############################################################################
+
+# The GNU MP library is not present on the Marconi system. Therefore it has to
+# be compiled from source.
+
+repo=gmp
+print-fancy-heading $repo
+
+case "$host" in
+    hazelhen)
+        # The upstream website only has a download as an LZMA compressed file. The
+        # CentOS does not provide an `lzip` command. Also, there is no module
+        # available that would supply it. Building `lzip` from source seems like a
+        # waste of effort. Therefore I have just repacked that on my local machine
+        # and uploaded to my webspace.
+        url=http://bulk.martin-ueding.de/gmp-6.1.2.tar.gz
+        #url=https://gmplib.org/download/gmp/gmp-6.1.2.tar.lz
+
+        if ! [[ -f "${url##*/}" ]]; then
+            cat<<EOF
+The sources for GMP could not be found in "$pwd". Unfortunately, outbound HTTP
+connections are blocked by the firewall. You will have to download the sources
+yourself by executing the following commands:
+
+    cd "$pwd"
+    wget "$url"
+EOF
+        fi
+        if ! [[ -d "$repo" ]]; then
+            tar -xf "${url##*/}"
+            mv gmp-6.1.2 gmp
+        fi
+
+        pushd "$repo"
+        cflags="$base_cflags"
+        cxxflags="$base_cxxflags"
+        autoreconf-if-needed
+        popd
+
+        mkdir -p "$build/$repo"
+        pushd "$build/$repo"
+        if ! [[ -f Makefile ]]; then
+            $sourcedir/$repo/configure $base_configure \
+                CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+        fi
+        make-make-install
+        popd
+        ;;
+    jureca)
+        set +x
+        module load GMP
+        set -x
+        ;;
+esac
+
+###############################################################################
 #                                   Chroma                                    #
 ###############################################################################
 
@@ -371,9 +469,6 @@ repo=chroma
 print-fancy-heading $repo
 clone-if-needed https://github.com/JeffersonLab/chroma.git $repo devel
 
-set +x
-module load GMP
-set -x
 
 pushd $repo
 cflags="$base_cflags $openmp_flags"
@@ -392,7 +487,7 @@ if ! [[ -f Makefile ]]; then
         --enable-qdp-alignment=128 \
         --enable-sse2 \
         --enable-qphix-solver-arch=avx2 \
-        --with-gmp="$EBROOTGMP" \
+        --with-gmp="$prefix" \
         --with-libxml2="$prefix/bin/xml2-config" \
         --with-qdp="$prefix" \
         --with-qphix-solver="$prefix" \
