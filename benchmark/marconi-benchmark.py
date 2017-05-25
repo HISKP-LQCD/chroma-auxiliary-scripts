@@ -9,6 +9,7 @@ import csv
 import functools
 import itertools
 import operator
+import os
 import pprint
 import re
 
@@ -39,6 +40,10 @@ meas_regexes = [
     r'Performance: (?P<gflops_total>[\d+-e]+) GFLOPS total',
     r'(?P<gflops_node>[\d+-e]+) GFLOPS / node',
     r'CG GFLOPS=(?P<cg_gflops>[\d+-e]+)',
+]
+
+filename_regexes = [
+    r'(?P<affinity>scatter|balanced|compact)'
 ]
 
 
@@ -72,6 +77,12 @@ def main():
             'geom4': 1,
         }
         results = collections.defaultdict(lambda: collections.defaultdict(list))
+
+        for regex in filename_regexes:
+            m = re.search(regex, os.path.basename(filename))
+            if m:
+                meta.update(m.groupdict())
+
 
         for line in lines:
             if line.startswith('Timing on cb'):
