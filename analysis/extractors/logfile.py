@@ -6,6 +6,7 @@
 import argparse
 import collections
 import glob
+import gzip
 import json
 import os
 import pprint
@@ -57,15 +58,21 @@ def parse_logfile_to_shard(logfile):
     bucket_before = []
     bucket_update = collections.defaultdict(list)
 
-    with open(logfile) as f:
-        bucket = bucket_before
-        for line in f:
-            m = doing_update_pattern.search(line)
-            if m:
-                update_no = int(m.group(1))
-                bucket = bucket_update[update_no]
+    if logfile.endswith('.gz'):
+        with gzip.open(logfile, 'rb') as f:
+            lines = [line.decode() for line in f]
+    else:
+        with open(logfile) as f:
+            lines = [line for line in f]
 
-            bucket.append(line)
+    for line in lines:
+        bucket = bucket_before
+        m = doing_update_pattern.search(line)
+        if m:
+            update_no = int(m.group(1))
+            bucket = bucket_update[update_no]
+
+        bucket.append(line)
 
     if len(bucket_update.keys()) > 0:
         last_update = max(bucket_update.keys())

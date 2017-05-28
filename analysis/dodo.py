@@ -24,7 +24,7 @@ directories = list(filter(os.path.isdir, os.listdir()))
 def task_logfiles_to_shards():
     for directory in directories:
         shard_names = []
-        for logfile in glob.glob(os.path.join(directory, 'hmc-out', 'hmc.slurm-*.out.txt')):
+        for logfile in glob.glob(os.path.join(directory, 'hmc-out', 'hmc.slurm-*.out.txt.gz')):
             shard_name = names.log_shard(logfile)
             shard_names.append(shard_name)
 
@@ -76,8 +76,8 @@ def task_xpath_shards():
     for directory in directories:
         for key, extractor in extractors.xmlfile.bits.items():
             shard_names = []
-            for xml_file in itertools.chain(glob.glob(os.path.join(directory, 'hmc-out', 'hmc.slurm-*.out.xml')),
-                                            glob.glob(os.path.join(directory, 'hmc-out', 'hmc.slurm-*.log.xml'))):
+            for xml_file in itertools.chain(glob.glob(os.path.join(directory, 'hmc-out', 'hmc.slurm-*.out.xml.gz')),
+                                            glob.glob(os.path.join(directory, 'hmc-out', 'hmc.slurm-*.log.xml.gz'))):
                 shard_name = names.xpath_shard(xml_file, key)
                 shard_names.append(shard_name)
                 yield {
