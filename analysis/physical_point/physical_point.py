@@ -21,7 +21,7 @@ except ImportError:
 
 
 def gmor_pion(aml, aB, aml_cr):
-    return 2 * aB * (aml + aml_cr)
+    return 2 * aB * (aml - aml_cr)
 
 
 def linear(x, a, b):
@@ -61,18 +61,18 @@ def main():
     print('am_cr =', siunitx(amcr_val, amcr_err))
 
     ams_paper = -0.057
-    ams_phys = ams_paper + amcr_val
+    ams_phys = ams_paper - amcr_val
     ams_red = 0.9 * ams_phys
-    ams_bare_red = ams_red - amcr_val
+    ams_bare_red = ams_red + amcr_val
 
     print(ams_paper, ams_phys, ams_red, ams_bare_red)
 
     print()
     print('Mass preconditioning masses:')
 
-    amlq = aml + amcr_val
+    amlq = aml - amcr_val
     for i in range(3):
-        amprec = amlq * 10**i - amcr_val
+        amprec = amlq * 10**i + amcr_val
         kappa = 1 / (amprec * 2 + 8)
         print('a m_prec:', amprec)
         print('κ', kappa)
