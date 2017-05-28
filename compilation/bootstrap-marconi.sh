@@ -438,6 +438,8 @@ if ! [[ -f Makefile ]]; then
         --enable-qdp-alignment=128 \
         --enable-sse2 \
         --enable-qphix-solver-arch=avx512 \
+        --enable-qphix-solver-soalen=4 \
+        --enable-qphix-solver-compress12 \
         --with-gmp="$prefix" \
         --with-libxml2="$prefix/bin/xml2-config" \
         --with-qdp="$prefix" \
