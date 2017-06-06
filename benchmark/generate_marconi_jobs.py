@@ -28,28 +28,39 @@ def main():
     template = env.get_template('marconi.sh.j2')
 
     count = 0
-    for nodes in [1]:
-        for ranks_per_node in [1, 2, 4, 8, 16, 32, 64]:
-            cores_per_rank = 1
-            for lattice in [32]:
-                for geometry in get_geometries(lattice, nodes * ranks_per_node):
-                    print(geometry, product(geometry))
-                    count += 1
-                    name = 'run_nodes{}_rpn{}_lattice{}_geom{}'.format(nodes, ranks_per_node, lattice, '-'.join(map(str, geometry)))
 
-                    rendered = template.render(
-                        cores_per_rank=cores_per_rank,
-                        geom=geometry,
-                        lattice=lattice,
-                        nodes=nodes,
-                        threads=4,
-                        name=name,
-                        ranks_per_node=ranks_per_node,
-                    )
+    ranks_per_node = 16
+    lattice = 48
 
-                    # Rendering LaTeX document with values.
-                    with open(name + '.sh', 'w') as f:
-                        f.write(rendered)
+    epoch = 5
+
+    for geometry in [
+        (2, 4, 2, 1),  #  16,  1
+        (2, 4, 2, 2),  #  32,  2
+        (2, 4, 2, 4),  #  64,  4
+        (2, 4, 2, 8),  # 128,  8
+        (2, 4, 4, 8),  # 256, 16
+    ]:
+        nodes = product(geometry) // ranks_per_node
+        for cores_per_rank in [1, 2]:
+            for prec in ['f', 'd']:
+                count += 1
+                name = 'run{:03d}_nodes{}_cpr{}_lattice{}_geom{}_prec{}'.format(epoch, nodes, cores_per_rank, lattice, '-'.join(map(str, geometry)), prec)
+
+                rendered = template.render(
+                    cores_per_rank=cores_per_rank,
+                    geom=geometry,
+                    lattice=lattice,
+                    nodes=nodes,
+                    threads=4,
+                    name=name,
+                    ranks_per_node=ranks_per_node,
+                    prec=prec,
+                )
+
+                # Rendering LaTeX document with values.
+                with open(name + '.sh', 'w') as f:
+                    f.write(rendered)
 
     print('Jobs:', count)
     print('Jobs * Cores:', count * 68)
