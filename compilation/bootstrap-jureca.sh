@@ -306,6 +306,9 @@ if [[ "$host" = jureca ]]; then
         pushd m4
         ln -fs /usr/share/aclocal/pkg.m4 .
         popd
+        set +x
+        module load Autotools
+        set -x
         NOCONFIGURE=yes ./autogen.sh
     fi
     popd
