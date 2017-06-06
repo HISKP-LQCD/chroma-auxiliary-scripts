@@ -333,10 +333,10 @@ popd
 #                                    QPhiX                                    #
 ###############################################################################
 
-set +x
-module load python
-module load cmake
-set -x
+#set +x
+#module load python
+#module load cmake
+#set -x
 
 repo=qphix
 print-fancy-heading $repo
