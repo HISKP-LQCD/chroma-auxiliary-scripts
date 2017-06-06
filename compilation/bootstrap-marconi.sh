@@ -333,9 +333,14 @@ popd
 #                                    QPhiX                                    #
 ###############################################################################
 
+set +x
+module load python
+module load cmake
+set -x
+
 repo=qphix
 print-fancy-heading $repo
-clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
+clone-if-needed https://github.com/JeffersonLab/qphix.git $repo master
 
 pushd $repo
 cflags="$base_cflags $openmp_flags $qphix_flags"
@@ -343,7 +348,7 @@ cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
 autoreconf-if-needed
 popd
 
-for soalen in 4 8 16; do
+for soalen in 4; do
     builddir="$build/$repo-soalen$soalen"
     mkdir -p "$builddir"
     pushd "$builddir"
