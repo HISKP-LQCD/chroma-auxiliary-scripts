@@ -345,7 +345,7 @@ cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
 autoreconf-if-needed
 popd
 
-for soalen in 1 2 4 8 16; do
+for soalen in 4 8 16; do
     builddir="$build/$repo-soalen$soalen"
     mkdir -p "$builddir"
     pushd "$builddir"
