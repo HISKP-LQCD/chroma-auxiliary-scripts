@@ -337,7 +337,7 @@ popd
 
 repo=qphix
 print-fancy-heading $repo
-clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
+clone-if-needed https://github.com/JeffersonLab/qphix.git $repo enable-all-tests
 
 pushd $repo
 cflags="$base_cflags $openmp_flags $qphix_flags"
@@ -358,6 +358,7 @@ for soalen in 1 2 4 8 16; do
             --enable-clover \
             --enable-twisted-mass \
             --enable-tm-clover \
+            --enable-testing \
             --enable-openmp \
             --enable-mm-malloc \
             --enable-parallel-arch=parscalar \
