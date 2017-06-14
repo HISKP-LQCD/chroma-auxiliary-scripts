@@ -12,13 +12,13 @@ import jinja2
 
 jobscript_text = r'''#!/bin/bash 
 
-#SBATCH --nodes=1
+#SBATCH --nodes=8
 #SBATCH --ntasks-per-node=2
 #SBATCH --time=06:00:00
 #SBATCH --partition=batch
 #SBATCH --cpus-per-task=12
 #SBATCH --output={{ template }}.slurm-%j.out.txt
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=FAIL,END
 #SBATCH --mail-user=ueding@hiskp.uni-bonn.de
 
 module load Intel
@@ -34,7 +34,7 @@ export KMP_AFFINITY=compact,0
 {% for chroma_input in chroma_inputs %}
 srun ~/jureca-local-icc/bin/chroma \
         -i "{{ chroma_input }}" \
-        -by 8 -bz 8 -c 12 -sy 1 -sz 1 -pxy 1 -pxyz 0 -minct 1
+        -by 6 -bz 6 -c 12 -sy 1 -sz 1 -pxy 1 -pxyz 0 -minct 1 -geom 1 1 2 8
 {% endfor %}
 '''
 
