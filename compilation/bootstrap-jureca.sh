@@ -30,7 +30,7 @@ set -x
 
 # Force the user to specify a directory where everything should be put into.
 if (( $# == 0 )); then
-    echo "usage: $0 BASE"
+  echo "usage: $0 BASE"
 fi
 
 mkdir -p "$1"
@@ -43,98 +43,109 @@ popd
 export LC_ALL=C
 
 if [[ "$(hostname -f)" =~ [^.]*\.hww\.de ]]; then
-    host=hazelhen
-    compiler="${COMPILER-gcc}"
+  host=hazelhen
+  compiler="${COMPILER-gcc}"
 elif [[ "$(hostname -f)" =~ [^.]*\.jureca ]]; then
-    host=jureca
-    compiler="${COMPILER-icc}"
+  host=jureca
+  compiler="${COMPILER-icc}"
 else
-    set +x
-    echo "This machine is neither JURECA nor Hazel Hen. It is not clear which compiler to use. Set the environment variable 'COMPILER' to 'cray', 'icc' or 'gcc'."
-    exit 1
+  set +x
+  echo "This machine is neither JURECA nor Hazel Hen. It is not clear which compiler to use. Set the environment variable 'COMPILER' to 'cray', 'icc' or 'gcc'."
+  exit 1
 fi
 
 
 # Set up the chosen compiler.
 case $compiler in
-    cray)
+  # The cray compiler does not support half-precision data types (yet). So
+  # one cannot actually use that for QPhiX right now.
+  cray)
+    cc_name=cc
+    cxx_name=CC
+    color_flags=""
+    openmp_flags=""
+    base_flags="-O2 -hcpu=haswell"
+    c99_flags="-hstd=c99"
+    cxx11_flags="-hstd=c++11"
+    disable_warnings_flags=""
+    qphix_flags=""
+    qphix_configure=""
+    ;;
+  icc)
+    case "$host" in
+      jureca)
+        set +x
+        module load Intel/2017.2.174-GCC-5.4.0
+        module load IntelMPI/2017.2.174
+        module list
+        set -x
+        cc_name=mpiicc
+        cxx_name=mpiicpc
+        ;;
+      hazelhen)
+        set +x
+        # On Hazel Hen, the default compiler is the Cray compiler. One needs to
+        # unload that and load the Intel programming environment. That should
+        # also load the Intel MPI implementation.
+        module swap PrgEnv-cray PrgEnv-intel
+        # If one does not load a newer GCC version, the modern Intel compiler
+        # will use the GCC 4.3 standard library. That however does not support
+        # C++11 such that it will not work.
+        module load gcc/6.3.0
+        module load intel/17.0.2.174
+        module list
+        set -x
+        # On this system, the compiler is always the same because the module
+        # system loads the right one of these wrappers.
         cc_name=cc
         cxx_name=CC
-        color_flags=""
-        openmp_flags=""
-        base_flags="-O2 -hcpu=haswell"
-        c99_flags="-hstd=c99"
-        cxx11_flags="-hstd=c++11"
-        disable_warnings_flags=""
-        qphix_flags=""
-        qphix_configure=""
         ;;
-    icc)
-        case "$host" in
-            jureca)
-                set +x
-                module load Intel/2017.2.174-GCC-5.4.0
-                module load IntelMPI/2017.2.174
-                module list
-                set -x
-                cc_name=mpiicc
-                cxx_name=mpiicpc
-                ;;
-            hazelhen)
-                set +x
-                module swap PrgEnv-cray PrgEnv-intel
-                module load intel/17.0.2.174
-                module list
-                set -x
-                cc_name=cc
-                cxx_name=CC
-                ;;
-        esac
+    esac
 
-        color_flags=""
-        openmp_flags="-fopenmp"
-        base_flags="-xAVX2 -O2"
-        c99_flags="-std=c99"
-        cxx11_flags="-std=c++11"
-        disable_warnings_flags="-Wno-all -Wno-pedantic -diag-disable 1224"
-        qphix_flags="-restrict"
-        # QPhiX can make use of the Intel “C Extended Array Notation”, this
-        # gets enabled here.
-        qphix_configure="--enable-cean"
+    color_flags=""
+    openmp_flags="-fopenmp"
+    base_flags="-xAVX2 -O2"
+    c99_flags="-std=c99"
+    cxx11_flags="-std=c++11"
+    disable_warnings_flags="-Wno-all -Wno-pedantic -diag-disable 1224"
+    qphix_flags="-restrict"
+    # QPhiX can make use of the Intel “C Extended Array Notation”, this
+    # gets enabled here.
+    qphix_configure="--enable-cean"
+    ;;
+  gcc)
+    case "$host" in
+      jureca)
+        set +x
+        module load GCC
+        module load ParaStationMPI
+        module list
+        set -x
+        cc_name=mpicc
+        cxx_name=mpic++
         ;;
-    gcc)
-        case "$host" in
-            jureca)
-                set +x
-                module load GCC
-                module load ParaStationMPI
-                module list
-                set -x
-                cc_name=mpicc
-                cxx_name=mpic++
-                ;;
-            hazelhen)
-                set +x
-                module swap PrgEnv-cray PrgEnv-gnu
-                module list
-                set -x
-                cc_name=cc
-                cxx_name=CC
-                ;;
-        esac
-        color_flags="-fdiagnostics-color=auto"
-        openmp_flags="-fopenmp"
-        base_flags="-O2 -finline-limit=50000 $color_flags -mavx2"
-        c99_flags="--std=c99"
-        cxx11_flags="--std=c++11"
-        disable_warnings_flags="-Wno-all -Wno-pedantic"
-        qphix_flags="-Drestrict=__restrict__"
-        qphix_configure=""
+      hazelhen)
+        set +x
+        module swap PrgEnv-cray PrgEnv-gnu
+        module list
+        set -x
+        cc_name=cc
+        cxx_name=CC
         ;;
-    *)
-        echo 'This compiler is not supported by this script. Choose another one or add another block to the `case` in this script.'
-        exit 1
-        ;;
+    esac
+    color_flags="-fdiagnostics-color=auto"
+    openmp_flags="-fopenmp"
+    base_flags="-O2 -finline-limit=50000 $color_flags -mavx2"
+    c99_flags="--std=c99"
+    cxx11_flags="--std=c++11"
+    disable_warnings_flags="-Wno-all -Wno-pedantic"
+    qphix_flags="-Drestrict=__restrict__"
+    qphix_configure=""
+    ;;
+  *)
+    echo 'This compiler is not supported by this script. Choose another one or add another block to the `case` in this script.'
+    exit 1
+    ;;
 esac
 
 # Directory where the git repositories reside.
@@ -166,20 +177,20 @@ base_configure="--prefix=$prefix CC=$(which $cc_name) CXX=$(which $cxx_name)"
 # wrapper. Autotools need to be told that it cross compiles such that the
 # `./configure` script won't try to execute the test programs.
 if [[ "$host" = hazelhen ]]; then
-    base_configure="$base_configure --host=x86_64-linux-gnu"
+  base_configure="$base_configure --host=x86_64-linux-gnu"
 fi
 
 # Clones a git repository if the directory does not exist. It does not call
 # `git pull`. After cloning, it deletes the `configure` and `Makefile` that are
 # shipped by default such that they get regenerated in the next step.
 clone-if-needed() {
-    local url="$1"
-    local dir="$2"
-    local branch="$3"
+  local url="$1"
+  local dir="$2"
+  local branch="$3"
 
-    case "$host" in
-        hazelhen)
-            cat<<EOF
+  case "$host" in
+    hazelhen)
+      cat<<EOF
 The git repository for “$dir” could not be found, it has to be cloned.
 Unfortunately outgoing HTTPS connections as needed for “git clone” are blocked
 by the firewall. You will have to download the repository yourself. Execute the
@@ -189,21 +200,21 @@ following commands:
     git clone "$url" --recursive -b "$branch"
     rm -f configure Makefile
 EOF
-            ;;
-        *)
-            if ! [[ -d "$dir" ]]
-            then
-                git clone "$url" --recursive -b "$branch"
+      ;;
+    *)
+      if ! [[ -d "$dir" ]]
+      then
+        git clone "$url" --recursive -b "$branch"
 
-                pushd "$dir"
-                if [[ -f Makefile.am ]]; then
-                    rm -f Makefile
-                fi
-                rm -f configure
-                popd
-            fi
-            ;;
-    esac
+        pushd "$dir"
+        if [[ -f Makefile.am ]]; then
+          rm -f Makefile
+        fi
+        rm -f configure
+        popd
+      fi
+      ;;
+  esac
 }
 
 # If the user has not given a variable `SMP` in the environment, use as many
@@ -215,30 +226,30 @@ make_smp_flags="${SMP-$make_smp_template}"
 # parallel on multiple cores. A sentinel file is created such that `make` is
 # not invoked once it has correctly built.
 make-make-install() {
-    if ! [[ -f build-succeeded ]]; then
-        nice make $make_smp_flags
-        make install
-        touch build-succeeded
-        pushd $prefix/lib
-        rm -f *.so *.so.*
-        popd
-    fi
+  if ! [[ -f build-succeeded ]]; then
+    nice make $make_smp_flags
+    make install
+    touch build-succeeded
+    pushd $prefix/lib
+    rm -f *.so *.so.*
+    popd
+  fi
 }
 
 # Prints a large heading such that it is clear where one is in the compilation
 # process. This is not needed but occasionally helpful.
 print-fancy-heading() {
-    set +x
-    echo "######################################################################"
-    echo "# $*"
-    echo "######################################################################"
-    set -x
+  set +x
+  echo "######################################################################"
+  echo "# $*"
+  echo "######################################################################"
+  set -x
 
-    if [[ -d "$sourcedir/$repo/.git" ]]; then
-        pushd "$sourcedir/$repo"
-        git branch
-        popd
-    fi
+  if [[ -d "$sourcedir/$repo/.git" ]]; then
+    pushd "$sourcedir/$repo"
+    git branch
+    popd
+  fi
 }
 
 # Invokes the various commands that are needed to update the GNU Autotools
@@ -249,18 +260,18 @@ print-fancy-heading() {
 # the directory names do not have anything funny in them, the parsing of the
 # output can work.
 autoreconf-if-needed() {
-    if ! [[ -f configure ]]; then
-        if [[ -f .gitmodules ]]; then
-            for module in $(git submodule foreach --quiet --recursive pwd | tac); do
-                pushd "$module"
-                autoreconf -vif
-                popd
-            done
-        fi
-
-        aclocal
+  if ! [[ -f configure ]]; then
+    if [[ -f .gitmodules ]]; then
+      for module in $(git submodule foreach --quiet --recursive pwd | tac); do
+        pushd "$module"
         autoreconf -vif
+        popd
+      done
     fi
+
+    aclocal
+    autoreconf -vif
+  fi
 }
 
 cd "$sourcedir"
@@ -282,9 +293,9 @@ popd
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
-    $sourcedir/$repo/configure $base_configure \
-        --with-qmp-comms-type=MPI \
-        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+  $sourcedir/$repo/configure $base_configure \
+    --with-qmp-comms-type=MPI \
+    CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
 popd
@@ -294,56 +305,56 @@ popd
 ###############################################################################
 
 if [[ "$host" = jureca ]]; then
-    repo=libxml2
-    print-fancy-heading $repo
-    clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
+  repo=libxml2
+  print-fancy-heading $repo
+  clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
 
-    pushd $repo
-    cflags="$base_cflags"
-    cxxflags="$base_cxxflags"
-    if ! [[ -f configure ]]; then
-        mkdir -p m4
-        pushd m4
-        ln -fs /usr/share/aclocal/pkg.m4 .
-        popd
-        set +x
-        module load Autotools
-        set -x
-        NOCONFIGURE=yes ./autogen.sh
-    fi
+  pushd $repo
+  cflags="$base_cflags"
+  cxxflags="$base_cxxflags"
+  if ! [[ -f configure ]]; then
+    mkdir -p m4
+    pushd m4
+    ln -fs /usr/share/aclocal/pkg.m4 .
     popd
+    set +x
+    module load Autotools
+    set -x
+    NOCONFIGURE=yes ./autogen.sh
+  fi
+  popd
 
-    mkdir -p "$build/$repo"
-    pushd "$build/$repo"
-    if ! [[ -f Makefile ]]; then
-        $sourcedir/$repo/configure $base_configure \
-            --without-zlib \
-            --without-python \
-            --without-readline \
-            --without-threads \
-            --without-history \
-            --without-reader \
-            --without-writer \
-            --with-output \
-            --without-ftp \
-            --without-http \
-            --without-pattern \
-            --without-catalog \
-            --without-docbook \
-            --without-iconv \
-            --without-schemas \
-            --without-schematron \
-            --without-modules \
-            --without-xptr \
-            --without-xinclude \
-            CFLAGS="$cflags" CXXFLAGS="$cxxflags"
-    fi
-    make-make-install
-    popd
-    
-    libxml="$prefix/bin/xml2-config"
+  mkdir -p "$build/$repo"
+  pushd "$build/$repo"
+  if ! [[ -f Makefile ]]; then
+    $sourcedir/$repo/configure $base_configure \
+      --without-zlib \
+      --without-python \
+      --without-readline \
+      --without-threads \
+      --without-history \
+      --without-reader \
+      --without-writer \
+      --with-output \
+      --without-ftp \
+      --without-http \
+      --without-pattern \
+      --without-catalog \
+      --without-docbook \
+      --without-iconv \
+      --without-schemas \
+      --without-schematron \
+      --without-modules \
+      --without-xptr \
+      --without-xinclude \
+      CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+  fi
+  make-make-install
+  popd
+
+  libxml="$prefix/bin/xml2-config"
 else
-    libxml="/usr/include/libxml2"
+  libxml="/usr/include/libxml2"
 fi
 
 ###############################################################################
@@ -363,15 +374,15 @@ popd
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
-    $sourcedir/$repo/configure $base_configure \
-        --enable-openmp \
-        --enable-sse --enable-sse2 \
-        --enable-parallel-arch=parscalar \
-        --enable-parallel-io \
-        --enable-precision=double \
-        --with-libxml2="$libxml" \
-        --with-qmp="$prefix" \
-        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+  $sourcedir/$repo/configure $base_configure \
+    --enable-openmp \
+    --enable-sse --enable-sse2 \
+    --enable-parallel-arch=parscalar \
+    --enable-parallel-io \
+    --enable-precision=double \
+    --with-libxml2="$libxml" \
+    --with-qmp="$prefix" \
+    CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
 popd
@@ -393,19 +404,19 @@ popd
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
-    $sourcedir/$repo/configure $base_configure \
-        $qphix_configure \
-        --enable-testing \
-        --enable-proc=AVX2 \
-        --enable-soalen=2 \
-        --enable-clover \
-        --enable-openmp \
-        --enable-mm-malloc \
-        --enable-parallel-arch=parscalar \
-        --enable-twisted-mass --enable-tm-clover \
-        --with-qdp="$prefix" \
-        --with-qmp="$prefix" \
-        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+  $sourcedir/$repo/configure $base_configure \
+    $qphix_configure \
+    --enable-testing \
+    --enable-proc=AVX2 \
+    --enable-soalen=2 \
+    --enable-clover \
+    --enable-openmp \
+    --enable-mm-malloc \
+    --enable-parallel-arch=parscalar \
+    --enable-twisted-mass --enable-tm-clover \
+    --with-qdp="$prefix" \
+    --with-qmp="$prefix" \
+    CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
 popd
@@ -421,15 +432,15 @@ repo=gmp
 print-fancy-heading $repo
 
 case "$host" in
-    hazelhen)
-        gmp="-lgmp"
-        ;;
-    jureca)
-        set +x
-        module load GMP
-        set -x
-        gmp="$EBROOTGMP"
-        ;;
+  hazelhen)
+    gmp="-lgmp"
+    ;;
+  jureca)
+    set +x
+    module load GMP
+    set -x
+    gmp="$EBROOTGMP"
+    ;;
 esac
 
 ###############################################################################
@@ -450,21 +461,21 @@ popd
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
-    $sourcedir/$repo/configure $base_configure \
-        --enable-openmp \
-        --enable-parallel-arch=parscalar \
-        --enable-parallel-io \
-        --enable-precision=double \
-        --enable-qdp-alignment=128 \
-        --enable-sse2 \
-        --enable-qphix-solver-arch=avx2 \
-        --enable-qphix-solver-soalen=2 \
-        --enable-qphix-solver-compress12 \
-        --with-gmp="$gmp" \
-        --with-libxml2="$prefix/bin/xml2-config" \
-        --with-qdp="$prefix" \
-        --with-qphix-solver="$prefix" \
-        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+  $sourcedir/$repo/configure $base_configure \
+    --enable-openmp \
+    --enable-parallel-arch=parscalar \
+    --enable-parallel-io \
+    --enable-precision=double \
+    --enable-qdp-alignment=128 \
+    --enable-sse2 \
+    --enable-qphix-solver-arch=avx2 \
+    --enable-qphix-solver-soalen=2 \
+    --enable-qphix-solver-compress12 \
+    --with-gmp="$gmp" \
+    --with-libxml2="$prefix/bin/xml2-config" \
+    --with-qdp="$prefix" \
+    --with-qphix-solver="$prefix" \
+    CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
 popd
@@ -472,4 +483,4 @@ popd
 echo
 echo "That took $SECONDS seconds."
 
-# vim: spell
+# vim: spell sts=2 sw=2
