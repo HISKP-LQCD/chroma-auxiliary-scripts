@@ -41,7 +41,7 @@ pion correlator from that.
           <obsvP>false</obsvP>
           <FermionAction>
             <FermAct>CLOVER</FermAct>
-            <Mass>-0.0960</Mass>
+            <Mass>-0.1265</Mass>
             <clovCoeff>1.0</clovCoeff>
             <FermState>
               <Name>STOUT_FERM_STATE</Name>
@@ -58,7 +58,8 @@ pion correlator from that.
             <invType>QPHIX_CLOVER_INVERTER</invType>
             <SolverType>CG</SolverType>
             <MaxIter>10000</MaxIter>
-            <RsdTarget>1e-9</RsdTarget>
+            <RsdTarget>1e-10</RsdTarget>
+            <RsdToleranceFactor>25</RsdToleranceFactor>
             <CloverParams>
               <Mass>-0.1265</Mass>
               <clovCoeff>1.0</clovCoeff>
@@ -99,9 +100,10 @@ pion correlator from that.
             <invType>QPHIX_CLOVER_INVERTER</invType>
             <SolverType>CG</SolverType>
             <MaxIter>10000</MaxIter>
-            <RsdTarget>1e-9</RsdTarget>
+            <RsdTarget>1e-10</RsdTarget>
+            <RsdToleranceFactor>25</RsdToleranceFactor>
             <CloverParams>
-              <Mass>-0.057</Mass>
+              <Mass>-0.065</Mass>
               <clovCoeff>1.0</clovCoeff>
             </CloverParams>
             <AntiPeriodicT>true</AntiPeriodicT>
