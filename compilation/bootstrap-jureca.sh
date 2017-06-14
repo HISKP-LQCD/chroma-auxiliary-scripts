@@ -44,7 +44,7 @@ export LC_ALL=C
 
 if [[ "$(hostname -f)" =~ [^.]*\.hww\.de ]]; then
   host=hazelhen
-  compiler="${COMPILER-gcc}"
+  compiler="${COMPILER-icc}"
 elif [[ "$(hostname -f)" =~ [^.]*\.jureca ]]; then
   host=jureca
   compiler="${COMPILER-icc}"
