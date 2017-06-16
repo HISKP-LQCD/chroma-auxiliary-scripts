@@ -24,13 +24,27 @@ def product(values):
 
 general_regexes = [
     r'TIMING IN (?P<precision>\w+) PRECISION',
+    r'FT\s+(?P<precision>double|half|float)',
+
     r'VECLEN ?= ?(?P<veclen>\d+),? SOALEN ?= ?(?P<soalen>\d+)',
+    r'veclen\s+(?P<veclen>\d+)',
+    r'soalen\s+(?P<soalen>\d+)',
+
     r'Global Lattice Size =  (?P<Lx>\d+) (?P<Ly>\d+) (?P<Lz>\d+) (?P<Lt>\d+)',
     r'Local Lattice Size =  (?P<lx>\d+) (?P<ly>\d+) (?P<lz>\d+) (?P<lt>\d+)',
+
     r'Block Sizes: By ?= ?(?P<By>\d+) Bz ?= ?(?P<Bz>\d+)',
+    r'Blocking\s+(?P<By>\d+) (?P<Bz>\d+)',
+
     r'Cores = (?P<Cores>\d+)',
+    r'Cores\s+(?P<Cores>\d+)',
+
     r'SMT Grid: Sy ?= ?(?P<Sy>\d+) Sz ?= ?(?P<Sz>\d+)',
+    r'Sy Sz\s+(?P<Sy>\d+) (?P<Sz>\d+)',
+
     r'Pad Factors: PadXY ?= ?(?P<PadXY>\d+) PadXYZ ?= ?(?P<PadXYZ>\d+)',
+    r'PadXY PadXYZ\s+(?P<PadXY>\d+) (?P<PadXYZ>\d+)',
+
     r'Threads_per_core = (?P<threads_per_core>\d+)',
     r'Declared QMP Topology: (?P<geom1>\d+) (?P<geom2>\d+) (?P<geom3>\d+) (?P<geom4>\d+)',
 ]
