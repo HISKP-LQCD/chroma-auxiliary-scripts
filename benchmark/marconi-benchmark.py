@@ -129,7 +129,7 @@ def main():
             for operation, op_data in sorted(results.items()):
                 #print(operation)
                 for key, vals in sorted(op_data.items()):
-                    vals = list(map(float, vals))
+                    vals = list(map(float, vals))[1:]
                     #print(key, vals)
                     mean = np.mean(vals)
                     err =  np.std(vals) / np.sqrt(len(vals))
