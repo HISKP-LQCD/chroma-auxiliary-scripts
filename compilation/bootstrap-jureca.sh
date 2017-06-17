@@ -188,9 +188,10 @@ clone-if-needed() {
   local dir="$2"
   local branch="$3"
 
-  case "$host" in
-    hazelhen)
-      cat<<EOF
+  if ! [[ -d "$dir" ]]; then
+    case "$host" in
+      hazelhen)
+        cat<<EOF
 The git repository for “$dir” could not be found, it has to be cloned.
 Unfortunately outgoing HTTPS connections as needed for “git clone” are blocked
 by the firewall. You will have to download the repository yourself. Execute the
@@ -200,10 +201,8 @@ following commands:
     git clone "$url" --recursive -b "$branch"
     rm -f configure Makefile
 EOF
-      ;;
-    *)
-      if ! [[ -d "$dir" ]]
-      then
+        ;;
+      *)
         git clone "$url" --recursive -b "$branch"
 
         pushd "$dir"
@@ -212,9 +211,9 @@ EOF
         fi
         rm -f configure
         popd
-      fi
-      ;;
-  esac
+        ;;
+    esac
+  fi
 }
 
 # If the user has not given a variable `SMP` in the environment, use as many
