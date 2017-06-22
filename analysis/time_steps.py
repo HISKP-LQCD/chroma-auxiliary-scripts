@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
 import os
@@ -20,14 +20,14 @@ template_text = r'''
 \usepackage{tikz}
 \begin{document}
     \begin{tikzpicture}
-        %< set ticks = 100 >%
+        %< set ticks = 8 * n_steps >%
         %< set x_stretch = 150 >%
         %< set num_mon = monomials|length >%
         %< for i in range(ticks) >%
-        \draw (<< x_stretch * i / ticks >>, -0.5) -- ++(0, << num_mon >>) node[above] {$<< i / ticks >>$};
+        \draw (<< x_stretch * i / ticks >>, -0.5) -- ++(0, << num_mon >>) node[above] {$<< (i / ticks)|round(2) >>$};
         %< endfor >%
-        %< for i in range(10) >%
-        \draw[thick, red] (<< x_stretch * i / 10 >>, -0.5) -- ++(0, << num_mon >>);
+        %< for i in range(n_steps) >%
+        \draw[thick, red] (<< x_stretch * i / n_steps >>, -0.5) -- ++(0, << num_mon >>);
         %< endfor >%
         %< for monomial, evaluations in monomials >%
         %< set y = loop.index0 >%
@@ -48,6 +48,13 @@ def main():
 
     print('Loading XML …')
     tree = etree.parse(options.xml_file)
+
+    tau0 = float(tree.xpath('/hmc/Input/Params/HMCTrj/MDIntegrator/tau0/text()')[0])
+    n_steps = int(tree.xpath('/hmc/Input/Params/HMCTrj/MDIntegrator/Integrator/n_steps/text()')[0])
+    print('n_steps', n_steps)
+    print('tau0', tau0)
+
+    delta_tau = tau0 / n_steps
 
     print('Extracting first update …')
     steps = tree.xpath('/hmc/doHMC/MCUpdates/elem')
@@ -95,7 +102,11 @@ def main():
         'TwoFlavorExactWilsonTypeFermMonomial': 'light-det',
     }
 
-    rendered = template.render(monomials=sorted(evaluations.items()), translation=translation)
+    rendered = template.render(
+        monomials=sorted(evaluations.items()),
+        translation=translation,
+        n_steps=n_steps,
+    )
     with open('evaluations.tex', 'w') as f:
         f.write(rendered)
 
