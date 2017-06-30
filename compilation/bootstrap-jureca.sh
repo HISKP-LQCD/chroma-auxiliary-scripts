@@ -404,6 +404,61 @@ make-make-install
 popd
 
 ###############################################################################
+#                                QPhiX Codegen                                #
+###############################################################################
+
+repo=qphix-codegen
+print-fancy-heading $repo
+clone-if-needed https://github.com/JeffersonLab/qphix-codegen.git $repo devel
+
+cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
+cxx=$(which $cxx_name)
+
+case $host in
+  hazelhen)
+    # Hazel Hen has the quirk that a modern version of CMake can only be loaded
+    # in the GNU programming environment. So here we switch to the GNU
+    # environment, just to be able to _use_ a non-ancient version of CMake.
+    set +x
+    module swap PrgEnv-intel PrgEnv-gnu
+    set -x
+    checked-module-load tools/cmake
+    checked-module-load tools/python
+    set +x
+    module list
+    set -x
+
+    python_library=/opt/hlrs/tools/python/anaconda3-4.2.0/lib/libpython3.so
+    python_include_dir=/opt/hlrs/tools/python/anaconda3-4.2.0/include
+    ;;
+esac
+
+mkdir -p "$build/$repo"
+pushd "$build/$repo"
+if ! [[ -f Makefile ]]; then
+  CXX=g++ CXXFLAGS='-O2' cmake \
+    -Disa=avx2 \
+    -Dtarget_cxx=$cxx -Dtarget_cxxflags=$cxxflags \
+    -Dtarget_jN=$(nproc) \
+    -DCMAKE_INSTALL_PREFIX:PATH=$prefix \
+    -DPYTHON_EXECUTABLE:PATH=$(which python3) \
+    -DPYTHON_LIBRARY:PATH=$python_library \
+    -DPYTHON_INCLUDE_DIR:PATH=$python_include_dir \
+    $sourcedir/qphix-codegen
+fi
+
+case $host in
+  hazelhen)
+    # Now we have to get our target programming environment back.
+    module swap PrgEnv-gnu PrgEnv-intel
+    checked-module-load gcc/6.3.0
+    checked-module-load intel/17.0.2.174
+    ;;
+esac
+
+make-make-install
+
+###############################################################################
 #                                    QPhiX                                    #
 ###############################################################################
 
@@ -411,28 +466,31 @@ repo=qphix
 print-fancy-heading $repo
 clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
 
-pushd $repo
-cflags="$base_cflags $openmp_flags $qphix_flags"
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
-autoreconf-if-needed
-popd
+
+#pushd $repo
+#autoreconf-if-needed
+#popd
 
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
-  $sourcedir/$repo/configure $base_configure \
-    $qphix_configure \
-    --enable-testing \
-    --enable-proc=AVX2 \
-    --enable-soalen=2 \
-    --enable-clover \
-    --enable-openmp \
-    --enable-mm-malloc \
-    --enable-parallel-arch=parscalar \
-    --enable-twisted-mass --enable-tm-clover \
-    --with-qdp="$prefix" \
-    --with-qmp="$prefix" \
-    CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+  cxx=$(which $cxx_name)
+  CXX=$cxx CXXFLAGS="$cxxflags" \
+    cmake -Disa=avx2 \
+    -Dhost_cxx="g++" \
+    -Dhost_cxxflags="-g -O3 -std=c++11" \
+    -Drecursive_jN=$(nproc) \
+    -DCMAKE_INSTALL_PREFIX="$prefix" \
+    -DQDPXX_DIR="$prefix" \
+    -Dclover=TRUE \
+    -Dtwisted_mass=TRUE \
+    -Dtm_clover=TRUE \
+    -Dcean=FALSE \
+    -Dmm_malloc=TRUE \
+    -Dtesting=TRUE \
+    -DQPHIX_CODEGEN=$prefix \
+    $sourcedir/$repo
 fi
 make-make-install
 popd
