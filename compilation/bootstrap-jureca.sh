@@ -38,6 +38,23 @@ pushd "$1"
 basedir="$PWD"
 popd
 
+# The `module load` command does not set the exit status when it fails. Also it
+# annoyingly outputs everything on standard error. This function parses the
+# output and checks for the word `error` case insensitively. The function will
+# then fail.
+checked-module-load() {
+  set +x
+  echo "+ module load $1"
+  module load $1 2>&1 > module-load-output.txt
+  set -x
+  cat module-load-output.txt
+  if grep -i error module-load-output.txt; then
+    echo "There has been some error while loading module $1, aborting"
+    exit 1
+  fi
+  rm -f module-load-output.txt
+}
+
 # Set all locale to C, such that compiler error messages are all in English.
 # This makes debugging way easier.
 export LC_ALL=C
@@ -75,8 +92,8 @@ case $compiler in
     case "$host" in
       jureca)
         set +x
-        module load Intel/2017.2.174-GCC-5.4.0
-        module load IntelMPI/2017.2.174
+        checked-module-load Intel/2017.2.174-GCC-5.4.0
+        checked-module-load IntelMPI/2017.2.174
         module list
         set -x
         cc_name=mpiicc
@@ -91,8 +108,8 @@ case $compiler in
         # If one does not load a newer GCC version, the modern Intel compiler
         # will use the GCC 4.3 standard library. That however does not support
         # C++11 such that it will not work.
-        module load gcc/6.3.0
-        module load intel/17.0.2.174
+        checked-module-load gcc/6.3.0
+        checked-module-load intel/17.0.2.174
         module list
         set -x
         # On this system, the compiler is always the same because the module
@@ -117,8 +134,8 @@ case $compiler in
     case "$host" in
       jureca)
         set +x
-        module load GCC
-        module load ParaStationMPI
+        checked-module-load GCC
+        checked-module-load ParaStationMPI
         module list
         set -x
         cc_name=mpicc
@@ -317,7 +334,7 @@ if [[ "$host" = jureca ]]; then
     ln -fs /usr/share/aclocal/pkg.m4 .
     popd
     set +x
-    module load Autotools
+    checked-module-load Autotools
     set -x
     NOCONFIGURE=yes ./autogen.sh
   fi
@@ -436,7 +453,7 @@ case "$host" in
     ;;
   jureca)
     set +x
-    module load GMP
+    checked-module-load GMP
     set -x
     gmp="$EBROOTGMP"
     ;;
