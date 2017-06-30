@@ -243,8 +243,8 @@ make_smp_flags="${SMP-$make_smp_template}"
 # not invoked once it has correctly built.
 make-make-install() {
   if ! [[ -f build-succeeded ]]; then
-    nice make $make_smp_flags
-    make install
+    nice make $make_smp_flags VERBOSE=1
+    make install VERBOSE=1
     touch build-succeeded
     pushd $prefix/lib
     rm -f *.so *.so.*
