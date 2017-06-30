@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
 import itertools
@@ -39,7 +39,7 @@ def main():
     format_as_tikz(data, 'chroma-names-trunk.tex', False)
 
     format_as_latex(data, 'chroma-names-list.tex')
-
+    format_as_markdown(data, 'chroma-names-list.md')
 
 
 def enter(data, bits, name):
@@ -151,6 +151,31 @@ def _format_as_latex(subtree, prefix='', leaves=True):
             results[prefix].append(key)
         else:
             results.update(_format_as_latex(val, prefix_key))
+
+    return results
+
+
+def format_as_markdown(subtree, filename):
+    results = _format_as_markdown(subtree)
+    with open(filename, 'w') as f:
+        for key, vals in sorted(results.items()):
+            f.write(r'**' + key[len('/lib'):] + '**\n\n')
+            for val in sorted(vals):
+                f.write(r'- ' + val + '\n')
+            f.write('\n')
+
+
+
+def _format_as_markdown(subtree, prefix='', leaves=True):
+    results = {}
+    for key, val in sorted(subtree.items()):
+        prefix_key = prefix + '/' + key
+        if len(val.keys()) == 0:
+            if not prefix in results:
+                results[prefix] = []
+            results[prefix].append(key)
+        else:
+            results.update(_format_as_markdown(val, prefix_key))
 
     return results
 
