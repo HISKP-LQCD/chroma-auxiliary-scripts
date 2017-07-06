@@ -61,11 +61,17 @@ def main():
     if options.doit:
         os.makedirs(options.target, exist_ok=True)
 
+    action = 'Symlinked' if options.doit else 'Would symlink'
+
     for path, new_path in sorted(mapping):
-        print('{:30s} → {:30s}'.format(path, new_path))
+        print('{} {:30s} to {:30s}'.format(action, path, new_path))
 
         if options.doit:
             os.symlink(path, new_path)
+
+    if not options.doit:
+        print()
+        print('Run again with option `--doit` to actually create symlinks.')
 
 
 def _parse_args():
