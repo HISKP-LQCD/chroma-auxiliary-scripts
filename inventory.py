@@ -42,7 +42,7 @@ def main():
              '/hiskp2/gauges/sWC_A2p1_Mpi270_L24T96/backwards/stout'),
             ('/work/hbn28/hbn284/eigensystems/sWC_A2p1_Mpi270_L24T96_backwards',
              '/hiskp2/eigensystems/sWC_A2p1_Mpi270_L24T96_backwards'),
-            (),
+            ('/hiskp2/ueding/peram_generation/sWC_A2p1_Mpi270_L24T96_backwards',),
         ),
         Ensemble(
             'L = 32 Forward Replica',
