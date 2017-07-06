@@ -1,0 +1,90 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Copyright © 2017 Martin Ueding <dev@martin-ueding.de>
+
+import argparse
+import os
+import re
+
+DIGITS_PATTERN = re.compile(r'(\d{3,4})')
+
+def get_index(path):
+    basename = os.path.basename(path)
+    m = DIGITS_PATTERN.search(basename)
+    if m:
+        return int(m.group(1))
+
+    raise RuntimeError('The path `{}` did not contain a four digit number.'.format(path))
+
+
+def extract_all_indices(paths):
+    return {
+        get_index(path): path
+        for path in paths
+    }
+
+
+def get_new_path(path, new_dirname, new_index):
+    new_name = DIGITS_PATTERN.sub('{:04d}'.format(new_index), os.path.basename(path))
+    new_path = os.path.join(new_dirname, new_name)
+    return new_path
+
+
+def main():
+    options = _parse_args()
+
+    forward = extract_all_indices(options.forward)
+    backward = extract_all_indices(options.backward)
+
+    # Get the index of the last backward element. This is going to be the very
+    # first element in the joined chain.
+    last = max(backward.keys())
+
+    new_midpoint = last - options.common
+
+    renames_forward = [
+        (new_midpoint + (index - options.common), path)
+        for index, path in sorted(forward.items())
+    ]
+    renames_backward = [
+        (new_midpoint - (index - options.common), path)
+        for index, path in sorted(backward.items())
+    ]
+    renames = renames_forward + renames_backward
+
+    mapping = [
+        (path, get_new_path(path, options.target, new_index))
+        for new_index, path in renames
+    ]
+
+    if options.doit:
+        os.makedirs(options.target, exist_ok=True)
+
+    for path, new_path in sorted(mapping):
+        print('{:30s} → {:30s}'.format(path, new_path))
+
+        if options.doit:
+            os.symlink(path, new_path)
+
+
+def _parse_args():
+    '''
+    Parses the command line arguments.
+
+    :return: Namespace with arguments.
+    :rtype: Namespace
+    '''
+    parser = argparse.ArgumentParser(description='Linearizes two Markov chains into a single one with continous index numbers by creating symlinks.')
+    parser.add_argument('--forward', nargs='+', required=True, help='Paths to files from the forward chain')
+    parser.add_argument('--backward', nargs='+', required=True, help='Paths to files from the backward chain')
+    parser.add_argument('--common', type=int, required=True, help='Index which is common to both parts of the chain')
+    parser.add_argument('--target', required=True, help='Target directory for symlinks')
+    parser.add_argument('--doit', action='store_true', help='Actually create symlinks, otherwise a dry run is performed only')
+    options = parser.parse_args()
+
+    return options
+
+
+if __name__ == '__main__':
+    main()
