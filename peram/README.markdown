@@ -33,7 +33,8 @@ get the following help message:
       --quda_rsc_path QUDA_RSC_PATH
                             default: /hadron/ueding/quda_rsc_path/
 
-After letting it create the scripts for a single configuration, you will have the following directory structure:
+After letting it create the scripts for a single configuration, you will have
+the following directory structure:
 
     $ tree light strange
     light
