@@ -27,6 +27,15 @@ def main():
 
     ensembles = [
         Ensemble(
+            'L = 16 Forward Replica',
+            ('/work/hbn28/hbn28e/0106-Mpi660-L16-T32/cfg',),
+            ('/work/hbn28/hbn28e/0106-Mpi660-L16-T32/stout',
+             '/hiskp2/gauges/0106-Mpi660-L16-T32/stout_smeared',),
+            ('/work/hbn28/hbn284/eigensystems/0106-Mpi660-L16-T32',
+             '/hiskp2/eigensystems/0106-Mpi660-L16-T32/hyp_062_062_3/nev_120'),
+            ('/hiskp2/ueding/peram_generation/sWC_A2p1_Mpi660_L16T32',),
+        ),
+        Ensemble(
             'L = 24 Forward Replica',
             ('/work/hbn28/hbn28e/0120-Mpi270-L24-T96/cfg',),
             ('/work/hbn28/hbn28e/0120-Mpi270-L24-T96/stout',
