@@ -36,8 +36,8 @@ def main():
     for cfg_id in range(options.conf_start, options.conf_end + 1, options.conf_step):
         print('Creating scripts for configuration', cfg_id)
 
-        for flavor, kappa, quarktype in [('light', 0.129082225, 'u'),
-                                         ('strange', 0.127064803, 's')]:
+        for flavor, kappa, quarktype in [('light', 0.1280738, 'u'),
+                                         ('strange', 0.126807, 's')]:
             cfg_dir = os.path.join(flavor, 'cnfg{:04d}'.format(cfg_id))
             os.makedirs(os.path.join(cfg_dir, 'outputs'), exist_ok=True)
             rundir = os.path.join(options.rundir, flavor, 'cnfg')
@@ -71,6 +71,8 @@ def main():
                         outfile=outfile,
                         laphin=laphin,
                         quda_rsc_path=options.quda_rsc_path,
+                        rundir=rundir,
+                        flavor=flavor,
                     ))
 
                 with open(os.path.join(rv_dir, 'invert.input'), 'w') as f:
