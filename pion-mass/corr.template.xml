@@ -22,7 +22,7 @@ pion correlator from that.
             <version>2</version>
             <SourceType>POINT_SOURCE</SourceType>
             <j_decay>3</j_decay>
-            <t_srce>0 0 0 0</t_srce>
+            <t_srce>0 0 0 20</t_srce>
           </Source>
         </Param>
         <NamedObject>
