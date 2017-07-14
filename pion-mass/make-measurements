@@ -14,8 +14,12 @@ jobscript_text = r'''#!/bin/bash
 
 #SBATCH --nodes=8
 #SBATCH --ntasks-per-node=2
+{% if partition == 'batch' %}
 #SBATCH --time=06:00:00
-#SBATCH --partition=batch
+{% else %}
+#SBATCH --time=02:00:00
+{% endif %}
+#SBATCH --partition={{ partition }}
 #SBATCH --cpus-per-task=12
 #SBATCH --output={{ template }}.slurm-%j.out.txt
 #SBATCH --mail-type=FAIL,END
@@ -48,7 +52,9 @@ def chunks(l, n):
 
     http://stackoverflow.com/a/312464
     '''
-    for i in range(0, len(l), n):
+    yield l[0]
+
+    for i in range(1, len(l), n):
         yield l[i:i + n]
 
 
@@ -90,7 +96,9 @@ def main():
     for i, chunk in enumerate(chunks(chroma_inputs, options.package)):
         slurm_rendered = slurm_template.render(
             chroma_inputs=chunk,
-            template=options.template)
+            template=options.template,
+            partition='devel' if i == 0 else 'batch',
+        )
 
         filename_slurm_input = '{}.{}.slurm.sh'.format(options.template, i)
 
