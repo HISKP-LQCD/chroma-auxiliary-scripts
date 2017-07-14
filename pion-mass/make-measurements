@@ -52,7 +52,7 @@ def chunks(l, n):
 
     http://stackoverflow.com/a/312464
     '''
-    yield l[0]
+    yield [l[0]]
 
     for i in range(1, len(l), n):
         yield l[i:i + n]
