@@ -68,7 +68,6 @@ def main():
             f.write(rendered_contract)
 
 
-
 def do_consistency_checks(options):
     '''
     This runs various consistency checks.
@@ -85,7 +84,6 @@ def do_consistency_checks(options):
 
     if not os.path.isfile(options.correlator_list):
         raise RuntimeError('The file with the correlators at “{}” does not exist! Please make sure that a correct path has been given.'.format(options.correlator_list))
-
 
 
 def _parse_args():
