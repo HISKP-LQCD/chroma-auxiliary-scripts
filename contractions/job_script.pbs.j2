@@ -1,0 +1,18 @@
+#PBS -N rho_contraction
+#PBS -l walltime=48:00:00,mem=30gb
+#PBS -l nodes=1:ppn=4
+{% if email_address != '' %}
+#PBS -M {{ email_address }}
+#PBS -m abe
+{% endif %}
+#PBS -j oe
+
+cd "{{ rundir }}
+
+export OMP_NUM_THREADS=4
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/hiskp2/werner/libraries/boost_1_60_0/stage/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/hiskp2/knippsch/hdf5-1.8.17/lib 
+
+./contract -i contract.in &> contract.out
+
+chmod -R g+rwx *
