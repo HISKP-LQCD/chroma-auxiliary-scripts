@@ -7,7 +7,7 @@
 {% endif %}
 #PBS -j oe
 
-cd "{{ rundir }}
+cd "{{ rundir }}"
 
 export OMP_NUM_THREADS=4
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/hiskp2/werner/libraries/boost_1_60_0/stage/lib

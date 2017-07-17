@@ -18,7 +18,7 @@ delta_config = {{ config_step }}
 
 # eigenvector handling: path not neede right now
 number_of_eigen_vec = {{ ev_count }}
-{% if ev_path is defined %}
+{% if ev_path != '' %}
 path_eigenvectors = {{ ev_path }}
 {% endif %}
 name_eigenvectors = eigenvectors
@@ -28,9 +28,9 @@ overwrite_old = yes
 
 # quarks to be used - The file at the and is the location of the perambulators.
 [quarks]
-{% for quark in quarks %}
+{% for quark in quarks -%}
 {{ quark }}
-{% foreach %}
+{% endfor -%}
 
 # operators to be used
 [operator_lists]
