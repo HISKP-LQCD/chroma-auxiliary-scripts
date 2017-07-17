@@ -36,8 +36,11 @@ def main():
     # Copy the executable into the right spot.
     shutil.copy(options.exe, os.path.join(options.rundir, 'contract'))
 
-    # Create a list with all configuration numbers.
-    config_ids = list(range(options.conf_start, options.conf_end + 1, options.conf_step))
+    # Create a list with all configuration numbers. Configurations that should
+    # be skipped will be filtered out.
+    config_ids = filter(
+        lambda x: x not in options.conf_skip,
+        (range(options.conf_start, options.conf_end + 1, options.conf_step)))
 
     for config_id in config_ids:
         # Create a directory for the configuration.
@@ -101,10 +104,9 @@ def _parse_args():
     group_config.add_argument('conf_start', type=int, help='First configuration, inclusive')
     group_config.add_argument('conf_end', type=int, help='Last configuration, inclusive')
     group_config.add_argument('conf_step', type=int, nargs='?', default=8, help='default: %(default)s')
-    parser.add_argument('--lattice-space', type=int, required=True,
-                        help='Size of the lattice in the space directions. Currently only lattices with equal space extents are supported.')
-    parser.add_argument('--lattice-time', type=int, required=True,
-                        help='Size of the lattice in time direction.')
+    group_config.add_argument('--lattice-space', type=int, required=True, help='Size of the lattice in the space directions. Currently only lattices with equal space extents are supported.')
+    group_config.add_argument('--lattice-time', type=int, required=True, help='Size of the lattice in time direction.')
+    group_config.add_argument('--conf-skip', type=int, nargs='+', help='Skip the given gauge configurations.')
 
     group_job = parser.add_argument_group('Job', 'Options for the jobs to create.')
     group_job.add_argument('--rundir', required=True, help='Base path for output.')
