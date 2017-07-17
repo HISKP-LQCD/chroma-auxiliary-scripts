@@ -85,6 +85,12 @@ def do_consistency_checks(options):
     if not os.path.isfile(options.correlator_list):
         raise RuntimeError('The file with the correlators at “{}” does not exist! Please make sure that a correct path has been given.'.format(options.correlator_list))
 
+    for quark in options.quarks:
+        segments = quark.split(':')
+        path = segments[-1]
+        if not os.path.isdir(path):
+            raise RuntimeError('The quark path “{}” does not exist! Please make sure that a correct path has been given.'.format(options.correlator_list))
+
 
 def _parse_args():
     parser = argparse.ArgumentParser(description='Generates a hierarchy of input files and job scripts for the contraction code. The script will also make sure that the referenced files actually exist such that the jobs will have a higher chance of succeeding.')
