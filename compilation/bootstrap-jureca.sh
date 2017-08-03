@@ -428,6 +428,8 @@ case $host in
     python_library=/opt/hlrs/tools/python/anaconda3-4.2.0/lib/libpython3.so
     python_include_dir=/opt/hlrs/tools/python/anaconda3-4.2.0/include
     ;;
+  jureca)
+    checked-module-load CMake
 esac
 
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
