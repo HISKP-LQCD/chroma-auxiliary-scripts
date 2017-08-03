@@ -430,6 +430,7 @@ case $host in
     ;;
   jureca)
     checked-module-load CMake
+    checked-module-load Python
 esac
 
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
