@@ -260,7 +260,7 @@ def task_correlators():
     for dirname in directories:
         for meson in ['pion', 'kaon']:
             corr_tsv_files = []
-            for corr_xml in glob.glob(os.path.join(dirname, 'corr', 'corr.config-*.{}.xml'.format(meson))):
+            for corr_xml in glob.glob(os.path.join(dirname, 'corr', 'corr.config-*.{}.xml.gz'.format(meson))):
                 corr_tsv = names.correlator_tsv(corr_xml, meson)
                 corr_tsv_files.append(corr_tsv)
                 yield make_single_transform(dirname,
