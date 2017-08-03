@@ -444,6 +444,8 @@ which python3
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
 cxx=$(which $cxx_name)
 
+# https://stackoverflow.com/a/38121972
+
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
@@ -461,6 +463,8 @@ if ! [[ -f Makefile ]]; then
     -Dcean=FALSE \
     -Dmm_malloc=TRUE \
     -Dtesting=TRUE \
+    -DPYTHON_INCLUDE_DIR=$(python3 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")  \
+    -DPYTHON_LIBRARY=$(python3 -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")
     $sourcedir/$repo
 fi
 make-make-install
