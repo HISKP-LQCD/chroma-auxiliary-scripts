@@ -437,7 +437,9 @@ set +x
 module list
 set -x
 
-exit
+# Check whether Python 3 interpreter is there.
+python3 -c ''
+which python3
 
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
 cxx=$(which $cxx_name)
