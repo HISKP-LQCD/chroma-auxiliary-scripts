@@ -404,15 +404,12 @@ make-make-install
 popd
 
 ###############################################################################
-#                                QPhiX Codegen                                #
+#                                    QPhiX                                    #
 ###############################################################################
 
-repo=qphix-codegen
+repo=qphix
 print-fancy-heading $repo
-clone-if-needed https://github.com/JeffersonLab/qphix-codegen.git $repo devel
-
-cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
-cxx=$(which $cxx_name)
+clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
 
 case $host in
   hazelhen)
@@ -433,44 +430,8 @@ case $host in
     ;;
 esac
 
-mkdir -p "$build/$repo"
-pushd "$build/$repo"
-if ! [[ -f Makefile ]]; then
-  CXX=g++ CXXFLAGS='-O2' cmake \
-    -Disa=avx2 \
-    -Dtarget_cxx=$cxx -Dtarget_cxxflags=$cxxflags \
-    -Dtarget_jN=$(nproc) \
-    -DCMAKE_INSTALL_PREFIX:PATH=$prefix \
-    -DPYTHON_EXECUTABLE:PATH=$(which python3) \
-    -DPYTHON_LIBRARY:PATH=$python_library \
-    -DPYTHON_INCLUDE_DIR:PATH=$python_include_dir \
-    $sourcedir/qphix-codegen
-fi
-
-case $host in
-  hazelhen)
-    # Now we have to get our target programming environment back.
-    module swap PrgEnv-gnu PrgEnv-intel
-    checked-module-load gcc/6.3.0
-    checked-module-load intel/17.0.2.174
-    ;;
-esac
-
-make-make-install
-
-###############################################################################
-#                                    QPhiX                                    #
-###############################################################################
-
-repo=qphix
-print-fancy-heading $repo
-clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
-
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
-
-#pushd $repo
-#autoreconf-if-needed
-#popd
+cxx=$(which $cxx_name)
 
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
@@ -494,6 +455,16 @@ if ! [[ -f Makefile ]]; then
 fi
 make-make-install
 popd
+
+case $host in
+  hazelhen)
+    # Now we have to get our target programming environment back.
+    module swap PrgEnv-gnu PrgEnv-intel
+    checked-module-load gcc/6.3.0
+    checked-module-load intel/17.0.2.174
+    ;;
+esac
+
 
 ###############################################################################
 #                             GNU Multi Precision                             #
