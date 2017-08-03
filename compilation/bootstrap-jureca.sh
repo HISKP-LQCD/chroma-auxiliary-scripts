@@ -453,7 +453,6 @@ if ! [[ -f Makefile ]]; then
     -Dcean=FALSE \
     -Dmm_malloc=TRUE \
     -Dtesting=TRUE \
-    -DQPHIX_CODEGEN=$prefix \
     $sourcedir/$repo
 fi
 make-make-install
