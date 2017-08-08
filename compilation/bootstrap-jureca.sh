@@ -28,15 +28,46 @@ set -e
 set -u
 set -x
 
-# Force the user to specify a directory where everything should be put into.
-if (( $# == 0 )); then
-  echo "usage: $0 BASE"
+# Force the user specify a directory where everything should be put into.
+if (( $# == 0 )) || [[ ${1:0:1} = - ]]; then
+    cat <<EOF
+This is a script to install Chroma, QPhiX, QDP++, QMP, and their dependencies
+on the Intel Knights Landing based supercomputer “Marconi A2” hosted by CINECA
+in Casalecchio di Reno, Italy.
+
+Usage: $0 BASE
+
+BASE is the directory where everthing is downloaded, compiled, and installed.
+After this script ran though, you will have the following directories:
+
+BASE/build-icc/qmp
+BASE/build-icc/qphix
+BASE/build-icc/qdpxx
+BASE/build-icc/chroma
+BASE/build-icc/libxml2
+
+BASE/local-icc/include
+BASE/local-icc/bin
+BASE/local-icc/lib
+BASE/local-icc/share
+
+BASE/sources/qmp
+BASE/sources/qphix
+BASE/sources/qdpxx
+BASE/sources/chroma
+BASE/sources/libxml2
+EOF
+    exit 1
 fi
 
 mkdir -p "$1"
 pushd "$1"
 basedir="$PWD"
 popd
+
+# Set all locale to C, such that compiler error messages are all in English.
+# This makes debugging way easier.
+export LC_ALL=C
 
 # The `module load` command does not set the exit status when it fails. Also it
 # annoyingly outputs everything on standard error. This function parses the
@@ -65,6 +96,14 @@ if [[ "$(hostname -f)" =~ [^.]*\.hww\.de ]]; then
 elif [[ "$(hostname -f)" =~ [^.]*\.jureca ]]; then
   host=jureca
   compiler="${COMPILER-icc}"
+elif [[ "$(hostname -f)" =~ [^.]*\.marconi.cineca.it ]]; then
+  if [[ -n "$ENV_KNL_HOME" ]]; then
+    host=marconi-a2
+    compiler="${COMPILER-icc}"
+  else
+    echo 'You seem to be running on Marconi but the environment variable ENV_KNL_HOME is not set. This script currently only supports Marconi A2, so please do `module load env-knl` to select the KNL partition.'
+    exit 1
+  fi
 else
   set +x
   echo "This machine is neither JURECA nor Hazel Hen. It is not clear which compiler to use. Set the environment variable 'COMPILER' to 'cray', 'icc' or 'gcc'."
@@ -98,6 +137,7 @@ case $compiler in
         set -x
         cc_name=mpiicc
         cxx_name=mpiicpc
+        base_flags="-xAVX2 -O3"
         ;;
       hazelhen)
         set +x
@@ -116,12 +156,22 @@ case $compiler in
         # system loads the right one of these wrappers.
         cc_name=cc
         cxx_name=CC
+        base_flags="-xAVX2 -O3"
+        ;;
+      case marconi-a2)
+        set +x
+        checked-module-load intel/pe-xe-2017--binary
+        checked-module-load intelmpi
+        module list
+        set -x
+        cc_name=mpiicc
+        cxx_name=mpiicpc
+        base_flags="-xMIC-AVX512 -O3"
         ;;
     esac
 
     color_flags=""
     openmp_flags="-fopenmp"
-    base_flags="-xAVX2 -O2"
     c99_flags="-std=c99"
     cxx11_flags="-std=c++11"
     disable_warnings_flags="-Wno-all -Wno-pedantic -diag-disable 1224"
@@ -131,6 +181,14 @@ case $compiler in
     qphix_configure="--enable-cean"
     ;;
   gcc)
+    color_flags="-fdiagnostics-color=auto"
+    openmp_flags="-fopenmp"
+    c99_flags="--std=c99"
+    cxx11_flags="--std=c++11"
+    disable_warnings_flags="-Wno-all -Wno-pedantic"
+    qphix_flags="-Drestrict=__restrict__"
+    qphix_configure=""
+
     case "$host" in
       jureca)
         set +x
@@ -140,6 +198,7 @@ case $compiler in
         set -x
         cc_name=mpicc
         cxx_name=mpic++
+        base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
         ;;
       hazelhen)
         set +x
@@ -148,16 +207,19 @@ case $compiler in
         set -x
         cc_name=cc
         cxx_name=CC
+        base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
+        ;;
+      marconi-a2)
+        set +x
+        checked-module-load gnu
+        checked-module-load ParaStationMPI
+        module list
+        set -x
+        cc_name=mpicc
+        cxx_name=mpic++
+        base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=knl"
         ;;
     esac
-    color_flags="-fdiagnostics-color=auto"
-    openmp_flags="-fopenmp"
-    base_flags="-O2 -finline-limit=50000 $color_flags -mavx2"
-    c99_flags="--std=c99"
-    cxx11_flags="--std=c++11"
-    disable_warnings_flags="-Wno-all -Wno-pedantic"
-    qphix_flags="-Drestrict=__restrict__"
-    qphix_configure=""
     ;;
   *)
     echo 'This compiler is not supported by this script. Choose another one or add another block to the `case` in this script.'
@@ -189,13 +251,21 @@ base_cxxflags="$base_flags"
 base_cflags="$base_flags $c99_flags"
 base_configure="--prefix=$prefix CC=$(which $cc_name) CXX=$(which $cxx_name)"
 
-# The “huge pages” are used on Hazel Hen. This leads to the inability to run
-# execute programs on the login nodes that are compiled with the MPI compiler
-# wrapper. Autotools need to be told that it cross compiles such that the
-# `./configure` script won't try to execute the test programs.
-if [[ "$host" = hazelhen ]]; then
-  base_configure="$base_configure --host=x86_64-linux-gnu"
-fi
+case hostname in
+  hazelhen)
+    # The “huge pages” are used on Hazel Hen. This leads to the inability to run
+    # execute programs on the login nodes that are compiled with the MPI compiler
+    # wrapper. Autotools need to be told that it cross compiles such that the
+    # `./configure` script won't try to execute the test programs.
+    base_configure="$base_configure --host=x86_64-linux-gnu"
+    ;;
+  marconi-a2)
+    # Marconi A2 has a cross compilation from Haswell to Knights Landing,
+    # therefore one needs to tell GNU Autotools that programs compiled with the
+    # target compiler cannot be executed on the host.
+    base_configure="$base_configure --host=x86_64-linux-gnu"
+    ;;
+esac
 
 # Clones a git repository if the directory does not exist. It does not call
 # `git pull`. After cloning, it deletes the `configure` and `Makefile` that are
@@ -320,58 +390,61 @@ popd
 #                                   libxml2                                   #
 ###############################################################################
 
-if [[ "$host" = jureca ]]; then
-  repo=libxml2
-  print-fancy-heading $repo
-  clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
+case hostname in
+  jureca|marconi-a2)
+    repo=libxml2
+    print-fancy-heading $repo
+    clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
 
-  pushd $repo
-  cflags="$base_cflags"
-  cxxflags="$base_cxxflags"
-  if ! [[ -f configure ]]; then
-    mkdir -p m4
-    pushd m4
-    ln -fs /usr/share/aclocal/pkg.m4 .
+    pushd $repo
+    cflags="$base_cflags"
+    cxxflags="$base_cxxflags"
+    if ! [[ -f configure ]]; then
+      mkdir -p m4
+      pushd m4
+      ln -fs /usr/share/aclocal/pkg.m4 .
+      popd
+      set +x
+      checked-module-load Autotools
+      set -x
+      NOCONFIGURE=yes ./autogen.sh
+    fi
     popd
-    set +x
-    checked-module-load Autotools
-    set -x
-    NOCONFIGURE=yes ./autogen.sh
-  fi
-  popd
 
-  mkdir -p "$build/$repo"
-  pushd "$build/$repo"
-  if ! [[ -f Makefile ]]; then
-    $sourcedir/$repo/configure $base_configure \
-      --without-zlib \
-      --without-python \
-      --without-readline \
-      --without-threads \
-      --without-history \
-      --without-reader \
-      --without-writer \
-      --with-output \
-      --without-ftp \
-      --without-http \
-      --without-pattern \
-      --without-catalog \
-      --without-docbook \
-      --without-iconv \
-      --without-schemas \
-      --without-schematron \
-      --without-modules \
-      --without-xptr \
-      --without-xinclude \
-      CFLAGS="$cflags" CXXFLAGS="$cxxflags"
-  fi
-  make-make-install
-  popd
+    mkdir -p "$build/$repo"
+    pushd "$build/$repo"
+    if ! [[ -f Makefile ]]; then
+      $sourcedir/$repo/configure $base_configure \
+        --without-zlib \
+        --without-python \
+        --without-readline \
+        --without-threads \
+        --without-history \
+        --without-reader \
+        --without-writer \
+        --with-output \
+        --without-ftp \
+        --without-http \
+        --without-pattern \
+        --without-catalog \
+        --without-docbook \
+        --without-iconv \
+        --without-schemas \
+        --without-schematron \
+        --without-modules \
+        --without-xptr \
+        --without-xinclude \
+        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+    fi
+    make-make-install
+    popd
 
-  libxml="$prefix/bin/xml2-config"
-else
-  libxml="/usr/include/libxml2"
-fi
+    libxml="$prefix/bin/xml2-config"
+    ;;
+  hazelhen)
+    libxml="/usr/include/libxml2"
+    ;;
+esac
 
 ###############################################################################
 #                                    QDP++                                    #
@@ -412,6 +485,10 @@ print-fancy-heading $repo
 clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
 
 case $host in
+  jureca)
+    checked-module-load CMake
+    checked-module-load Python
+    ;;
   hazelhen)
     # Hazel Hen has the quirk that a modern version of CMake can only be loaded
     # in the GNU programming environment. So here we switch to the GNU
@@ -428,9 +505,10 @@ case $host in
     python_library=/opt/hlrs/tools/python/anaconda3-4.2.0/lib/libpython3.so
     python_include_dir=/opt/hlrs/tools/python/anaconda3-4.2.0/include
     ;;
-  jureca)
-    checked-module-load CMake
-    checked-module-load Python
+  marconi-a2)
+    checked-module-load cmake
+    checked-module-load python
+    ;;
 esac
 
 set +x
@@ -484,21 +562,22 @@ esac
 #                             GNU Multi Precision                             #
 ###############################################################################
 
-# The GNU MP library is not present on the Marconi system. Therefore it has to
-# be compiled from source.
-
 repo=gmp
 print-fancy-heading $repo
 
 case "$host" in
-  hazelhen)
-    gmp="-lgmp"
-    ;;
   jureca)
     set +x
     checked-module-load GMP
     set -x
     gmp="$EBROOTGMP"
+    ;;
+  hazelhen)
+    gmp="-lgmp"
+    ;;
+  marconi-a2)
+    checked-module-load gmp
+    gmp="-lgmp"
     ;;
 esac
 
@@ -517,6 +596,15 @@ cxxflags="$base_cxxflags $openmp_flags"
 autoreconf-if-needed
 popd
 
+case hostname in
+  jureca|hazelhen)
+    chroma_configure='--enable-qphix-solver-arch=avx2 --enable-qphix-solver-soalen=4'
+    ;;
+  marconi-a2)
+    chroma_configure='--enable-qphix-solver-arch=avx512 --enable-qphix-solver-soalen=4'
+    ;;
+esac
+
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
@@ -527,13 +615,12 @@ if ! [[ -f Makefile ]]; then
     --enable-precision=double \
     --enable-qdp-alignment=128 \
     --enable-sse2 \
-    --enable-qphix-solver-arch=avx2 \
-    --enable-qphix-solver-soalen=4 \
-    --enable-qphix-solver-compress12 \
     --with-gmp="$gmp" \
-    --with-libxml2="$prefix/bin/xml2-config" \
+    --with-libxml2="$libxml" \
     --with-qdp="$prefix" \
     --with-qphix-solver="$prefix" \
+    --enable-qphix-solver-compress12 \
+    $chroma_configure \
     CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
