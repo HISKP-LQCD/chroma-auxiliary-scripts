@@ -162,9 +162,9 @@ case "$compiler" in
         ;;
       marconi-a2)
         set +x
-        checked-module-load gnu
         checked-module-load intel/pe-xe-2017--binary
         checked-module-load intelmpi
+        checked-module-load gnu
         module list
         set -x
         cc_name=mpiicc
