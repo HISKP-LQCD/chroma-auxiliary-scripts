@@ -583,7 +583,7 @@ case "$host" in
     ;;
   marconi-a2)
     checked-module-load gmp
-    gmp="-lgmp"
+    gmp="$GMP_HOME"
     ;;
 esac
 
