@@ -114,7 +114,7 @@ fi
 
 
 # Set up the chosen compiler.
-case $compiler in
+case "$compiler" in
   # The cray compiler does not support half-precision data types (yet). So
   # one cannot actually use that for QPhiX right now.
   cray)
@@ -253,7 +253,7 @@ base_cxxflags="$base_flags"
 base_cflags="$base_flags $c99_flags"
 base_configure="--prefix=$prefix CC=$(which $cc_name) CXX=$(which $cxx_name)"
 
-case hostname in
+case "$host" in
   hazelhen)
     # The “huge pages” are used on Hazel Hen. This leads to the inability to run
     # execute programs on the login nodes that are compiled with the MPI compiler
@@ -392,7 +392,7 @@ popd
 #                                   libxml2                                   #
 ###############################################################################
 
-case hostname in
+case "$host" in
   jureca|marconi-a2)
     repo=libxml2
     print-fancy-heading $repo
@@ -598,7 +598,7 @@ cxxflags="$base_cxxflags $openmp_flags"
 autoreconf-if-needed
 popd
 
-case hostname in
+case "$host" in
   jureca|hazelhen)
     chroma_configure='--enable-qphix-solver-arch=avx2 --enable-qphix-solver-soalen=4'
     ;;
