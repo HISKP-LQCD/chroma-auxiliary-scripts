@@ -609,7 +609,7 @@ case "$host" in
     chroma_configure='--enable-qphix-solver-arch=avx2 --enable-qphix-solver-soalen=4'
     ;;
   marconi-a2)
-    chroma_configure='--enable-qphix-solver-arch=avx512 --enable-qphix-solver-soalen=4'
+    chroma_configure='--enable-qphix-solver-arch=avx512 --enable-qphix-solver-soalen=8'
     ;;
 esac
 
