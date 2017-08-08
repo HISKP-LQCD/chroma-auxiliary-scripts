@@ -28,6 +28,8 @@ set -e
 set -u
 set -x
 
+PS4='+[${SECONDS}s] '
+
 # Force the user specify a directory where everything should be put into.
 if (( $# == 0 )) || [[ ${1:0:1} = - ]]; then
     cat <<EOF
