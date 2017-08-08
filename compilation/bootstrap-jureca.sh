@@ -99,7 +99,7 @@ elif [[ "$hostname_f" =~ [^.]*\.jureca ]]; then
   host=jureca
   compiler="${COMPILER-icc}"
 elif [[ "$hostname_f" =~ [^.]*\.marconi.cineca.it ]]; then
-  if [[ -n "$ENV_KNL_HOME" ]]; then
+  if [[ -n "${ENV_KNL_HOME-}" ]]; then
     host=marconi-a2
     compiler="${COMPILER-icc}"
   else
@@ -162,6 +162,7 @@ case "$compiler" in
         ;;
       marconi-a2)
         set +x
+        checked-module-load gnu
         checked-module-load intel/pe-xe-2017--binary
         checked-module-load intelmpi
         module list
