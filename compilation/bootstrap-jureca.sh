@@ -90,13 +90,15 @@ checked-module-load() {
 # This makes debugging way easier.
 export LC_ALL=C
 
-if [[ "$(hostname -f)" =~ [^.]*\.hww\.de ]]; then
+hostname_f="$(hostname -f)"
+
+if [[ "$hostname_f" =~ [^.]*\.hww\.de ]]; then
   host=hazelhen
   compiler="${COMPILER-icc}"
-elif [[ "$(hostname -f)" =~ [^.]*\.jureca ]]; then
+elif [[ "$hostname_f" =~ [^.]*\.jureca ]]; then
   host=jureca
   compiler="${COMPILER-icc}"
-elif [[ "$(hostname -f)" =~ [^.]*\.marconi.cineca.it ]]; then
+elif [[ "$hostname_f" =~ [^.]*\.marconi.cineca.it ]]; then
   if [[ -n "$ENV_KNL_HOME" ]]; then
     host=marconi-a2
     compiler="${COMPILER-icc}"
@@ -106,7 +108,7 @@ elif [[ "$(hostname -f)" =~ [^.]*\.marconi.cineca.it ]]; then
   fi
 else
   set +x
-  echo "This machine is neither JURECA nor Hazel Hen. It is not clear which compiler to use. Set the environment variable 'COMPILER' to 'cray', 'icc' or 'gcc'."
+  echo "This machine is neither JURECA nor Hazel Hen nor Marconi A2. It is not clear which compiler to use. Set the environment variable 'COMPILER' to 'cray', 'icc' or 'gcc'."
   exit 1
 fi
 
