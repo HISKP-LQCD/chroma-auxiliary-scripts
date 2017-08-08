@@ -164,6 +164,9 @@ case "$compiler" in
         set +x
         checked-module-load intel/pe-xe-2017--binary
         checked-module-load intelmpi
+        # We need a host compiler and the default `g++` is only 4.8, which just
+        # barely supports C++11. We just load a newer version of the GCC
+        # alongside of the ICC.
         checked-module-load gnu
         module list
         set -x
