@@ -160,7 +160,7 @@ case $compiler in
         cxx_name=CC
         base_flags="-xAVX2 -O3"
         ;;
-      case marconi-a2)
+      marconi-a2)
         set +x
         checked-module-load intel/pe-xe-2017--binary
         checked-module-load intelmpi
