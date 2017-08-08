@@ -96,13 +96,16 @@ hostname_f="$(hostname -f)"
 
 if [[ "$hostname_f" =~ [^.]*\.hww\.de ]]; then
   host=hazelhen
+  isa=avx2
   compiler="${COMPILER-icc}"
 elif [[ "$hostname_f" =~ [^.]*\.jureca ]]; then
   host=jureca
+  isa=avx2
   compiler="${COMPILER-icc}"
 elif [[ "$hostname_f" =~ [^.]*\.marconi.cineca.it ]]; then
   if [[ -n "${ENV_KNL_HOME-}" ]]; then
     host=marconi-a2
+    isa=avx512
     compiler="${COMPILER-icc}"
   else
     echo 'You seem to be running on Marconi but the environment variable ENV_KNL_HOME is not set. This script currently only supports Marconi A2, so please do `module load env-knl` to select the KNL partition.'
@@ -537,7 +540,7 @@ pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
   cxx=$(which $cxx_name)
   CXX=$cxx CXXFLAGS="$cxxflags" \
-    cmake -Disa=avx2 \
+    cmake -Disa=$isa \
     -Dhost_cxx="g++" \
     -Dhost_cxxflags="-g -O3 -std=c++11" \
     -Drecursive_jN=$(nproc) \
@@ -606,10 +609,10 @@ popd
 
 case "$host" in
   jureca|hazelhen)
-    chroma_configure='--enable-qphix-solver-arch=avx2 --enable-qphix-solver-soalen=4'
+    chroma_configure='--enable-qphix-solver-soalen=4'
     ;;
   marconi-a2)
-    chroma_configure='--enable-qphix-solver-arch=avx512 --enable-qphix-solver-soalen=8'
+    chroma_configure='--enable-qphix-solver-soalen=8'
     ;;
 esac
 
@@ -628,6 +631,7 @@ if ! [[ -f Makefile ]]; then
     --with-qdp="$prefix" \
     --with-qphix-solver="$prefix" \
     --enable-qphix-solver-compress12 \
+    --enable-qphix-solver-arch=$isa \
     $chroma_configure \
     CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
