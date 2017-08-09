@@ -39,6 +39,10 @@ set -x
 
 PS4='+[${SECONDS}s] '
 
+###############################################################################
+#                                 Help Screen                                 #
+###############################################################################
+
 # Force the user specify a directory where everything should be put into.
 if (( $# == 0 )) || [[ ${1:0:1} = - ]]; then
     cat <<EOF
@@ -71,14 +75,9 @@ EOF
     exit 1
 fi
 
-mkdir -p "$1"
-pushd "$1"
-basedir="$PWD"
-popd
-
-# Set all locale to C, such that compiler error messages are all in English.
-# This makes debugging way easier.
-export LC_ALL=C
+###############################################################################
+#                                  Functions                                  #
+###############################################################################
 
 # The `module load` command does not set the exit status when it fails. Also it
 # annoyingly outputs everything on standard error. This function parses the
@@ -97,8 +96,106 @@ checked-module-load() {
   rm -f module-load-output.txt
 }
 
+# Clones a git repository if the directory does not exist. It does not call
+# `git pull`. After cloning, it deletes the `configure` and `Makefile` that are
+# shipped by default such that they get regenerated in the next step.
+clone-if-needed() {
+  local url="$1"
+  local dir="$2"
+  local branch="$3"
+
+  if ! [[ -d "$dir" ]]; then
+    case "$host" in
+      hazelhen)
+        cat<<EOF
+The git repository for “$dir” could not be found, it has to be cloned.
+Unfortunately outgoing HTTPS connections as needed for “git clone” are blocked
+by the firewall. You will have to download the repository yourself. Execute the
+following commands:
+
+    cd "$PWD"
+    git clone "$url" --recursive -b "$branch"
+    rm -f configure Makefile
+EOF
+        ;;
+      *)
+        git clone "$url" --recursive -b "$branch"
+
+        pushd "$dir"
+        if [[ -f Makefile.am ]]; then
+          rm -f Makefile
+        fi
+        rm -f configure
+        popd
+        ;;
+    esac
+  fi
+}
+
+# Runs `make && make install` with appropriate flags that make compilation
+# parallel on multiple cores. A sentinel file is created such that `make` is
+# not invoked once it has correctly built.
+make-make-install() {
+  if ! [[ -f build-succeeded ]]; then
+    nice make $make_smp_flags VERBOSE=1
+    make install VERBOSE=1
+    touch build-succeeded
+    pushd $prefix/lib
+    rm -f *.so *.so.*
+    popd
+  fi
+}
+
+# Prints a large heading such that it is clear where one is in the compilation
+# process. This is not needed but occasionally helpful.
+print-fancy-heading() {
+  set +x
+  echo "######################################################################"
+  echo "# $*"
+  echo "######################################################################"
+  set -x
+
+  if [[ -d "$sourcedir/$repo/.git" ]]; then
+    pushd "$sourcedir/$repo"
+    git branch
+    popd
+  fi
+}
+
+# Invokes the various commands that are needed to update the GNU Autotools
+# build system. Since the submodules are also Autotools projects, these
+# commands need to be invoked from the bottom up, recursively. The regular `git
+# submodule foreach` will do a traversal from the top. Due to the nested nature
+# of the GNU Autotools, we need to have depth-first traversal. Assuming that
+# the directory names do not have anything funny in them, the parsing of the
+# output can work.
+autoreconf-if-needed() {
+  if ! [[ -f configure ]]; then
+    if [[ -f .gitmodules ]]; then
+      for module in $(git submodule foreach --quiet --recursive pwd | tac); do
+        pushd "$module"
+        autoreconf -vif
+        popd
+      done
+    fi
+
+    aclocal
+    autoreconf -vif
+  fi
+}
+
+###############################################################################
+#                              Environment Setup                              #
+###############################################################################
+
+mkdir -p "$1"
+pushd "$1"
+basedir="$PWD"
+popd
+
 # Set all locale to C, such that compiler error messages are all in English.
-# This makes debugging way easier.
+# This makes debugging way easier because you can search for the messages
+# online.
 export LC_ALL=C
 
 hostname_f="$(hostname -f)"
@@ -125,7 +222,6 @@ else
   echo "This machine is neither JURECA nor Hazel Hen nor Marconi A2. It is not clear which compiler to use. Set the environment variable 'COMPILER' to 'cray', 'icc' or 'gcc'."
   exit 1
 fi
-
 
 # Set up the chosen compiler.
 case "$compiler" in
@@ -290,98 +386,10 @@ case "$host" in
     ;;
 esac
 
-# Clones a git repository if the directory does not exist. It does not call
-# `git pull`. After cloning, it deletes the `configure` and `Makefile` that are
-# shipped by default such that they get regenerated in the next step.
-clone-if-needed() {
-  local url="$1"
-  local dir="$2"
-  local branch="$3"
-
-  if ! [[ -d "$dir" ]]; then
-    case "$host" in
-      hazelhen)
-        cat<<EOF
-The git repository for “$dir” could not be found, it has to be cloned.
-Unfortunately outgoing HTTPS connections as needed for “git clone” are blocked
-by the firewall. You will have to download the repository yourself. Execute the
-following commands:
-
-    cd "$PWD"
-    git clone "$url" --recursive -b "$branch"
-    rm -f configure Makefile
-EOF
-        ;;
-      *)
-        git clone "$url" --recursive -b "$branch"
-
-        pushd "$dir"
-        if [[ -f Makefile.am ]]; then
-          rm -f Makefile
-        fi
-        rm -f configure
-        popd
-        ;;
-    esac
-  fi
-}
-
 # If the user has not given a variable `SMP` in the environment, use as many
 # processes to compile as there are cores in the system.
 make_smp_template="-j $(nproc)"
 make_smp_flags="${SMP-$make_smp_template}"
-
-# Runs `make && make install` with appropriate flags that make compilation
-# parallel on multiple cores. A sentinel file is created such that `make` is
-# not invoked once it has correctly built.
-make-make-install() {
-  if ! [[ -f build-succeeded ]]; then
-    nice make $make_smp_flags VERBOSE=1
-    make install VERBOSE=1
-    touch build-succeeded
-    pushd $prefix/lib
-    rm -f *.so *.so.*
-    popd
-  fi
-}
-
-# Prints a large heading such that it is clear where one is in the compilation
-# process. This is not needed but occasionally helpful.
-print-fancy-heading() {
-  set +x
-  echo "######################################################################"
-  echo "# $*"
-  echo "######################################################################"
-  set -x
-
-  if [[ -d "$sourcedir/$repo/.git" ]]; then
-    pushd "$sourcedir/$repo"
-    git branch
-    popd
-  fi
-}
-
-# Invokes the various commands that are needed to update the GNU Autotools
-# build system. Since the submodules are also Autotools projects, these
-# commands need to be invoked from the bottom up, recursively. The regular `git
-# submodule foreach` will do a traversal from the top. Due to the nested nature
-# of the GNU Autotools, we need to have depth-first traversal. Assuming that
-# the directory names do not have anything funny in them, the parsing of the
-# output can work.
-autoreconf-if-needed() {
-  if ! [[ -f configure ]]; then
-    if [[ -f .gitmodules ]]; then
-      for module in $(git submodule foreach --quiet --recursive pwd | tac); do
-        pushd "$module"
-        autoreconf -vif
-        popd
-      done
-    fi
-
-    aclocal
-    autoreconf -vif
-  fi
-}
 
 cd "$sourcedir"
 
