@@ -1,8 +1,17 @@
 #!/bin/bash
 # Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
 
-# Installs US QCD Chroma on JURECA, an Intel Xeon E5-2680 v3 Haswell + NVIDIA
-# K40 supercomputer.
+# Installs USQCD Chroma on with QPhiX on selected Intel-based supercomputers.
+#
+# This script will download the needed sources, configure, compile, and install
+# them. After the script ran through, you will have a working installation of
+# Chroma with QPhiX acceleration.
+#
+# If the machine of your interest is not support by this script, it should be
+# fairly straightforward to add it. In the various `case` statements you need
+# to add another block. The names of the module system will probably have to be
+# adapted as well. In case you need to compile additional dependencies, it
+# would sense to make this a conditional on the `$host` variable as well.
 
 # License (MIT/Expat)
 #
