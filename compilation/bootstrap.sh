@@ -623,8 +623,42 @@ case "$host" in
     gmp="-lgmp"
     ;;
   marconi-a2)
-    checked-module-load autoload gmp
-    gmp="$GMP_HOME"
+    # The GNU MP library installed on the Marconi system, but it might be
+    # linked against an older version of the standard library. Therefore we
+    # compile it from scratch.
+
+    repo=gmp
+    print-fancy-heading $repo
+
+    if ! [[ -d "$repo" ]];
+    then
+      # The upstream website only has a download as an LZMA compressed file. The
+      # CentOS does not provide an `lzip` command. Also, there is no module
+      # available that would supply it. Building `lzip` from source seems like a
+      # waste of effort. Therefore I have just repacked that on my local machine
+      # and uploaded to my webspace.
+      url=http://bulk.martin-ueding.de/gmp-6.1.2.tar.gz
+      #url=https://gmplib.org/download/gmp/gmp-6.1.2.tar.lz
+
+      wget "$url"
+      tar -xf "${url##*/}"
+      mv gmp-6.1.2 gmp
+    fi
+
+    pushd "$repo"
+    cflags="$base_cflags"
+    cxxflags="$base_cxxflags"
+    autoreconf-if-needed
+    popd
+
+    mkdir -p "$build/$repo"
+    pushd "$build/$repo"
+    if ! [[ -f Makefile ]]; then
+      $sourcedir/$repo/configure $base_configure \
+        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+    fi
+    make-make-install
+    popd
     ;;
 esac
 
