@@ -97,7 +97,7 @@ fi
 checked-module-load() {
   set +x
   echo "+ module load $1"
-  module load $1 2>&1 > module-load-output.txt
+  module load "$@" 2>&1 > module-load-output.txt
   set -x
   cat module-load-output.txt
   if grep -i error module-load-output.txt; then
