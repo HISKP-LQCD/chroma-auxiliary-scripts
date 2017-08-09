@@ -144,6 +144,7 @@ case "$compiler" in
         set -x
         cc_name=mpiicc
         cxx_name=mpiicpc
+        host_cxx=icpc
         base_flags="-xAVX2 -O3"
         ;;
       hazelhen)
@@ -163,6 +164,7 @@ case "$compiler" in
         # system loads the right one of these wrappers.
         cc_name=cc
         cxx_name=CC
+        host_cxx=g++
         base_flags="-xAVX2 -O3"
         ;;
       marconi-a2)
@@ -177,6 +179,7 @@ case "$compiler" in
         set -x
         cc_name=mpiicc
         cxx_name=mpiicpc
+        host_cxx=icpc
         base_flags="-xMIC-AVX512 -O3"
         ;;
     esac
@@ -541,8 +544,8 @@ if ! [[ -f Makefile ]]; then
   cxx=$(which $cxx_name)
   CXX=$cxx CXXFLAGS="$cxxflags" \
     cmake -Disa=$isa \
-    -Dhost_cxx="g++" \
-    -Dhost_cxxflags="-g -O3 -std=c++11" \
+    -Dhost_cxx="$host_cxx" \
+    -Dhost_cxxflags="$cxx11_flags" \
     -Drecursive_jN=$(nproc) \
     -DCMAKE_INSTALL_PREFIX="$prefix" \
     -DQDPXX_DIR="$prefix" \
