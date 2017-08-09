@@ -37,6 +37,9 @@ set -e
 set -u
 set -x
 
+# With `set -x`, Bash will output all commands that are run. This changes the
+# output such that the number of seconds is printed out with each line. This
+# will give some feeling for the time it needs to compile.
 PS4='+[${SECONDS}s] '
 
 ###############################################################################
@@ -55,22 +58,30 @@ Usage: $0 BASE
 BASE is the directory where everthing is downloaded, compiled, and installed.
 After this script ran though, you will have the following directories:
 
-BASE/build-icc/qmp
-BASE/build-icc/qphix
-BASE/build-icc/qdpxx
-BASE/build-icc/chroma
-BASE/build-icc/libxml2
+    BASE/build-icc/qmp
+    BASE/build-icc/qphix
+    BASE/build-icc/qdpxx
+    BASE/build-icc/chroma
+    BASE/build-icc/libxml2
 
-BASE/local-icc/include
-BASE/local-icc/bin
-BASE/local-icc/lib
-BASE/local-icc/share
+    BASE/local-icc/include
+    BASE/local-icc/bin
+    BASE/local-icc/lib
+    BASE/local-icc/share
 
-BASE/sources/qmp
-BASE/sources/qphix
-BASE/sources/qdpxx
-BASE/sources/chroma
-BASE/sources/libxml2
+    BASE/sources/qmp
+    BASE/sources/qphix
+    BASE/sources/qdpxx
+    BASE/sources/chroma
+    BASE/sources/libxml2
+
+You can set the environment variable SMP to be the flags that Make should be
+passed, use SMP= in order to disable parallel building. This might be a good
+thing in order to get readable output when something is failing.
+
+You can also set the environment variable COMPILER which will select a
+different compiler. This script will automatically choose the most sensible
+compiler for each system, therefore it should not be needed in production.
 EOF
     exit 1
 fi
@@ -188,6 +199,9 @@ autoreconf-if-needed() {
 #                              Environment Setup                              #
 ###############################################################################
 
+# Create the target directory and then store the absolute path to this
+# directory. Many compilation scripts have issues with linking to relative
+# paths.
 mkdir -p "$1"
 pushd "$1"
 basedir="$PWD"
@@ -198,8 +212,9 @@ popd
 # online.
 export LC_ALL=C
 
+# Determine the fully qualified hostname and then set the optimal default
+# compiler for the architecture found.
 hostname_f="$(hostname -f)"
-
 if [[ "$hostname_f" =~ [^.]*\.hww\.de ]]; then
   host=hazelhen
   isa=avx2
@@ -240,6 +255,16 @@ case "$compiler" in
     qphix_configure=""
     ;;
   icc)
+    color_flags=""
+    openmp_flags="-fopenmp"
+    c99_flags="-std=c99"
+    cxx11_flags="-std=c++11"
+    disable_warnings_flags="-Wno-all -Wno-pedantic -diag-disable 1224"
+    qphix_flags="-restrict"
+    # QPhiX can make use of the Intel “C Extended Array Notation”, this
+    # gets enabled here.
+    qphix_configure="--enable-cean"
+
     case "$host" in
       jureca)
         set +x
@@ -276,10 +301,6 @@ case "$compiler" in
         set +x
         checked-module-load intel/pe-xe-2017--binary
         checked-module-load intelmpi
-        # We need a host compiler and the default `g++` is only 4.8, which just
-        # barely supports C++11. We just load a newer version of the GCC
-        # alongside of the ICC.
-        checked-module-load gnu
         module list
         set -x
         cc_name=mpiicc
@@ -288,16 +309,6 @@ case "$compiler" in
         base_flags="-xMIC-AVX512 -O3"
         ;;
     esac
-
-    color_flags=""
-    openmp_flags="-fopenmp"
-    c99_flags="-std=c99"
-    cxx11_flags="-std=c++11"
-    disable_warnings_flags="-Wno-all -Wno-pedantic -diag-disable 1224"
-    qphix_flags="-restrict"
-    # QPhiX can make use of the Intel “C Extended Array Notation”, this
-    # gets enabled here.
-    qphix_configure="--enable-cean"
     ;;
   gcc)
     color_flags="-fdiagnostics-color=auto"
@@ -351,8 +362,8 @@ sourcedir="$basedir/sources"
 mkdir -p "$sourcedir"
 
 # Directory for the installed files (headers, libraries, executables). This
-# contains the chosen compiler such that multiple compilers can be used
-# simultaneously.
+# contains the chosen compiler in the dirname such that multiple compilers can
+# be used simultaneously.
 prefix="$basedir/local-$compiler"
 mkdir -p "$prefix"
 
@@ -363,9 +374,14 @@ mkdir -p "$build"
 
 # The GNU Autotools install `X-config` programs that let a dependent library
 # query the `CFLAGS` and `CXXFLAGS` used in the compilation. This needs to be
-# in the `$PATH`, otherwise libraries cannot be found properly.
+# in the `$PATH`, otherwise libraries cannot be found properly. In principle it
+# should be sufficient to pass the installation path to the `configure` scripts
+# but this has not always worked properly, therefore this additional thing.
 PATH=$prefix/bin:$PATH
 
+# Basic flags that will be used for all compilations. The full path to the C
+# and C++ compiler are queried here and stored. Changes in modules later on
+# will not alter the compilers, therefore.
 base_cxxflags="$base_flags"
 base_cflags="$base_flags $c99_flags"
 base_configure="--prefix=$prefix CC=$(which $cc_name) CXX=$(which $cxx_name)"
