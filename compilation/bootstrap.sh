@@ -659,6 +659,8 @@ case "$host" in
     fi
     make-make-install
     popd
+
+    gmp="$prefix"
     ;;
 esac
 
