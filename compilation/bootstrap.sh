@@ -35,60 +35,20 @@
 
 set -e
 set -u
-set -x
-
-# With `set -x`, Bash will output all commands that are run. This changes the
-# output such that the number of seconds is printed out with each line. This
-# will give some feeling for the time it needs to compile.
-PS4='+[${SECONDS}s] '
-
-###############################################################################
-#                                 Help Screen                                 #
-###############################################################################
-
-# Force the user specify a directory where everything should be put into.
-if (( $# == 0 )) || [[ ${1:0:1} = - ]]; then
-    cat <<EOF
-This is a script to install Chroma, QPhiX, QDP++, QMP, and their dependencies
-on the Intel Knights Landing based supercomputer “Marconi A2” hosted by CINECA
-in Casalecchio di Reno, Italy.
-
-Usage: $0 BASE
-
-BASE is the directory where everthing is downloaded, compiled, and installed.
-After this script ran though, you will have the following directories:
-
-    BASE/build-icc/qmp
-    BASE/build-icc/qphix
-    BASE/build-icc/qdpxx
-    BASE/build-icc/chroma
-    BASE/build-icc/libxml2
-
-    BASE/local-icc/include
-    BASE/local-icc/bin
-    BASE/local-icc/lib
-    BASE/local-icc/share
-
-    BASE/sources/qmp
-    BASE/sources/qphix
-    BASE/sources/qdpxx
-    BASE/sources/chroma
-    BASE/sources/libxml2
-
-You can set the environment variable SMP to be the flags that Make should be
-passed, use SMP= in order to disable parallel building. This might be a good
-thing in order to get readable output when something is failing.
-
-You can also set the environment variable COMPILER which will select a
-different compiler. This script will automatically choose the most sensible
-compiler for each system, therefore it should not be needed in production.
-EOF
-    exit 1
-fi
 
 ###############################################################################
 #                                  Functions                                  #
 ###############################################################################
+
+print-help() {
+    cat <<EOF
+Usage: $0 [OPTIONS] BASE
+
+Have a look at the manual page (bootstrap-chroma.1.md) or its compiled version
+(bootstrap.1) for a full description.
+EOF
+    exit 1
+}
 
 # The `module load` command does not set the exit status when it fails. Also it
 # annoyingly outputs everything on standard error. This function parses the
@@ -196,8 +156,72 @@ autoreconf-if-needed() {
 }
 
 ###############################################################################
+#                           Command Line Arguments                            #
+###############################################################################
+
+opt_chroma_branch=devel
+opt_only_qphix=false
+opt_qphix_branch=devel
+opt_verbose=true
+
+# By default, all cores in the system are used for compilation.
+make_smp_flags="-j $(nproc)"
+
+while getopts cC:hj:qQ:s:V opt; do
+  case "$opt" in
+    c)
+      opt_compiler=$OPTARG
+      ;;
+    C)
+      opt_chroma_branch=$OPTARG
+      ;;
+    h)
+      print-help
+      ;;
+    j)
+      make_smp_flags="-j $OPTARG"
+      ;;
+    q)
+      opt_only_qphix=true
+      ;;
+    Q)
+      opt_qphix_branch=$OPTARG
+      ;;
+    s)
+      opt_soalen=$OPTARG
+      ;;
+    V)
+      opt_verbose=false
+      ;;
+    *)
+      echo
+      print-help
+      ;;
+  esac
+done
+
+# We shift such that the remaining options are the positional elements.
+shift "$(( OPTIND - 1 ))"
+
+# Check that the base directory was given.
+if [[ -z "${1-}" ]]; then
+  echo "No base directory was given."
+  echo
+  print-help
+fi
+
+###############################################################################
 #                              Environment Setup                              #
 ###############################################################################
+
+# With `set -x`, Bash will output all commands that are run. This changes the
+# output such that the number of seconds is printed out with each line. This
+# will give some feeling for the time it needs to compile.
+PS4='+[${SECONDS}s] '
+
+if [[ "$opt_verbose" = "true" ]]; then
+  set -x
+fi
 
 # Create the target directory and then store the absolute path to this
 # directory. Many compilation scripts have issues with linking to relative
@@ -218,23 +242,23 @@ hostname_f="$(hostname -f)"
 if [[ "$hostname_f" =~ [^.]*\.hww\.de ]]; then
   host=hazelhen
   isa=avx2
-  compiler="${COMPILER-icc}"
+  compiler="${opt_compiler-icc}"
 elif [[ "$hostname_f" =~ [^.]*\.jureca ]]; then
   host=jureca
   isa=avx2
-  compiler="${COMPILER-icc}"
+  compiler="${opt_compiler-icc}"
 elif [[ "$hostname_f" =~ [^.]*\.marconi.cineca.it ]]; then
   if [[ -n "${ENV_KNL_HOME-}" ]]; then
     host=marconi-a2
     isa=avx512
-    compiler="${COMPILER-icc}"
+    compiler="${opt_compiler-icc}"
   else
     echo 'You seem to be running on Marconi but the environment variable ENV_KNL_HOME is not set. This script currently only supports Marconi A2, so please do `module load env-knl` to select the KNL partition.'
     exit 1
   fi
 else
   set +x
-  echo "This machine is neither JURECA nor Hazel Hen nor Marconi A2. It is not clear which compiler to use. Set the environment variable 'COMPILER' to 'cray', 'icc' or 'gcc'."
+  echo "This machine is neither JURECA nor Hazel Hen nor Marconi A2. It is not clear what should be done, please update the script."
   exit 1
 fi
 
@@ -402,11 +426,6 @@ case "$host" in
     ;;
 esac
 
-# If the user has not given a variable `SMP` in the environment, use as many
-# processes to compile as there are cores in the system.
-make_smp_template="-j $(nproc)"
-make_smp_flags="${SMP-$make_smp_template}"
-
 cd "$sourcedir"
 
 ###############################################################################
@@ -529,7 +548,7 @@ popd
 
 repo=qphix
 print-fancy-heading $repo
-clone-if-needed https://github.com/JeffersonLab/qphix.git $repo devel
+clone-if-needed https://github.com/JeffersonLab/qphix.git $repo "$opt_qphix_branch"
 
 case $host in
   jureca)
@@ -595,6 +614,11 @@ fi
 make-make-install
 popd
 
+if [[ "$opt_only_qphix" = "true" ]]; then
+  echo "QPhiX is installed, user wished to abort here."
+  exit 0
+fi
+
 case $host in
   hazelhen)
     # Now we have to get our target programming environment back.
@@ -603,7 +627,6 @@ case $host in
     checked-module-load intel/17.0.2.174
     ;;
 esac
-
 
 ###############################################################################
 #                             GNU Multi Precision                             #
@@ -670,8 +693,7 @@ esac
 
 repo=chroma
 print-fancy-heading $repo
-clone-if-needed https://github.com/JeffersonLab/chroma.git $repo devel
-
+clone-if-needed https://github.com/JeffersonLab/chroma.git $repo "$opt_chroma_branch"
 
 pushd $repo
 cflags="$base_cflags $openmp_flags"
@@ -679,14 +701,18 @@ cxxflags="$base_cxxflags $openmp_flags"
 autoreconf-if-needed
 popd
 
+# Select a default SoA length.
 case "$host" in
   jureca|hazelhen)
-    chroma_configure='--enable-qphix-solver-soalen=4'
+    soalen=4
     ;;
   marconi-a2)
-    chroma_configure='--enable-qphix-solver-soalen=8'
+    soalen=8
     ;;
 esac
+
+# Overwrite with the value that the user has chosen, if it is set.
+soalen=${opt_soalen-$soalen}
 
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
@@ -704,6 +730,7 @@ if ! [[ -f Makefile ]]; then
     --with-qphix-solver="$prefix" \
     --enable-qphix-solver-compress12 \
     --enable-qphix-solver-arch=$isa \
+    --enable-qphix-solver-soalen=$soalen \
     $chroma_configure \
     CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
