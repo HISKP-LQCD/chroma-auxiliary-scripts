@@ -81,12 +81,19 @@ Flags
     Git branch that should be used for QPhiX. (Default: ``devel``)
 
 ``-p PRECISION``
-    Working precision for QDP++ and Chroma. Can be either ``double`` (default)
-    or ``float``.
+    Working precision for QDP++ and Chroma. Can be either ``double`` or
+    ``float``. (Default: ``double``)
+
+``-P PRECISION``
+    Working precision for the *inner* solver in QPhiX. Can be either ``float``
+    or ``double`` or ``half``. (Default: ``float``)
 
 ``-s SOALEN``
-    Sets the SoA length that Chroma uses. For QPhiX, all variants will
-    be compiled and are available.
+    Sets the SoA length that Chroma uses. For QPhiX, all variants will be
+    compiled and are available. (Default: 4 on AVX2, 8 on KNL)
+
+``-S SOALEN``
+    Sets the SoA length that for the *inner* solver. (Default: 4)
 
 ``-V``
     Disable printing of Bash commands executed. By default every command

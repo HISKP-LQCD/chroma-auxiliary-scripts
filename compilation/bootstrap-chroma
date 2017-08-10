@@ -164,11 +164,12 @@ opt_only_qphix=false
 opt_qphix_branch=devel
 opt_verbose=true
 opt_precision=double
+opt_inner_precision=single
 
 # By default, all cores in the system are used for compilation.
 make_smp_flags="-j $(nproc)"
 
-while getopts cC:hj:qQ:p:s:V opt; do
+while getopts cC:hj:qQ:p:s:S:V opt; do
   case "$opt" in
     c)
       opt_compiler=$OPTARG
@@ -189,14 +190,32 @@ while getopts cC:hj:qQ:p:s:V opt; do
       opt_qphix_branch=$OPTARG
       ;;
     p)
-      if [[ "$OPTARG" != "double" ]] || [[ "$OPTARG" != "single" ]]; then
-        echo "The precision must be 'single' or 'double'."
-        exit 1
-      fi
-      opt=precision=$OPTARG
+      case "$OPTARG" in
+        f|float|single|d|double)
+          opt_precision=$OPTARG
+          ;;
+        *)
+          echo "The precision must be 'single' or 'double'."
+          exit 1
+          ;;
+      esac
+      ;;
+    P)
+      case "$OPTARG" in
+        h|half|f|float|single|d|double)
+          opt_inner_precision=$OPTARG
+          ;;
+        *)
+          echo "The precision must be 'single' or 'double'."
+          exit 1
+          ;;
+      esac
       ;;
     s)
       opt_soalen=$OPTARG
+      ;;
+    S)
+      opt_inner_soalen=$OPTARG
       ;;
     V)
       opt_verbose=false
@@ -416,7 +435,7 @@ PATH=$prefix/bin:$PATH
 # will not alter the compilers, therefore.
 base_cxxflags="$base_flags"
 base_cflags="$base_flags $c99_flags"
-base_configure="--prefix=$prefix CC=$(which $cc_name) CXX=$(which $cxx_name)"
+base_configure="--prefix=$prefix CC=$(which $cc_name) CXX=$(which $cxx_name) --enable-option-checking"
 
 case "$host" in
   hazelhen)
@@ -713,14 +732,17 @@ popd
 case "$host" in
   jureca|hazelhen)
     soalen=4
+    inner_soalen=4
     ;;
   marconi-a2)
     soalen=8
+    inner_soalen=4
     ;;
 esac
 
 # Overwrite with the value that the user has chosen, if it is set.
 soalen=${opt_soalen-$soalen}
+inner_soalen=${opt_inner_soalen-$inner_soalen}
 
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
@@ -739,6 +761,8 @@ if ! [[ -f Makefile ]]; then
     --enable-qphix-solver-compress12 \
     --enable-qphix-solver-arch=$isa \
     --enable-qphix-solver-soalen=$soalen \
+    --enable-qphix-solver-inner-soalen=$inner_soalen \
+    --enable-qphix-solver-inner-type=$inner_precision \
     CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
