@@ -5,10 +5,10 @@ directory are the result of several months of fiddling with compiler options
 and dependencies.
 
 Use the `bootstrap-chroma` script and have a look into its [manual page
-`bootstrap-chroma.1.md`](bootstrap-chroma.1.md). If you like, you can convert
+`bootstrap-chroma.1.rst`](bootstrap-chroma.1.rst). If you like, you can convert
 this into a manpage using Pandoc:
 
-    pandoc -s bootstrap-chroma.1.md -o bootstrap-chroma.1
+    pandoc -s bootstrap-chroma.1.rst -o bootstrap-chroma.1
     man -l bootstrap-chroma.1
 
 Compilation on JUQUEEN (Blue Gene/Q) had been tried, it does not make much
