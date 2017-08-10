@@ -163,11 +163,12 @@ opt_chroma_branch=devel
 opt_only_qphix=false
 opt_qphix_branch=devel
 opt_verbose=true
+opt_precision=double
 
 # By default, all cores in the system are used for compilation.
 make_smp_flags="-j $(nproc)"
 
-while getopts cC:hj:qQ:s:V opt; do
+while getopts cC:hj:qQ:p:s:V opt; do
   case "$opt" in
     c)
       opt_compiler=$OPTARG
@@ -186,6 +187,13 @@ while getopts cC:hj:qQ:s:V opt; do
       ;;
     Q)
       opt_qphix_branch=$OPTARG
+      ;;
+    p)
+      if [[ "$OPTARG" != "double" ]] || [[ "$OPTARG" != "single" ]]; then
+        echo "The precision must be 'single' or 'double'."
+        exit 1
+      fi
+      opt=precision=$OPTARG
       ;;
     s)
       opt_soalen=$OPTARG
@@ -534,7 +542,7 @@ if ! [[ -f Makefile ]]; then
     --enable-sse --enable-sse2 \
     --enable-parallel-arch=parscalar \
     --enable-parallel-io \
-    --enable-precision=double \
+    --enable-precision=$precision \
     --with-libxml2="$libxml" \
     --with-qmp="$prefix" \
     CFLAGS="$cflags" CXXFLAGS="$cxxflags"
@@ -721,7 +729,7 @@ if ! [[ -f Makefile ]]; then
     --enable-openmp \
     --enable-parallel-arch=parscalar \
     --enable-parallel-io \
-    --enable-precision=double \
+    --enable-precision=$precision \
     --enable-qdp-alignment=128 \
     --enable-sse2 \
     --with-gmp="$gmp" \

@@ -80,6 +80,10 @@ Flags
 ``-Q BRANCH``
     Git branch that should be used for QPhiX. (Default: ``devel``)
 
+``-p PRECISION``
+    Working precision for QDP++ and Chroma. Can be either ``double`` (default)
+    or ``float``.
+
 ``-s SOALEN``
     Sets the SoA length that Chroma uses. For QPhiX, all variants will
     be compiled and are available.
