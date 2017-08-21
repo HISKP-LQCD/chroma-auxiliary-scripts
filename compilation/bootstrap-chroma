@@ -474,7 +474,7 @@ case "$host" in
     fi
 
     pushd "$repo"
-    if [[ -f Makefile ]]; then
+    if ! [[ -f Makefile ]]; then
       ./bootstrap --prefix="$prefix"
     fi
     make-make-install
