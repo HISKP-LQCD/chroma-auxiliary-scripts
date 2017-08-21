@@ -345,7 +345,7 @@ case "$compiler" in
         # system loads the right one of these wrappers.
         cc_name=cc
         cxx_name=CC
-        host_cxx=g++
+        host_cxx=icpc
         base_flags="-xAVX2 -O3"
         ;;
       marconi-a2)
