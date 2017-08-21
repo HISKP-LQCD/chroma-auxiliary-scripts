@@ -40,6 +40,15 @@ set -u
 #                                  Functions                                  #
 ###############################################################################
 
+# Disables output of commands for the given command. This is useful for
+# `module` commands because they are all sourced and pollute the screen.
+silent() {
+  set +x
+  echo "+[${SECONDS}s] $*"
+  "$@"
+  set -x
+}
+
 print-help() {
     cat <<EOF
 Usage: $0 [OPTIONS] BASE
@@ -55,10 +64,7 @@ EOF
 # output and checks for the word `error` case insensitively. The function will
 # then fail.
 checked-module-load() {
-  set +x
-  echo "+ module load $1"
-  module load "$@" 2>&1 > module-load-output.txt
-  set -x
+  silent module load "$@" 2>&1 > module-load-output.txt
   cat module-load-output.txt
   if grep -i error module-load-output.txt; then
     echo "There has been some error while loading module $1, aborting"
@@ -318,29 +324,25 @@ case "$compiler" in
 
     case "$host" in
       jureca)
-        set +x
         checked-module-load Intel/2017.2.174-GCC-5.4.0
         checked-module-load IntelMPI/2017.2.174
-        module list
-        set -x
+        silent module list
         cc_name=mpiicc
         cxx_name=mpiicpc
         host_cxx=icpc
         base_flags="-xAVX2 -O3"
         ;;
       hazelhen)
-        set +x
         # On Hazel Hen, the default compiler is the Cray compiler. One needs to
         # unload that and load the Intel programming environment. That should
         # also load the Intel MPI implementation.
-        module swap PrgEnv-cray PrgEnv-intel
+        silent module swap PrgEnv-cray PrgEnv-intel
         # If one does not load a newer GCC version, the modern Intel compiler
         # will use the GCC 4.3 standard library. That however does not support
         # C++11 such that it will not work.
         checked-module-load gcc/6.3.0
         checked-module-load intel/17.0.2.174
-        module list
-        set -x
+        silent module list
         # On this system, the compiler is always the same because the module
         # system loads the right one of these wrappers.
         cc_name=cc
@@ -349,11 +351,9 @@ case "$compiler" in
         base_flags="-xAVX2 -O3"
         ;;
       marconi-a2)
-        set +x
         checked-module-load intel/pe-xe-2017--binary
         checked-module-load intelmpi
-        module list
-        set -x
+        silent module list
         cc_name=mpiicc
         cxx_name=mpiicpc
         host_cxx=icpc
@@ -372,30 +372,24 @@ case "$compiler" in
 
     case "$host" in
       jureca)
-        set +x
         checked-module-load GCC
         checked-module-load ParaStationMPI
-        module list
-        set -x
+        silent module list
         cc_name=mpicc
         cxx_name=mpic++
         base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
         ;;
       hazelhen)
-        set +x
-        module swap PrgEnv-cray PrgEnv-gnu
-        module list
-        set -x
+        silent module swap PrgEnv-cray PrgEnv-gnu
+        silent module list
         cc_name=cc
         cxx_name=CC
         base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
         ;;
       marconi-a2)
-        set +x
         checked-module-load gnu
         checked-module-load ParaStationMPI
-        module list
-        set -x
+        silent module list
         cc_name=mpicc
         cxx_name=mpic++
         base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=knl"
@@ -497,9 +491,7 @@ case "$host" in
       pushd m4
       ln -fs /usr/share/aclocal/pkg.m4 .
       popd
-      set +x
       checked-module-load Autotools
-      set -x
       NOCONFIGURE=yes ./autogen.sh
     fi
     popd
@@ -585,18 +577,16 @@ case $host in
   hazelhen)
     checked-module-load tools/python
 
-    set +x
-    module list
-    set -x
+    silent module list
 
     # On Hazel Hen, the CMake module is only available in the GNU programming
     # environment. This is bad for us because we need to have the MPI enabled
     # Intel C++ compiler available to compile for the target. Therefore this is
     # an ugly hack to retrieve the CMake path and add it to our `PATH`
     # variable.
-    module swap PrgEnv-intel PrgEnv-gnu
+    silent module swap PrgEnv-intel PrgEnv-gnu
     PATH=$(dirname $(which cmake)):$PATH
-    module swap PrgEnv-gnu PrgEnv-intel
+    silent module swap PrgEnv-gnu PrgEnv-intel
 
     python_library=/opt/hlrs/tools/python/anaconda3-4.2.0/lib/libpython3.so
     python_include_dir=/opt/hlrs/tools/python/anaconda3-4.2.0/include
