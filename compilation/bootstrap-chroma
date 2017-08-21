@@ -475,8 +475,7 @@ case "$host" in
 
     pushd "$repo"
     ./bootstrap --prefix="$prefix"
-    make $make_smp_flags
-    make install
+    make-make-install
     popd
     ;;
 esac
