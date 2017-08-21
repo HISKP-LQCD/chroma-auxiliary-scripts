@@ -46,14 +46,23 @@ def main():
         print('- {} {}'.format(job_id, job_name))
     print()
 
+    commands = []
+
+    for job_id, job_name in sorted(my_cpu_jobs):
+        command = []
+        if options.action == 'hold':
+            command.append('qhold')
+        elif options.action == 'release':
+            command.append('qrls')
+        command.append(str(job_id))
+        commands.append(command)
+
+    print('The following commands will be executed:')
+    for command in commands:
+        print(' '.join(command))
+
     if options.armed:
-        for job_id, job_name in sorted(my_cpu_jobs):
-            command = ['echo']
-            if options.action == 'hold':
-                command.append('qhold')
-            elif options.action == 'release':
-                command.append('qrls')
-            command.append(str(job_id))
+        for command in commands:
             subprocess.check_call(command)
     else:
         print('Nothing has been done. Run the script again with `--armed` in order to actually perform the actions.')
