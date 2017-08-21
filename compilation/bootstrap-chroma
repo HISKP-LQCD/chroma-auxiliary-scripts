@@ -579,6 +579,10 @@ case $host in
 
     silent module list
 
+    # Record the version of the system wide CMake installation.
+    cmake_version_file_before="$(mktemp)"
+    cmake --version > "$cmake_version_file_before"
+
     # On Hazel Hen, the CMake module is only available in the GNU programming
     # environment. This is bad for us because we need to have the MPI enabled
     # Intel C++ compiler available to compile for the target. Therefore this is
@@ -587,6 +591,24 @@ case $host in
     silent module swap PrgEnv-intel PrgEnv-gnu
     PATH=$(dirname $(which cmake)):$PATH
     silent module swap PrgEnv-gnu PrgEnv-intel
+
+    # Test out whether we have a different version of CMake installed.
+    cmake_version_file_after="$(mktemp)"
+    cmake --version > "$cmake_version_file_after"
+    if ! diff "$cmake_version_file_before" "$cmake_version_file_after"; then
+      set +x
+      echo 'The versions of CMake did not change by the PATH mangling.'
+      echo
+      echo 'Old version:'
+      cat "$cmake_version_file_before"
+      echo
+      echo 'New version:'
+      cat "$cmake_version_file_after"
+      exit 1
+    fi
+
+    rm "$cmake_version_file_before"
+    rm "$cmake_version_file_after"
 
     python_library=/opt/hlrs/tools/python/anaconda3-4.2.0/lib/libpython3.so
     python_include_dir=/opt/hlrs/tools/python/anaconda3-4.2.0/include
