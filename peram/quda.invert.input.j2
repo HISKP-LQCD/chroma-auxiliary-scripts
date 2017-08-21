@@ -1,7 +1,7 @@
 ompnumthreads = 1
 
-L=16
-T=32
+L= {{ L }}
+T= {{ T }}
 
 DisableIOChecks = no
 DebugLevel = 2
@@ -29,6 +29,10 @@ NoSamples = 1
 
 ranluxdlevel=2
 reproducerandomnumbers=no
+
+BeginExternalInverter QUDA                                                      
+  FermionBC = apbc                                                              
+EndExternalInverter
 
 BeginOperator CLOVER
   2kappamu = 0.0

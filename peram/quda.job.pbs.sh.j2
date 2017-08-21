@@ -13,6 +13,10 @@ outfile={{ outfile }}
 infile={{ laphin }}
 export QUDA_RESOURCE_PATH={{ quda_rsc_path }}
 
+export PATH=/qbigwork/gcc-4.9.3/bin:$PATH
+export LD_LIBRARY_PATH=/qbigwork/gcc-4.9.3/lib:$LD_LIBRARY_PATH                 
+
+
 cd ${rundir}
 date > ${outfile}
 mpirun.openmpi -x QUDA_RESOURCE_PATH -x OMP_NUM_THREADS=1 -np 4 -npersocket 2 \

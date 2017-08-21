@@ -5,10 +5,10 @@ config = {{ i }}
 total number of configs = 1
 distance between configs = 8
 
-Ls = 16
-Lt = 32
+Ls = {{ L }}
+Lt = {{ T }}
 
-nb_ev = 32
+nb_ev = {{ nb_ev }}
 
 nb_rnd = 1
 id {{ rv }} seed {{ seed }}
@@ -31,9 +31,9 @@ nb_of_sink_rnd_vec = 1
 seed = 0
 
 inversion_sink_type_t   = F
-inversion_sink_number_t = 32
+inversion_sink_number_t = {{ T }}
 inversion_sink_type_s   = F
-inversion_sink_number_s = 16
+inversion_sink_number_s = {{ L }}
 inversion_sink_type_d   = F
 inversion_sink_number_d = 4
 inversion_sink_type_c   = F
