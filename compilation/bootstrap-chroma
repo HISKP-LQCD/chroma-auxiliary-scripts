@@ -421,6 +421,8 @@ mkdir -p "$build"
 # in the `$PATH`, otherwise libraries cannot be found properly. In principle it
 # should be sufficient to pass the installation path to the `configure` scripts
 # but this has not always worked properly, therefore this additional thing.
+# Additionally we might install auxiliary software like CMake on some systems,
+# we want it to be preferred over the system-wide installed versions.
 PATH=$prefix/bin:$PATH
 
 # Basic flags that will be used for all compilations. The full path to the C
