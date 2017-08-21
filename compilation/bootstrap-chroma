@@ -44,7 +44,6 @@ set -u
 # `module` commands because they are all sourced and pollute the screen.
 silent() {
   set +x
-  echo "+[${SECONDS}s] $*"
   "$@"
   set -x
 }
