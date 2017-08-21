@@ -588,6 +588,7 @@ case $host in
     # an ugly hack to retrieve the CMake path and add it to our `PATH`
     # variable.
     silent module swap PrgEnv-intel PrgEnv-gnu
+    silent module load tools/cmake
     PATH=$(dirname $(which cmake)):$PATH
     silent module swap PrgEnv-gnu PrgEnv-intel
 
