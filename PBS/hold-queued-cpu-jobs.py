@@ -60,7 +60,7 @@ def main():
     print('The following commands will be executed:')
     for command in commands:
         print(' '.join(command))
-        print()
+    print()
 
     if options.armed:
         for command in commands:
