@@ -64,6 +64,7 @@ def main():
 
     if options.armed:
         for command in commands:
+            print(' '.join(command))
             subprocess.check_call(command)
     else:
         print('Nothing has been done. Run the script again with `--armed` in order to actually perform the actions.')
@@ -76,7 +77,7 @@ def _parse_args():
     :return: Namespace with arguments.
     :rtype: Namespace
     '''
-    parser = argparse.ArgumentParser(description='')
+    parser = argparse.ArgumentParser(description='Holds or releases all PBS jobs that do not use GPUs.')
     parser.add_argument('action', choices=['hold', 'release'])
     parser.add_argument('--armed', action='store_true', help='Actually change the job states')
     parser.add_argument('--user', default=os.getlogin(), help='Username. Default: %(default)s')
