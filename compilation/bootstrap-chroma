@@ -598,14 +598,14 @@ case $host in
     cat "$cmake_version_file_before"
     cat "$cmake_version_file_after"
 
-    if ! diff "$cmake_version_file_before" "$cmake_version_file_after"; then
+    if diff "$cmake_version_file_before" "$cmake_version_file_after"; then
       set +x
       echo 'The versions of CMake did not change by the PATH mangling.'
       exit 1
     fi
 
-    #rm "$cmake_version_file_before"
-    #rm "$cmake_version_file_after"
+    rm "$cmake_version_file_before"
+    rm "$cmake_version_file_after"
 
     python_library=/opt/hlrs/tools/python/anaconda3-4.2.0/lib/libpython3.so
     python_include_dir=/opt/hlrs/tools/python/anaconda3-4.2.0/include
