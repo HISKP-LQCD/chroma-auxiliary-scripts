@@ -583,17 +583,20 @@ case $host in
     checked-module-load Python
     ;;
   hazelhen)
-    # Hazel Hen has the quirk that a modern version of CMake can only be loaded
-    # in the GNU programming environment. So here we switch to the GNU
-    # environment, just to be able to _use_ a non-ancient version of CMake.
-    set +x
-    module swap PrgEnv-intel PrgEnv-gnu
-    set -x
-    checked-module-load tools/cmake
     checked-module-load tools/python
+
     set +x
     module list
     set -x
+
+    # On Hazel Hen, the CMake module is only available in the GNU programming
+    # environment. This is bad for us because we need to have the MPI enabled
+    # Intel C++ compiler available to compile for the target. Therefore this is
+    # an ugly hack to retrieve the CMake path and add it to our `PATH`
+    # variable.
+    module swap PrgEnv-intel PrgEnv-gnu
+    PATH=$(dirname $(which cmake)):$PATH
+    module swap PrgEnv-gnu PrgEnv-intel
 
     python_library=/opt/hlrs/tools/python/anaconda3-4.2.0/lib/libpython3.so
     python_include_dir=/opt/hlrs/tools/python/anaconda3-4.2.0/include
