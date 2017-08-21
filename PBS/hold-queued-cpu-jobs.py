@@ -16,7 +16,7 @@ def main():
     qstat_xml = subprocess.check_output(['qstat', '-x'])
 
     tree = ET.fromstring(qstat_xml)
-    root = tree.getroot()
+    root = tree
 
     my_cpu_jobs = []
 
