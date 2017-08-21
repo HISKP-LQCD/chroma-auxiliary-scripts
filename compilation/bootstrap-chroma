@@ -458,8 +458,22 @@ cd "$sourcedir"
 # version of CMake works, but then it cannot load the GNU standard library.
 # Therefore we probably have to install CMake by hand, *sigh*.
 
+repo=cmake
+print-fancy-heading $repo
+
 case "$host" in
   hazelhen)
+    # Download CMake and unpack it.
+    if ! [[ -d "$repo" ]];
+    then
+      url=https://cmake.org/files/v3.9/cmake-3.9.1.tar.gz
+
+      wget "$url"
+      tar -xf "${url##*/}"
+      mv cmake-3.9.1 cmake
+    fi
+
+    exit 1
     ;;
 esac
 
