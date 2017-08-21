@@ -449,6 +449,21 @@ esac
 cd "$sourcedir"
 
 ###############################################################################
+#                                    CMake                                    #
+###############################################################################
+
+# Hazel Hen only has version 2.6 of CMake which is too old for us. There is a
+# newer version, but that can only be used when the GNU compiler is loaded. It
+# does not work with the Intel compiler. Trying to find the path of the modern
+# version of CMake works, but then it cannot load the GNU standard library.
+# Therefore we probably have to install CMake by hand, *sigh*.
+
+case "$host" in
+  hazelhen)
+    ;;
+esac
+
+###############################################################################
 #                                     QMP                                     #
 ###############################################################################
 
@@ -588,9 +603,12 @@ case $host in
     # an ugly hack to retrieve the CMake path and add it to our `PATH`
     # variable.
     silent module swap PrgEnv-intel PrgEnv-gnu
+    global_gnu_version="$GNU_VERSION"
     silent module load tools/cmake
     PATH=$(dirname $(which cmake)):$PATH
     silent module swap PrgEnv-gnu PrgEnv-intel
+
+    export GNU_VERSION="$global_gnu_version"
 
     # Test out whether we have a different version of CMake installed.
     cmake_version_file_after="$(mktemp)"
