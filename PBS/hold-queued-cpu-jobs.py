@@ -13,7 +13,9 @@ import xml.etree.ElementTree as ET
 def main():
     options = _parse_args()
 
-    tree = ET.parse('qstat.xml')
+    qstat_xml = subprocess.check_output(['qstat', '-x'])
+
+    tree = ET.fromstring(qstat_xml)
     root = tree.getroot()
 
     my_cpu_jobs = []
@@ -42,8 +44,9 @@ def main():
     print('Found the following jobs that do not use GPUs and are in state “Q”:')
     for job_id, job_name in sorted(my_cpu_jobs):
         print('- {} {}'.format(job_id, job_name))
+    print()
 
-    if not options.dry:
+    if options.armed:
         for job_id, job_name in sorted(my_cpu_jobs):
             command = ['echo']
             if options.action == 'hold':
@@ -52,6 +55,8 @@ def main():
                 command.append('qrls')
             command.append(str(job_id))
             subprocess.check_call(command)
+    else:
+        print('Nothing has been done. Run the script again with `--armed` in order to actually perform the actions.')
 
 
 def _parse_args():
@@ -63,7 +68,7 @@ def _parse_args():
     '''
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('action', choices=['hold', 'release'])
-    parser.add_argument('--dry', action='store_true')
+    parser.add_argument('--armed', action='store_true', help='Actually change the job states')
     parser.add_argument('--user', default=os.getlogin(), help='Username. Default: %(default)s')
     options = parser.parse_args()
 
