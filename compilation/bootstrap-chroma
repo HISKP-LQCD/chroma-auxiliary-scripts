@@ -174,7 +174,7 @@ opt_inner_precision=single
 # By default, all cores in the system are used for compilation.
 make_smp_flags="-j $(nproc)"
 
-while getopts cC:hj:qQ:p:P:s:S:V opt; do
+while getopts c:C:hj:qQ:p:P:s:S:V opt; do
   case "$opt" in
     c)
       opt_compiler=$OPTARG
