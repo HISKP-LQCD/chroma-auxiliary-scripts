@@ -473,7 +473,11 @@ case "$host" in
       mv cmake-3.9.1 cmake
     fi
 
-    exit 1
+    pushd "$repo"
+    ./bootstrap --prefix="$prefix"
+    make $make_smp_flags
+    make install
+    popd
     ;;
 esac
 
