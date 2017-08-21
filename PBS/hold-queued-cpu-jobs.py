@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Copyright © 2017 Martin Ueding <dev@martin-ueding.de>
+# Licensed under the MIT/Expat license.
+
+import argparse
+import os
+import subprocess
+import xml.etree.ElementTree as ET
+
+
+def main():
+    options = _parse_args()
+
+    tree = ET.parse('qstat.xml')
+    root = tree.getroot()
+
+    my_cpu_jobs = []
+
+    for job in root.findall('.//Job'):
+        job_id = job.find('Job_Id').text
+        job_state = job.find('job_state').text
+        job_name = job.find('Job_Name').text
+
+        if job_state == {'hold': 'Q', 'release': 'H'}[options.action]:
+            nodes = job.findall('Resource_List/nodes')
+            is_cpu_job = True
+            for node in nodes:
+                words = node.text.split(':')
+                if any(word.startswith('gpus=') for word in words):
+                    is_cpu_job = False
+
+
+            if is_cpu_job:
+                my_cpu_jobs.append((job_id, job_name))
+
+    if len(my_cpu_jobs) == 0:
+        print('No jobs founds.')
+        return
+
+    print('Found the following jobs that do not use GPUs and are in state “Q”:')
+    for job_id, job_name in sorted(my_cpu_jobs):
+        print('- {} {}'.format(job_id, job_name))
+
+    if not options.dry:
+        for job_id, job_name in sorted(my_cpu_jobs):
+            command = ['echo']
+            if options.action == 'hold':
+                command.append('qhold')
+            elif options.action == 'release':
+                command.append('qrls')
+            command.append(str(job_id))
+            subprocess.check_call(command)
+
+
+def _parse_args():
+    '''
+    Parses the command line arguments.
+
+    :return: Namespace with arguments.
+    :rtype: Namespace
+    '''
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('action', choices=['hold', 'release'])
+    parser.add_argument('--dry', action='store_true')
+    parser.add_argument('--user', default=os.getlogin(), help='Username. Default: %(default)s')
+    options = parser.parse_args()
+
+    return options
+
+
+if __name__ == '__main__':
+    main()
