@@ -595,15 +595,13 @@ case $host in
     # Test out whether we have a different version of CMake installed.
     cmake_version_file_after="$(mktemp)"
     cmake --version > "$cmake_version_file_after"
+
+    cat "$cmake_version_file_before"
+    cat "$cmake_version_file_after"
+
     if ! diff "$cmake_version_file_before" "$cmake_version_file_after"; then
       set +x
       echo 'The versions of CMake did not change by the PATH mangling.'
-      echo
-      echo 'Old version:'
-      cat "$cmake_version_file_before"
-      echo
-      echo 'New version:'
-      cat "$cmake_version_file_after"
       exit 1
     fi
 
