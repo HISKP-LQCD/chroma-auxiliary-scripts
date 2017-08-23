@@ -498,9 +498,10 @@ repo=qmp
 print-fancy-heading $repo
 clone-if-needed https://github.com/usqcd-software/qmp.git $repo master
 
-pushd $repo
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags"
+
+pushd $repo
 autoreconf-if-needed
 popd
 
@@ -524,9 +525,10 @@ case "$host" in
     print-fancy-heading $repo
     clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
 
-    pushd $repo
     cflags="$base_cflags"
     cxxflags="$base_cxxflags"
+
+    pushd $repo
     if ! [[ -f configure ]]; then
       mkdir -p m4
       pushd m4
@@ -580,9 +582,10 @@ repo=qdpxx
 print-fancy-heading $repo
 clone-if-needed https://github.com/usqcd-software/qdpxx.git $repo devel
 
-pushd $repo
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
+
+pushd $repo
 autoreconf-if-needed
 popd
 
@@ -718,9 +721,10 @@ case "$host" in
       mv gmp-6.1.2 gmp
     fi
 
-    pushd "$repo"
     cflags="$base_cflags"
     cxxflags="$base_cxxflags"
+
+    pushd "$repo"
     autoreconf-if-needed
     popd
 
@@ -745,9 +749,10 @@ repo=chroma
 print-fancy-heading $repo
 clone-if-needed https://github.com/JeffersonLab/chroma.git $repo "$opt_chroma_branch"
 
-pushd $repo
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags"
+
+pushd $repo
 autoreconf-if-needed
 popd
 
