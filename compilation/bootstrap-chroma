@@ -470,11 +470,11 @@ print-fancy-heading $repo
 case "$host" in
   hazelhen)
     # Download CMake and unpack it.
-    if ! [[ -d "$repo" ]];
-    then
-      url=https://cmake.org/files/v3.9/cmake-3.9.1.tar.gz
-
+    url=https://cmake.org/files/v3.9/cmake-3.9.1.tar.gz
+    if ! [[ -f "${url##*/}" ]]; then
       wget "$url"
+    fi
+    if ! [[ -d "$repo" ]]; then
       tar -xf "${url##*/}"
       mv cmake-3.9.1 cmake
     fi
