@@ -116,9 +116,11 @@ make-make-install() {
     nice make $make_smp_flags VERBOSE=1
     make install VERBOSE=1
     touch build-succeeded
-    pushd $prefix/lib
-    rm -f *.so *.so.*
-    popd
+    if [[ -d "$prefix/lib" ]]; then
+      pushd "$prefix/lib"
+      rm -f *.so *.so.*
+      popd
+    fi
   fi
 }
 
