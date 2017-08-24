@@ -24,9 +24,10 @@ def main():
         job_id = job.find('Job_Id').text
         job_state = job.find('job_state').text
         job_name = job.find('Job_Name').text
+        job_owner = job.find('Job_Owner').text
 
         # Skip other people's jobs.
-        if not job_name.startswith(options.user):
+        if not job_owner.startswith(options.user):
             continue
 
         if job_state == {'hold': 'Q', 'release': 'H'}[options.action]:
