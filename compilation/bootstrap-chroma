@@ -634,14 +634,22 @@ set +x
 module list
 set -x
 
-# Check whether Python 3 interpreter is there.
+# Check whether Python 3 interpreter is there. The following calls Python 3 and
+# lets it do explicitly nothing. That must always work. Then we output the path
+# for reference.
 python3 -c ''
 which python3
 
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
 cxx=$(which $cxx_name)
 
-# https://stackoverflow.com/a/38121972
+
+# Due to the module system, the `python3` executable can be found in the
+# `$PATH`, but somehow CMake cannot find what it needs. Therefore we need to
+# set those paths manually. Fortunately we can [use Python to give this to
+# us](https://stackoverflow.com/a/38121972) and pass that on to CMake.
+cmake_python_include_dir="$(python3 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")"
+cmake_python_library="$(python3 -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")"
 
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
@@ -660,8 +668,8 @@ if ! [[ -f Makefile ]]; then
     -Dcean=FALSE \
     -Dmm_malloc=TRUE \
     -Dtesting=TRUE \
-    -DPYTHON_INCLUDE_DIR="$(python3 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")"  \
-    -DPYTHON_LIBRARY="$(python3 -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")" \
+    -DPYTHON_INCLUDE_DIR="$cmake_python_include_dir"  \
+    -DPYTHON_LIBRARY="$cmake_python_library" \
     $sourcedir/$repo
 fi
 make-make-install
