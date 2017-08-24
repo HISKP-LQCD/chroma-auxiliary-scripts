@@ -25,6 +25,10 @@ def main():
         job_state = job.find('job_state').text
         job_name = job.find('Job_Name').text
 
+        # Skip other people's jobs.
+        if not job_name.startswith(options.user):
+            continue
+
         if job_state == {'hold': 'Q', 'release': 'H'}[options.action]:
             nodes = job.findall('Resource_List/nodes')
             is_cpu_job = True
