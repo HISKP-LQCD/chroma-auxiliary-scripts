@@ -166,6 +166,8 @@ autoreconf-if-needed() {
 #                           Command Line Arguments                            #
 ###############################################################################
 
+opt_machine=""
+opt_isa=""
 opt_chroma_branch=devel
 opt_only_qphix=false
 opt_qphix_branch=devel
@@ -176,8 +178,11 @@ opt_inner_precision=single
 # By default, all cores in the system are used for compilation.
 make_smp_flags="-j $(nproc)"
 
-while getopts c:C:hj:qQ:p:P:s:S:V opt; do
+while getopts i:m:c:C:hj:qQ:p:P:s:S:V opt; do
   case "$opt" in
+    m)
+      opt_machine="$OPTARG"
+      ;;
     c)
       opt_compiler=$OPTARG
       ;;
@@ -189,6 +194,9 @@ while getopts c:C:hj:qQ:p:P:s:S:V opt; do
       ;;
     j)
       make_smp_flags="-j $OPTARG"
+      ;;
+    i)
+      opt_isa=$OPTARG
       ;;
     q)
       opt_only_qphix=true
@@ -273,7 +281,15 @@ export LC_ALL=C
 # Determine the fully qualified hostname and then set the optimal default
 # compiler for the architecture found.
 hostname_f="$(hostname -f)"
-if [[ "$hostname_f" =~ [^.]*\.hww\.de ]]; then
+if [[ "${opt_machine}" == "local" ]]; then
+  if [[ -z "${opt_isa}" ]]; then
+    echo "Builds on local machines require the -i option to be passed (ISA: avx, avx2, avx512)"
+    exit 1
+  fi
+  host=local
+  isa=${opt_isa}
+  compiler="${opt_compiler-gcc}"
+elif [[ "$hostname_f" =~ [^.]*\.hww\.de ]]; then
   host=hazelhen
   isa=avx2
   compiler="${opt_compiler-icc}"
@@ -292,7 +308,7 @@ elif [[ "$hostname_f" =~ [^.]*\.marconi.cineca.it ]]; then
   fi
 else
   set +x
-  echo "This machine is neither JURECA nor Hazel Hen nor Marconi A2. It is not clear what should be done, please update the script."
+  echo "This machine is neither explicitly a 'local' machine nor JURECA nor Hazel Hen nor Marconi A2. It is not clear what should be done, please update the script."
   exit 1
 fi
 
@@ -394,6 +410,11 @@ case "$compiler" in
         cc_name=mpicc
         cxx_name=mpic++
         base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=knl"
+        ;;
+      local)
+        cc_name=mpicc
+        cxx_name=mpic++
+        base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=native"
         ;;
     esac
     ;;
