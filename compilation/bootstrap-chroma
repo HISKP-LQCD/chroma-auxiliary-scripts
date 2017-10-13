@@ -394,6 +394,7 @@ case "$compiler" in
         silent module list
         cc_name=mpicc
         cxx_name=mpic++
+        host_cxx=g++
         base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
         ;;
       hazelhen)
@@ -401,6 +402,7 @@ case "$compiler" in
         silent module list
         cc_name=cc
         cxx_name=CC
+        host_cxx=g++
         base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
         ;;
       marconi-a2)
@@ -409,11 +411,13 @@ case "$compiler" in
         silent module list
         cc_name=mpicc
         cxx_name=mpic++
+        host_cxx=g++
         base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=knl"
         ;;
       local)
         cc_name=mpicc
         cxx_name=mpic++
+        host_cxx=g++
         base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=native"
         ;;
     esac
@@ -652,7 +656,9 @@ case $host in
 esac
 
 set +x
-module list
+if [[ "$host" != "local" ]]; then
+  module list
+fi
 set -x
 
 # Check whether Python 3 interpreter is there. The following calls Python 3 and
