@@ -590,7 +590,7 @@ case "$host" in
 
     libxml="$prefix/bin/xml2-config"
     ;;
-  hazelhen)
+  hazelhen|local)
     libxml="/usr/include/libxml2"
     ;;
 esac
