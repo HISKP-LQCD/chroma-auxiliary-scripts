@@ -4,7 +4,7 @@ ARG_OPTIONAL_BOOLEAN([verbose], [V], [Disable printing of Bash commands executed
 ARG_OPTIONAL_SINGLE([machine], [m], , )
 ARG_OPTIONAL_SINGLE([compiler], [c], [Compiler family to use.], [])
 ARG_OPTIONAL_SINGLE([chroma-branch], [C], , [devel])
-ARG_OPTIONAL_SINGLE(, [j], , )
+ARG_OPTIONAL_SINGLE([make-j], [j], , )
 ARG_OPTIONAL_SINGLE([isa], [i], , )
 ARG_OPTIONAL_SINGLE([only-qphix], [q], , [no])
 ARG_OPTIONAL_SINGLE([qphix-branch], [Q], , [devel])
