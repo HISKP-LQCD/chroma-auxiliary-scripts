@@ -915,7 +915,6 @@ which python3
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
 cxx=$(which $cxx_name)
 
-
 # Due to the module system, the `python3` executable can be found in the
 # `$PATH`, but somehow CMake cannot find what it needs. Therefore we need to
 # set those paths manually. Fortunately we can [use Python to give this to
@@ -985,7 +984,6 @@ case "$host" in
 
     repo=gmp
     print-fancy-heading $repo
-
 
     cflags="$base_cflags"
     cxxflags="$base_cxxflags"
