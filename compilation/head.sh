@@ -58,15 +58,15 @@ EOF
     exit 1
 }
 
-# The `module load` command does not set the exit status when it fails. Also it
+# The `module` command does not set the exit status when it fails. Also it
 # annoyingly outputs everything on standard error. This function parses the
 # output and checks for the word `error` case insensitively. The function will
 # then fail.
-checked-module-load() {
-  module load "$@" 2> module-load-output.txt
+checked-module() {
+  module "$@" 2> module-load-output.txt
   cat module-load-output.txt
   if grep -i error module-load-output.txt; then
-    echo "There has been some error while loading module $1, aborting"
+    echo "There has been some error with 'module $*', aborting"
     exit 1
   fi
   rm -f module-load-output.txt

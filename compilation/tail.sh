@@ -166,8 +166,8 @@ case "$compiler" in
 
     case "$host" in
       jureca)
-        checked-module-load Intel/2017.2.174-GCC-5.4.0
-        checked-module-load IntelMPI/2017.2.174
+        checked-module load Intel/2017.2.174-GCC-5.4.0
+        checked-module load IntelMPI/2017.2.174
         silent module list
         cc_name=mpiicc
         cxx_name=mpiicpc
@@ -178,12 +178,12 @@ case "$compiler" in
         # On Hazel Hen, the default compiler is the Cray compiler. One needs to
         # unload that and load the Intel programming environment. That should
         # also load the Intel MPI implementation.
-        silent module swap PrgEnv-cray PrgEnv-intel
+        checked-module swap PrgEnv-cray PrgEnv-intel
         # If one does not load a newer GCC version, the modern Intel compiler
         # will use the GCC 4.3 standard library. That however does not support
         # C++11 such that it will not work.
-        checked-module-load gcc/6.3.0
-        checked-module-load intel/17.0.2.174
+        checked-module load gcc/6.3.0
+        checked-module load intel/17.0.2.174
         silent module list
         # On this system, the compiler is always the same because the module
         # system loads the right one of these wrappers.
@@ -193,8 +193,8 @@ case "$compiler" in
         base_flags="-xAVX2 -O3"
         ;;
       marconi-a2)
-        checked-module-load intel/pe-xe-2017--binary
-        checked-module-load intelmpi
+        checked-module load intel/pe-xe-2017--binary
+        checked-module load intelmpi
         silent module list
         cc_name=mpiicc
         cxx_name=mpiicpc
@@ -214,8 +214,8 @@ case "$compiler" in
 
     case "$host" in
       jureca)
-        checked-module-load GCC
-        checked-module-load ParaStationMPI
+        checked-module load GCC
+        checked-module load ParaStationMPI
         silent module list
         cc_name=mpicc
         cxx_name=mpic++
@@ -231,8 +231,8 @@ case "$compiler" in
         base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
         ;;
       marconi-a2)
-        checked-module-load gnu
-        checked-module-load ParaStationMPI
+        checked-module load gnu
+        checked-module load ParaStationMPI
         silent module list
         cc_name=mpicc
         cxx_name=mpic++
@@ -368,7 +368,7 @@ case "$host" in
       pushd m4
       ln -fs /usr/share/aclocal/pkg.m4 .
       popd
-      checked-module-load Autotools
+      checked-module load Autotools
       NOCONFIGURE=yes ./autogen.sh
     fi
     popd
@@ -491,18 +491,18 @@ print-fancy-heading $repo
 
 case $host in
   jureca)
-    checked-module-load CMake
-    checked-module-load Python
+    checked-module load CMake
+    checked-module load Python
     ;;
   hazelhen)
-    checked-module-load tools/python
+    checked-module load tools/python
 
     python_library=/opt/hlrs/tools/python/anaconda3-4.2.0/lib/libpython3.so
     python_include_dir=/opt/hlrs/tools/python/anaconda3-4.2.0/include
     ;;
   marconi-a2)
-    checked-module-load cmake
-    checked-module-load python
+    checked-module load cmake
+    checked-module load python
     ;;
 esac
 
@@ -561,8 +561,8 @@ case $host in
   hazelhen)
     # Now we have to get our target programming environment back.
     module swap PrgEnv-gnu PrgEnv-intel
-    checked-module-load gcc/6.3.0
-    checked-module-load intel/17.0.2.174
+    checked-module load gcc/6.3.0
+    checked-module load intel/17.0.2.174
     ;;
 esac
 
@@ -576,7 +576,7 @@ print-fancy-heading $repo
 case "$host" in
   jureca)
     set +x
-    checked-module-load GMP
+    checked-module load GMP
     set -x
     gmp="$EBROOTGMP"
     ;;
