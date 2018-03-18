@@ -81,18 +81,14 @@ clone-if-needed() {
   local branch="$3"
 
   if ! [[ -d "$dir" ]]; then
-    case "$host" in
-      *)
-        git clone "$url" --recursive -b "$branch"
+      git clone "$url" --recursive -b "$branch"
 
-        pushd "$dir"
-        if [[ -f Makefile.am ]]; then
+      pushd "$dir"
+      if [[ -f Makefile.am ]]; then
           rm -f Makefile
-        fi
-        rm -f configure
-        popd
-        ;;
-    esac
+      fi
+      rm -f configure
+      popd
   fi
 }
 
@@ -150,3 +146,4 @@ autoreconf-if-needed() {
   fi
 }
 
+# vim: spell sts=2 sw=2

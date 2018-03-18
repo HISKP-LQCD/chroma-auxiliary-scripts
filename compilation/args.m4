@@ -38,15 +38,15 @@ After this script ran though, you will have the following directories::
 
 ARG_POSITIONAL_SINGLE([basedir], [Base path], [])
 
-ARG_OPTIONAL_BOOLEAN([verbose], [V], [Print Bash commands executed], [yes])
-ARG_OPTIONAL_BOOLEAN([download-only], [d], [Download only (for systems like Hazel Hen)], [no])
+ARG_OPTIONAL_BOOLEAN([verbose], [V], [Print Bash commands executed], [on])
+ARG_OPTIONAL_BOOLEAN([download-only], [d], [Download only (for systems like Hazel Hen)], [off])
 
-ARG_OPTIONAL_BOOLEAN([autodetect-machine], [m], [Automatically figure out which machine we are on], [yes])
+ARG_OPTIONAL_BOOLEAN([autodetect-machine], [m], [Automatically figure out which machine we are on], [on])
 ARG_OPTIONAL_SINGLE([compiler], [c], [Compiler family to use, defaults to best on given machine], [])
 ARG_OPTIONAL_SINGLE([make-j], [j], [Maximum number of parallel processes used by make], [$(nproc)])
 ARG_OPTIONAL_SINGLE([isa], [i], [Manual instruction set architecture (ISA), usually automatically set], )
 
-ARG_OPTIONAL_BOOLEAN([only-qphix], [q], [Only compile QPhiX, not Chroma], [no])
+ARG_OPTIONAL_BOOLEAN([only-qphix], [q], [Only compile QPhiX, not Chroma], [off])
 ARG_OPTIONAL_SINGLE([qphix-branch], [Q], [QPhiX git branch], [devel])
 ARG_OPTIONAL_SINGLE([precision], [p], [Precision of solver, can be "double", "float"], [double])
 ARG_OPTIONAL_SINGLE([precision-inner], [P], [Precision of inner solver, can be "double", "float" or "half"], [single])

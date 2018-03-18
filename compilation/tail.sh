@@ -8,7 +8,7 @@
 # will give some feeling for the time it needs to compile.
 PS4='+[${SECONDS}s] '
 
-if [[ "$_arg_verbose" = "true" ]]; then
+if [[ "$_arg_verbose" = on ]]; then
   set -x
 fi
 
@@ -40,6 +40,7 @@ export LC_ALL=C
 pushd "$sourcedir"
 
 # CMake
+repo=cmake
 url=https://cmake.org/files/v3.9/cmake-3.9.1.tar.gz
 if ! [[ -f "${url##*/}" ]]; then
   wget "$url"
@@ -50,18 +51,23 @@ if ! [[ -d "$repo" ]]; then
 fi
 
 # QMP
+repo=qmp
 clone-if-needed https://github.com/usqcd-software/qmp.git $repo master
 
 # libxml2
+repo=libxml2
 clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
 
 # QDP++
+repo=qdpxx
 clone-if-needed https://github.com/usqcd-software/qdpxx.git $repo devel
 
 # QPhiX
+repo=qphix
 clone-if-needed https://github.com/JeffersonLab/qphix.git $repo "$_arg_qphix_branch"
 
 # GNU MP
+repo=gmp
 if ! [[ -d "$repo" ]];
 then
   # The upstream website only has a download as an LZMA compressed file. The
@@ -78,9 +84,10 @@ then
 fi
 
 # Chroma
+repo=chroma
 clone-if-needed https://github.com/JeffersonLab/chroma.git $repo "$_arg_chroma_branch"
 
-if [[ "$_arg_download_only" = "yes" ]]; then
+if [[ "$_arg_download_only" = on]]; then
   set +x
   echo "User wanted do download only, we are done here."
   exit 0
@@ -96,7 +103,7 @@ popd
 # compiler for the architecture found.
 hostname_f="$(hostname -f)"
 
-if [[ "$_arg_autodetect_machine" = "no" ]]; then
+if [[ "$_arg_autodetect_machine" = off ]]; then
   if [[ -z "$_arg_isa" ]]; then
     echo "Builds on local machines require the -i option to be passed (ISA: avx, avx2, avx512)"
     exit 1
