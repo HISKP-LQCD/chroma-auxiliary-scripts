@@ -63,7 +63,7 @@ EOF
 # output and checks for the word `error` case insensitively. The function will
 # then fail.
 checked-module() {
-  module "$@" 2> module-load-output.txt
+  silent module "$@" 2> module-load-output.txt
   cat module-load-output.txt
   if grep -i error module-load-output.txt; then
     set +x
@@ -625,8 +625,7 @@ case "$compiler" in
         # If one does not load a newer GCC version, the modern Intel compiler
         # will use the GCC 4.3 standard library. That however does not support
         # C++11 such that it will not work.
-        checked-module load gcc/6.3.0
-        checked-module load intel/17.0.2.174
+        checked-module load intel/17.0.6.256
         silent module list
         # On this system, the compiler is always the same because the module
         # system loads the right one of these wrappers.
@@ -999,15 +998,6 @@ if [[ "$_arg_only_qphix" = "true" ]]; then
   echo "QPhiX is installed, user wished to abort here."
   exit 0
 fi
-
-case $host in
-  hazelhen)
-    # Now we have to get our target programming environment back.
-    module swap PrgEnv-gnu PrgEnv-intel
-    checked-module load gcc/6.3.0
-    checked-module load intel/17.0.2.174
-    ;;
-esac
 
 ###############################################################################
 #                             GNU Multi Precision                             #

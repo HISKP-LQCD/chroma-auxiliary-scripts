@@ -63,7 +63,7 @@ EOF
 # output and checks for the word `error` case insensitively. The function will
 # then fail.
 checked-module() {
-  module "$@" 2> module-load-output.txt
+  silent module "$@" 2> module-load-output.txt
   cat module-load-output.txt
   if grep -i error module-load-output.txt; then
     set +x

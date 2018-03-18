@@ -179,11 +179,7 @@ case "$compiler" in
         # unload that and load the Intel programming environment. That should
         # also load the Intel MPI implementation.
         checked-module swap PrgEnv-cray PrgEnv-intel
-        # If one does not load a newer GCC version, the modern Intel compiler
-        # will use the GCC 4.3 standard library. That however does not support
-        # C++11 such that it will not work.
-        checked-module load gcc/6.3.0
-        checked-module load intel/17.0.2.174
+        checked-module load intel/17.0.6.256
         silent module list
         # On this system, the compiler is always the same because the module
         # system loads the right one of these wrappers.
@@ -556,15 +552,6 @@ if [[ "$_arg_only_qphix" = "true" ]]; then
   echo "QPhiX is installed, user wished to abort here."
   exit 0
 fi
-
-case $host in
-  hazelhen)
-    # Now we have to get our target programming environment back.
-    module swap PrgEnv-gnu PrgEnv-intel
-    checked-module load gcc/6.3.0
-    checked-module load intel/17.0.2.174
-    ;;
-esac
 
 ###############################################################################
 #                             GNU Multi Precision                             #
