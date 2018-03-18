@@ -87,7 +87,7 @@ fi
 repo=chroma
 clone-if-needed https://github.com/JeffersonLab/chroma.git $repo "$_arg_chroma_branch"
 
-if [[ "$_arg_download_only" = on]]; then
+if [[ "$_arg_download_only" = on ]]; then
   set +x
   echo "User wanted do download only, we are done here."
   exit 0
@@ -110,21 +110,21 @@ if [[ "$_arg_autodetect_machine" = off ]]; then
   fi
   host=local
   isa=$_arg_isa
-  compiler="${_arg_compiler-gcc}"
+  compiler="${_arg_compiler:-gcc}"
 else
   if [[ "$hostname_f" =~ eslogin[0-9]+ ]]; then
     host=hazelhen
     isa=avx2
-    compiler="${_arg_compiler-icc}"
+    compiler="${_arg_compiler:-icc}"
   elif [[ "$hostname_f" =~ [^.]*\.jureca ]]; then
     host=jureca
     isa=avx2
-    compiler="${_arg_compiler-icc}"
+    compiler="${_arg_compiler:-icc}"
   elif [[ "$hostname_f" =~ [^.]*\.marconi.cineca.it ]]; then
     if [[ -n "${ENV_KNL_HOME-}" ]]; then
       host=marconi-a2
       isa=avx512
-      compiler="${_arg_compiler-icc}"
+      compiler="${_arg_compiler:-icc}"
     else
       set +x
       echo 'You seem to be running on Marconi but the environment variable ENV_KNL_HOME is not set. This script currently only supports Marconi A2, so please do `module load env-knl` to select the KNL partition.'
@@ -312,19 +312,19 @@ cd "$sourcedir"
 # modern version of CMake that can be used with the Intel compiler. For the
 # meantime, we install CMake ourselves here and use that.
 
-repo=cmake
-print-fancy-heading $repo
-
-case "$host" in
-  hazelhen)
-    pushd "$repo"
-    if ! [[ -f Makefile ]]; then
-      ./bootstrap --prefix="$prefix"
-    fi
-    make-make-install
-    popd
-    ;;
-esac
+#repo=cmake
+#print-fancy-heading $repo
+#
+#case "$host" in
+#  hazelhen)
+#    pushd "$repo"
+#    if ! [[ -f Makefile ]]; then
+#      ./bootstrap --prefix="$prefix"
+#    fi
+#    make-make-install
+#    popd
+#    ;;
+#esac
 
 ###############################################################################
 #                                     QMP                                     #
