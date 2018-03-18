@@ -63,7 +63,7 @@ EOF
 # output and checks for the word `error` case insensitively. The function will
 # then fail.
 checked-module-load() {
-  silent module load "$@" 2>&1 > module-load-output.txt
+  module load "$@" 2> module-load-output.txt
   cat module-load-output.txt
   if grep -i error module-load-output.txt; then
     echo "There has been some error while loading module $1, aborting"

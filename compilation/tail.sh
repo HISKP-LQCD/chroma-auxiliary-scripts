@@ -354,11 +354,11 @@ popd
 #                                   libxml2                                   #
 ###############################################################################
 
+repo=libxml2
+print-fancy-heading $repo
+
 case "$host" in
   jureca|marconi-a2)
-    repo=libxml2
-    print-fancy-heading $repo
-
     cflags="$base_cflags"
     cxxflags="$base_cxxflags"
 
@@ -403,7 +403,51 @@ case "$host" in
 
     libxml="$prefix/bin/xml2-config"
     ;;
-  hazelhen|local)
+  hazelhen)
+    cflags="$base_cflags"
+    cxxflags="$base_cxxflags"
+
+    pushd $repo
+    if ! [[ -f configure ]]; then
+      mkdir -p m4
+      pushd m4
+      ln -fs /usr/share/aclocal/pkg.m4 .
+      popd
+      NOCONFIGURE=yes ./autogen.sh
+    fi
+    popd
+
+    mkdir -p "$build/$repo"
+    pushd "$build/$repo"
+    if ! [[ -f Makefile ]]; then
+      $sourcedir/$repo/configure $base_configure \
+        --without-zlib \
+        --without-python \
+        --without-readline \
+        --without-threads \
+        --without-history \
+        --without-reader \
+        --without-writer \
+        --with-output \
+        --without-ftp \
+        --without-http \
+        --without-pattern \
+        --without-catalog \
+        --without-docbook \
+        --without-iconv \
+        --without-schemas \
+        --without-schematron \
+        --without-modules \
+        --without-xptr \
+        --without-xinclude \
+        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+    fi
+    make-make-install
+    popd
+
+    libxml="$prefix/bin/xml2-config"
+    ;;
+  local)
     libxml="/usr/include/libxml2"
     ;;
 esac
