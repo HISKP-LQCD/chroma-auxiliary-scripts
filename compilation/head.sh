@@ -82,18 +82,6 @@ clone-if-needed() {
 
   if ! [[ -d "$dir" ]]; then
     case "$host" in
-      hazelhen)
-        cat<<EOF
-The git repository for “$dir” could not be found, it has to be cloned.
-Unfortunately outgoing HTTPS connections as needed for “git clone” are blocked
-by the firewall. You will have to download the repository yourself. Execute the
-following commands:
-
-    cd "$PWD"
-    git clone "$url" --recursive -b "$branch"
-    rm -f configure Makefile
-EOF
-        ;;
       *)
         git clone "$url" --recursive -b "$branch"
 
@@ -113,7 +101,7 @@ EOF
 # not invoked once it has correctly built.
 make-make-install() {
   if ! [[ -f build-succeeded ]]; then
-    nice make $make_smp_flags VERBOSE=1
+    nice make -j $_arg_make_j VERBOSE=1
     make install VERBOSE=1
     touch build-succeeded
     if [[ -d "$prefix/lib" ]]; then

@@ -8,55 +8,126 @@
 # will give some feeling for the time it needs to compile.
 PS4='+[${SECONDS}s] '
 
-if [[ "$opt_verbose" = "true" ]]; then
+if [[ "$_arg_verbose" = "true" ]]; then
   set -x
 fi
 
 # Create the target directory and then store the absolute path to this
 # directory. Many compilation scripts have issues with linking to relative
 # paths.
-mkdir -p "$1"
-pushd "$1"
+mkdir -p "$_arg_basedir"
+pushd "$_arg_basedir"
 basedir="$PWD"
 popd
+
+# Directory where the git repositories reside.
+sourcedir="$basedir/sources"
+mkdir -p "$sourcedir"
 
 # Set all locale to C, such that compiler error messages are all in English.
 # This makes debugging way easier because you can search for the messages
 # online.
 export LC_ALL=C
 
+###############################################################################
+#                                  Download                                   #
+###############################################################################
+
+# Download is done as an early step. This allows users to download all the
+# needed files on a different machine as internet access is blocked on machines
+# like Hazel Hen.
+
+pushd "$sourcedir"
+
+# CMake
+url=https://cmake.org/files/v3.9/cmake-3.9.1.tar.gz
+if ! [[ -f "${url##*/}" ]]; then
+  wget "$url"
+fi
+if ! [[ -d "$repo" ]]; then
+  tar -xf "${url##*/}"
+  mv cmake-3.9.1 cmake
+fi
+
+# QMP
+clone-if-needed https://github.com/usqcd-software/qmp.git $repo master
+
+# libxml2
+clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
+
+# QDP++
+clone-if-needed https://github.com/usqcd-software/qdpxx.git $repo devel
+
+# QPhiX
+clone-if-needed https://github.com/JeffersonLab/qphix.git $repo "$_arg_qphix_branch"
+
+# GNU MP
+if ! [[ -d "$repo" ]];
+then
+  # The upstream website only has a download as an LZMA compressed file. The
+  # CentOS does not provide an `lzip` command. Also, there is no module
+  # available that would supply it. Building `lzip` from source seems like a
+  # waste of effort. Therefore I have just repacked that on my local machine
+  # and uploaded to my webspace.
+  url=http://bulk.martin-ueding.de/gmp-6.1.2.tar.gz
+  #url=https://gmplib.org/download/gmp/gmp-6.1.2.tar.lz
+
+  wget "$url"
+  tar -xf "${url##*/}"
+  mv gmp-6.1.2 gmp
+fi
+
+# Chroma
+clone-if-needed https://github.com/JeffersonLab/chroma.git $repo "$_arg_chroma_branch"
+
+if [[ "$_arg_download_only" = "yes" ]]; then
+  set +x
+  echo "User wanted do download only, we are done here."
+  exit 0
+fi
+
+popd
+
+###############################################################################
+#                           Compiler Flag Selection                           #
+###############################################################################
+
 # Determine the fully qualified hostname and then set the optimal default
 # compiler for the architecture found.
 hostname_f="$(hostname -f)"
-if [[ "${opt_machine}" == "local" ]]; then
-  if [[ -z "${opt_isa}" ]]; then
+
+if [[ "$_arg_autodetect_machine" = "no" ]]; then
+  if [[ -z "$_arg_isa" ]]; then
     echo "Builds on local machines require the -i option to be passed (ISA: avx, avx2, avx512)"
     exit 1
   fi
   host=local
-  isa=${opt_isa}
-  compiler="${opt_compiler-gcc}"
-elif [[ "$hostname_f" =~ [^.]*\.hww\.de ]]; then
-  host=hazelhen
-  isa=avx2
-  compiler="${opt_compiler-icc}"
-elif [[ "$hostname_f" =~ [^.]*\.jureca ]]; then
-  host=jureca
-  isa=avx2
-  compiler="${opt_compiler-icc}"
-elif [[ "$hostname_f" =~ [^.]*\.marconi.cineca.it ]]; then
-  if [[ -n "${ENV_KNL_HOME-}" ]]; then
-    host=marconi-a2
-    isa=avx512
-    compiler="${opt_compiler-icc}"
+  isa=$_arg_isa
+  compiler="${_arg_compiler-gcc}"
+else
+  if [[ "$hostname_f" =~ eslogin[0-9]+ ]]; then
+    host=hazelhen
+    isa=avx2
+    compiler="${_arg_compiler-icc}"
+  elif [[ "$hostname_f" =~ [^.]*\.jureca ]]; then
+    host=jureca
+    isa=avx2
+    compiler="${_arg_compiler-icc}"
+  elif [[ "$hostname_f" =~ [^.]*\.marconi.cineca.it ]]; then
+    if [[ -n "${ENV_KNL_HOME-}" ]]; then
+      host=marconi-a2
+      isa=avx512
+      compiler="${_arg_compiler-icc}"
+    else
+      set +x
+      echo 'You seem to be running on Marconi but the environment variable ENV_KNL_HOME is not set. This script currently only supports Marconi A2, so please do `module load env-knl` to select the KNL partition.'
+      exit 1
+    fi
   else
-    echo 'You seem to be running on Marconi but the environment variable ENV_KNL_HOME is not set. This script currently only supports Marconi A2, so please do `module load env-knl` to select the KNL partition.'
+    set +x
+    echo "This machine is neither explicitly a 'local' machine nor JURECA nor Hazel Hen nor Marconi A2. It is not clear what should be done, please update the script."
     exit 1
   fi
-else
-  set +x
-  echo "This machine is neither explicitly a 'local' machine nor JURECA nor Hazel Hen nor Marconi A2. It is not clear what should be done, please update the script."
-  exit 1
 fi
 
 # Set up the chosen compiler.
@@ -175,10 +246,6 @@ case "$compiler" in
     ;;
 esac
 
-# Directory where the git repositories reside.
-sourcedir="$basedir/sources"
-mkdir -p "$sourcedir"
-
 # Directory for the installed files (headers, libraries, executables). This
 # contains the chosen compiler in the dirname such that multiple compilers can
 # be used simultaneously.
@@ -243,16 +310,6 @@ print-fancy-heading $repo
 
 case "$host" in
   hazelhen)
-    # Download CMake and unpack it.
-    url=https://cmake.org/files/v3.9/cmake-3.9.1.tar.gz
-    if ! [[ -f "${url##*/}" ]]; then
-      wget "$url"
-    fi
-    if ! [[ -d "$repo" ]]; then
-      tar -xf "${url##*/}"
-      mv cmake-3.9.1 cmake
-    fi
-
     pushd "$repo"
     if ! [[ -f Makefile ]]; then
       ./bootstrap --prefix="$prefix"
@@ -268,7 +325,6 @@ esac
 
 repo=qmp
 print-fancy-heading $repo
-clone-if-needed https://github.com/usqcd-software/qmp.git $repo master
 
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags"
@@ -295,7 +351,6 @@ case "$host" in
   jureca|marconi-a2)
     repo=libxml2
     print-fancy-heading $repo
-    clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
 
     cflags="$base_cflags"
     cxxflags="$base_cxxflags"
@@ -352,7 +407,6 @@ esac
 
 repo=qdpxx
 print-fancy-heading $repo
-clone-if-needed https://github.com/usqcd-software/qdpxx.git $repo devel
 
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
@@ -369,7 +423,7 @@ if ! [[ -f Makefile ]]; then
     --enable-sse --enable-sse2 \
     --enable-parallel-arch=parscalar \
     --enable-parallel-io \
-    --enable-precision=$opt_precision \
+    --enable-precision=$_arg_precision \
     --with-libxml2="$libxml" \
     --with-qmp="$prefix" \
     CFLAGS="$cflags" CXXFLAGS="$cxxflags"
@@ -383,7 +437,6 @@ popd
 
 repo=qphix
 print-fancy-heading $repo
-clone-if-needed https://github.com/JeffersonLab/qphix.git $repo "$opt_qphix_branch"
 
 case $host in
   jureca)
@@ -449,7 +502,7 @@ fi
 make-make-install
 popd
 
-if [[ "$opt_only_qphix" = "true" ]]; then
+if [[ "$_arg_only_qphix" = "true" ]]; then
   echo "QPhiX is installed, user wished to abort here."
   exit 0
 fi
@@ -488,20 +541,6 @@ case "$host" in
     repo=gmp
     print-fancy-heading $repo
 
-    if ! [[ -d "$repo" ]];
-    then
-      # The upstream website only has a download as an LZMA compressed file. The
-      # CentOS does not provide an `lzip` command. Also, there is no module
-      # available that would supply it. Building `lzip` from source seems like a
-      # waste of effort. Therefore I have just repacked that on my local machine
-      # and uploaded to my webspace.
-      url=http://bulk.martin-ueding.de/gmp-6.1.2.tar.gz
-      #url=https://gmplib.org/download/gmp/gmp-6.1.2.tar.lz
-
-      wget "$url"
-      tar -xf "${url##*/}"
-      mv gmp-6.1.2 gmp
-    fi
 
     cflags="$base_cflags"
     cxxflags="$base_cxxflags"
@@ -529,7 +568,6 @@ esac
 
 repo=chroma
 print-fancy-heading $repo
-clone-if-needed https://github.com/JeffersonLab/chroma.git $repo "$opt_chroma_branch"
 
 cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags"
@@ -551,8 +589,8 @@ case "$host" in
 esac
 
 # Overwrite with the value that the user has chosen, if it is set.
-soalen=${opt_soalen-$soalen}
-inner_soalen=${opt_inner_soalen-$inner_soalen}
+soalen=${_arg_soalen-$soalen}
+inner_soalen=${_arg_soalen_inner-$inner_soalen}
 
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
@@ -561,7 +599,7 @@ if ! [[ -f Makefile ]]; then
     --enable-openmp \
     --enable-parallel-arch=parscalar \
     --enable-parallel-io \
-    --enable-precision=$opt_precision \
+    --enable-precision=$_arg_precision \
     --enable-qdp-alignment=128 \
     --enable-sse2 \
     --with-gmp="$gmp" \
@@ -572,7 +610,7 @@ if ! [[ -f Makefile ]]; then
     --enable-qphix-solver-arch=$isa \
     --enable-qphix-solver-soalen=$soalen \
     --enable-qphix-solver-inner-soalen=$inner_soalen \
-    --enable-qphix-solver-inner-type=$opt_inner_precision \
+    --enable-qphix-solver-inner-type=$_arg_precision_inner \
     CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
 make-make-install
