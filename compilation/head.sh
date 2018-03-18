@@ -66,6 +66,7 @@ checked-module() {
   module "$@" 2> module-load-output.txt
   cat module-load-output.txt
   if grep -i error module-load-output.txt; then
+    set +x
     echo "There has been some error with 'module $*', aborting"
     exit 1
   fi
