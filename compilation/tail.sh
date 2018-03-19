@@ -40,15 +40,15 @@ export LC_ALL=C
 pushd "$sourcedir"
 
 # CMake
-repo=cmake
-url=https://cmake.org/files/v3.9/cmake-3.9.1.tar.gz
-if ! [[ -f "${url##*/}" ]]; then
-  wget "$url"
-fi
-if ! [[ -d "$repo" ]]; then
-  tar -xf "${url##*/}"
-  mv cmake-3.9.1 cmake
-fi
+#repo=cmake
+#url=https://cmake.org/files/v3.9/cmake-3.9.1.tar.gz
+#if ! [[ -d "$repo" ]]; then
+#  if ! [[ -f "${url##*/}" ]]; then
+#    wget "$url"
+#  fi
+#  tar -xf "${url##*/}"
+#  mv cmake-3.9.1 cmake
+#fi
 
 # QMP
 repo=qmp
