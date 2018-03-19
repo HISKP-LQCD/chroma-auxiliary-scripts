@@ -489,6 +489,38 @@ case "$host" in
 esac
 
 ###############################################################################
+#                                    LLVM                                     #
+###############################################################################
+
+if [[ "$_arg_qdpjit" = on ]]; then
+  repo=llvm
+  print-fancy-heading $repo
+
+  cflags="$base_cflags $openmp_flags"
+  cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
+
+  mkdir -p "$build/$repo"
+  pushd "$build/$repo"
+  if ! [[ -f Makefile ]]; then
+    cmake  \
+      -DCMAKE_CXX_FLAGS="$cxxflags" \
+      -DCMAKE_CXX_COMPILER="$(which $cxx_name)" \
+      -DLLVM_ENABLE_TERMINFO=OFF \
+      -DCMAKE_C_COMPILER="$(which $cc_name)" \
+      -DCMAKE_C_FLAGS="$cflags" \
+      -DCMAKE_BUILD_TYPE=Debug \
+      -DCMAKE_INSTALL_PREFIX="$prefix" \
+      -DLLVM_TARGETS_TO_BUILD=X86 \
+      -DLLVM_ENABLE_ZLIB=OFF \
+      -DBUILD_SHARED_LIBS=ON \
+      -DLLVM_ENABLE_RTTI=ON  \
+      "$sourcedir/$repo"
+  fi
+  make-make-install
+  popd
+fi
+
+###############################################################################
 #                                    QDP++                                    #
 ###############################################################################
 
