@@ -492,31 +492,42 @@ esac
 #                                    QDP++                                    #
 ###############################################################################
 
-repo=qdpxx
-print-fancy-heading $repo
+if [[ "$_arg_qdpjit" = off ]]; then
+  repo=qdpxx
+  print-fancy-heading $repo
 
-cflags="$base_cflags $openmp_flags"
-cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
+  cflags="$base_cflags $openmp_flags"
+  cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
 
-pushd $repo
-autoreconf-if-needed
-popd
+  pushd $repo
+  autoreconf-if-needed
+  popd
 
-mkdir -p "$build/$repo"
-pushd "$build/$repo"
-if ! [[ -f Makefile ]]; then
-  $sourcedir/$repo/configure $base_configure \
-    --enable-openmp \
-    --enable-sse --enable-sse2 \
-    --enable-parallel-arch=parscalar \
-    --enable-parallel-io \
-    --enable-precision=$_arg_precision \
-    --with-libxml2="$libxml" \
-    --with-qmp="$prefix" \
-    CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+  mkdir -p "$build/$repo"
+  pushd "$build/$repo"
+  if ! [[ -f Makefile ]]; then
+    $sourcedir/$repo/configure $base_configure \
+      --enable-openmp \
+      --enable-sse --enable-sse2 \
+      --enable-parallel-arch=parscalar \
+      --enable-parallel-io \
+      --enable-precision=$_arg_precision \
+      --with-libxml2="$libxml" \
+      --with-qmp="$prefix" \
+      CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+  fi
+  make-make-install
+  popd
 fi
-make-make-install
-popd
+
+###############################################################################
+#                                   QDP-JIT                                   #
+###############################################################################
+
+exit
+
+if [[ "$_arg_qdpjit" = on ]]; then
+fi
 
 ###############################################################################
 #                                    QPhiX                                    #
