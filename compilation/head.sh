@@ -45,7 +45,9 @@ set -u
 silent() {
   set +x
   "$@"
+  status=$?
   set -x
+  return $status
 }
 
 print-help() {
