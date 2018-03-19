@@ -60,10 +60,11 @@ EOF
   exit 1
 }
 
-# The `module` command does not set the exit status when it fails. Also it
-# annoyingly outputs everything on standard error. This function parses the
-# output and checks for the word `error` case insensitively. The function will
-# then fail.
+# On some machines, the `module` command does not set the exit status when it
+# fails. Also it annoyingly outputs everything on standard error. This function
+# parses the output and checks for the word `error` case insensitively. The
+# function will then fail. If there is a more modern `module` command (like on
+# JURECA), the exit status will be set. Therefore we need to do both things.
 checked-module() {
   set +x
   if ! module "$@" 2> module-load-output.txt; then
