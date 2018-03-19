@@ -51,13 +51,13 @@ silent() {
 }
 
 print-help() {
-    cat <<EOF
+  cat <<EOF
 Usage: $0 [OPTIONS] BASE
 
 Have a look at the manual page (bootstrap-chroma.1.md) or its compiled version
 (bootstrap.1) for a full description.
 EOF
-    exit 1
+  exit 1
 }
 
 # The `module` command does not set the exit status when it fails. Also it
