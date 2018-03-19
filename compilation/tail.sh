@@ -207,6 +207,10 @@ case "$compiler" in
         host_cxx=icpc
         base_flags="-xMIC-AVX512 -O3"
         ;;
+      *)
+        set +x
+        echo "Compiler ICC is not supported on $host."
+        exit 1
     esac
     ;;
   gcc)
@@ -251,6 +255,10 @@ case "$compiler" in
         host_cxx=g++
         base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=native"
         ;;
+      *)
+        set +x
+        echo "Compiler GCC is not supported on $host."
+        exit 1
     esac
     ;;
   *)
