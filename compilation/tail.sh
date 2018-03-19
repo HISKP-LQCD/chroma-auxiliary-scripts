@@ -58,6 +58,18 @@ clone-if-needed https://github.com/usqcd-software/qmp.git $repo master
 repo=libxml2
 clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
 
+# LLVM
+repo=llvm
+url=http://releases.llvm.org/6.0.0/llvm-6.0.0.src.tar.xz
+basename="${url##*/}"
+if ! [[ -d "$repo" ]]; then
+  if ! [[ -f "$basename" ]]; then
+    wget "$url"
+  fi
+  tar -xf "$basename"
+  mv llvm-6.0.0 "$repo"
+fi
+
 # QDP++
 if [[ "$_arg_qdpjit" = off ]]; then
   repo=qdpxx
