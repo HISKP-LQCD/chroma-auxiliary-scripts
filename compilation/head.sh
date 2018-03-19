@@ -106,7 +106,12 @@ clone-if-needed() {
 # not invoked once it has correctly built.
 make-make-install() {
   if ! [[ -f build-succeeded ]]; then
-    nice make -j $_arg_make_j VERBOSE=1
+    if ! nice make -j $_arg_make_j; then
+      echo "There was issue with the compilation, doing again with single process to give readable error messages."
+      print-fancy-heading "Compile again"
+      make VERBOSE=1
+      exit 1
+    fi
     make install VERBOSE=1
     touch build-succeeded
     if [[ -d "$prefix/lib" ]]; then
