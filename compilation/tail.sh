@@ -197,8 +197,10 @@ case "$compiler" in
         base_flags="-xAVX2 -O3"
         ;;
       jurecabooster)
-        checked-module load Intel/2018.1.163-GCC-5.4.0
-        checked-module load IntelMPI/2018.1.163
+        checked-module use /usr/local/software/jurecabooster/OtherStages
+        checked-module load Stages/2017a
+        checked-module load Intel/2017.2.174-GCC-5.4.0
+        checked-module load IntelMPI/2017.2.174
         checked-module load CMake
         silent module list
         cc_name=mpiicc
