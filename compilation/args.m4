@@ -46,6 +46,8 @@ ARG_OPTIONAL_SINGLE([compiler], [c], [Compiler family to use, defaults to best o
 ARG_OPTIONAL_SINGLE([make-j], [j], [Maximum number of parallel processes used by make], [$(nproc)])
 ARG_OPTIONAL_SINGLE([isa], [i], [Manual instruction set architecture (ISA), usually automatically set], )
 
+ARG_OPTIONAL_BOOLEAN([qdpjit], , [Use QDP-JIT instead of QDP++], [off])
+
 ARG_OPTIONAL_BOOLEAN([only-qphix], [q], [Only compile QPhiX, not Chroma], [off])
 ARG_OPTIONAL_SINGLE([qphix-branch], [Q], [QPhiX git branch], [devel])
 ARG_OPTIONAL_SINGLE([precision], [p], [Precision of solver, can be "double", "float"], [double])

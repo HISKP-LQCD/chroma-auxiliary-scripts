@@ -117,8 +117,13 @@ else
     isa=avx2
     compiler="${_arg_compiler:-icc}"
   elif [[ "$hostname_f" =~ [^.]*\.jureca ]]; then
-    host=jureca
-    isa=avx2
+    if [[ "${LMOD_SYSTEM_NAME-}" = jurecabooster ]]; then
+      host=jurecabooster
+      isa=avx512
+    else
+      host=jureca
+      isa=avx2
+    fi
     compiler="${_arg_compiler:-icc}"
   elif [[ "$hostname_f" =~ [^.]*\.marconi.cineca.it ]]; then
     if [[ -n "${ENV_KNL_HOME-}" ]]; then
