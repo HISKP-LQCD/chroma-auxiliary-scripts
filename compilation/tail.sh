@@ -59,8 +59,13 @@ repo=libxml2
 clone-if-needed https://git.gnome.org/browse/libxml2 $repo v2.9.4
 
 # QDP++
-repo=qdpxx
-clone-if-needed https://github.com/usqcd-software/qdpxx.git $repo devel
+if [[ "$_arg_qdpjit" = off ]]; then
+  repo=qdpxx
+  clone-if-needed https://github.com/usqcd-software/qdpxx.git $repo devel
+else
+  repo=qdp-jit
+  clone-if-needed https://github.com/fwinter/qdp-jit.git $repo master
+fi
 
 # QPhiX
 repo=qphix
