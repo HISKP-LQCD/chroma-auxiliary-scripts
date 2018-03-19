@@ -184,6 +184,16 @@ case "$compiler" in
         host_cxx=icpc
         base_flags="-xAVX2 -O3"
         ;;
+      jurecabooster)
+        checked-module load Intel/2018.1.163-GCC-5.4.0
+        checked-module load IntelMPI/2018.1.163
+        checked-module load CMake
+        silent module list
+        cc_name=mpiicc
+        cxx_name=mpiicpc
+        host_cxx=icpc
+        base_flags="-xMIC-AVX512 -O3"
+        ;;
       hazelhen)
         # On Hazel Hen, the default compiler is the Cray compiler. One needs to
         # unload that and load the Intel programming environment. That should
@@ -302,7 +312,7 @@ case "$host" in
     # `./configure` script won't try to execute the test programs.
     base_configure="$base_configure --host=x86_64-linux-gnu"
     ;;
-  marconi-a2)
+  jurecabooster|marconi-a2)
     # Marconi A2 has a cross compilation from Haswell to Knights Landing,
     # therefore one needs to tell GNU Autotools that programs compiled with the
     # target compiler cannot be executed on the host.
