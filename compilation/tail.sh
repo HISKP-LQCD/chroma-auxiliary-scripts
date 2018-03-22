@@ -595,7 +595,10 @@ set -x
 # Check whether Python 3 interpreter is there. The following calls Python 3 and
 # lets it do explicitly nothing. That must always work. Then we output the path
 # for reference.
-python3 -c ''
+if ! python3 -c ''; then
+  exit-with-error 'Python 3 cannot be found. Please update this script such that it can be found, for instance by loading the needed module.'
+fi
+
 which python3
 
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
