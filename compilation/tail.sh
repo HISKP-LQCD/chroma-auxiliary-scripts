@@ -722,7 +722,7 @@ repo=chroma
 print-fancy-heading $repo
 
 cflags="$base_cflags $openmp_flags"
-cxxflags="$base_cxxflags $openmp_flags"
+cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
 
 pushd $repo
 autoreconf-if-needed
