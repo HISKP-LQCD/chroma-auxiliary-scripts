@@ -81,6 +81,19 @@ else
   clone-if-needed https://github.com/fwinter/qdp-jit.git $repo master
 fi
 
+# Jinja2
+url='https://pypi.python.org/packages/56/e6/332789f295cf22308386cf5bbd1f4e00ed11484299c5d7383378cf48ba47/Jinja2-2.10.tar.gz'
+jinja_source_archive="${url##*/}"
+if ! [[ -f "$jinja_source_archive" ]]; then
+  wget "$url"
+fi
+
+url='https://pypi.python.org/packages/4d/de/32d741db316d8fdb7680822dd37001ef7a448255de9699ab4bfcbdf4172b/MarkupSafe-1.0.tar.gz'
+markupsafe_source_archive="${url##*/}"
+if ! [[ -f "$markupsafe_source_archive" ]]; then
+  wget "$url"
+fi
+
 # QPhiX
 repo=qphix
 clone-if-needed https://github.com/JeffersonLab/qphix.git $repo "$_arg_qphix_branch"
@@ -577,8 +590,13 @@ case $host in
     checked-module load Python
     ;;
   hazelhen)
-    python_library=/opt/python/3.6.1.1/lib/libpython3.so
-    python_include_dir=/opt/python/3.6.1.1/include
+    # There is a Python 3 installation from SLES. However, the needed PIP 3 is
+    # not installed, and we need this in order to install a third-party library
+    # which is not installed either.
+    module load tools/python
+
+    python_include_dir=/sw/hazelhen-cle6/hlrs/tools/python/3.4.3/include/python3.4m/
+    python_library=/sw/hazelhen-cle6/hlrs/tools/python/3.4.3/lib/libpython3.4m.a
     ;;
   marconi-a2)
     checked-module load cmake
@@ -603,7 +621,13 @@ which python3
 
 # We also check for the jinja2 library.
 if ! python3 -c 'import jinja2'; then
-  exit-with-error 'The Python 3 library jinja2 is not installed. Please to so using pip3 or manually.'
+  pip3 install --user "$markupsafe_source_archive"
+  pip3 install --user "$jinja_source_archive"
+fi
+
+# Now it should work, if not, there is nothing this script can do right now.
+if ! python3 -c 'import jinja2'; then
+  exit-with-error 'The Python 3 library jinja2 is not installed and could not be installed automatically. You need to manually make sure that it is installed.'
 fi
 
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
