@@ -39,17 +39,6 @@ export LC_ALL=C
 
 pushd "$sourcedir"
 
-# CMake
-#repo=cmake
-#url=https://cmake.org/files/v3.9/cmake-3.9.1.tar.gz
-#if ! [[ -d "$repo" ]]; then
-#  if ! [[ -f "${url##*/}" ]]; then
-#    wget "$url"
-#  fi
-#  tar -xf "${url##*/}"
-#  mv cmake-3.9.1 cmake
-#fi
-
 # QMP
 repo=qmp
 clone-if-needed https://github.com/usqcd-software/qmp.git $repo master
@@ -344,34 +333,6 @@ case "$host" in
 esac
 
 cd "$sourcedir"
-
-###############################################################################
-#                                    CMake                                    #
-###############################################################################
-
-# Hazel Hen only has version 2.6 of CMake which is too old for us. There is a
-# newer version, but that can only be used when the GNU compiler is loaded. It
-# does not work with the Intel compiler. Trying to find the path of the modern
-# version of CMake works, but then it cannot load the GNU standard library,
-# *sigh*.
-#
-# I have contacted the support on 2017-08-21 and they will provide a more
-# modern version of CMake that can be used with the Intel compiler. For the
-# meantime, we install CMake ourselves here and use that.
-
-#repo=cmake
-#print-fancy-heading $repo
-#
-#case "$host" in
-#  hazelhen)
-#    pushd "$repo"
-#    if ! [[ -f Makefile ]]; then
-#      ./bootstrap --prefix="$prefix"
-#    fi
-#    make-make-install
-#    popd
-#    ;;
-#esac
 
 ###############################################################################
 #                                     QMP                                     #
