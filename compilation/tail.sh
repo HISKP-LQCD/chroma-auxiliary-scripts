@@ -450,6 +450,8 @@ case "$host" in
   hazelhen)
     cflags="$base_cflags"
     cxxflags="$base_cxxflags"
+    cflags="-O3"
+    cxxflags="-O3"
 
     pushd $repo
     if ! [[ -f configure ]]; then
@@ -465,10 +467,12 @@ case "$host" in
     pushd "$build/$repo"
     if ! [[ -f Makefile ]]; then
       $sourcedir/$repo/configure $base_configure \
+        CC=gcc CXX=g++ \
         --without-zlib \
         --without-python \
         --without-readline \
         --without-threads \
+        --without-gnu-ld \
         --without-history \
         --without-reader \
         --without-writer \
@@ -483,6 +487,8 @@ case "$host" in
         --without-schematron \
         --without-modules \
         --without-xptr \
+        --without-libz \
+        --without-lzma \
         --without-xinclude \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
     fi
