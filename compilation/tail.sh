@@ -588,10 +588,8 @@ case $host in
     checked-module load Python
     ;;
   hazelhen)
-    checked-module load tools/python
-
-    python_library=/opt/hlrs/tools/python/anaconda3-4.2.0/lib/libpython3.so
-    python_include_dir=/opt/hlrs/tools/python/anaconda3-4.2.0/include
+    python_library=/opt/python/3.6.1.1/lib/libpython3.so
+    python_include_dir=/opt/python/3.6.1.1/include
     ;;
   marconi-a2)
     checked-module load cmake
