@@ -601,6 +601,11 @@ fi
 
 which python3
 
+# We also check for the jinja2 library.
+if ! python3 -c 'import jinja2'; then
+  exit-with-error 'The Python 3 library jinja2 is not installed. Please to so using pip3 or manually.'
+fi
+
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
 cxx=$(which $cxx_name)
 
