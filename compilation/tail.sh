@@ -756,8 +756,8 @@ case "$host" in
 esac
 
 # Overwrite with the value that the user has chosen, if it is set.
-soalen=${_arg_soalen-$soalen}
-inner_soalen=${_arg_soalen_inner-$inner_soalen}
+soalen=${_arg_soalen:-$soalen}
+inner_soalen=${_arg_soalen_inner:-$inner_soalen}
 
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
