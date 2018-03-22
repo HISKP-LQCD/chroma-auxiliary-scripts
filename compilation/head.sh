@@ -75,9 +75,7 @@ checked-module() {
   cat module-load-output.txt
 
   if grep -i error module-load-output.txt; then
-    set +x
-    echo "There has been some error with 'module $*', aborting"
-    exit 1
+    exit-with-error "There has been some error with 'module $*', aborting"
   fi
   rm -f module-load-output.txt
 }
@@ -159,6 +157,16 @@ autoreconf-if-needed() {
     aclocal
     autoreconf -vif
   fi
+}
+
+exit-with-error() {
+  set +x
+  echo
+  echo 'Fatal error'
+  echo '==========='
+  echo
+  echo "$@"
+  exit 1
 }
 
 # vim: spell sts=2 sw=2

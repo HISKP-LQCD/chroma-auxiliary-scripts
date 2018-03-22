@@ -124,8 +124,7 @@ hostname_f="$(hostname -f)"
 
 if [[ "$_arg_autodetect_machine" = off ]]; then
   if [[ -z "$_arg_isa" ]]; then
-    echo "Builds on local machines require the -i option to be passed (ISA: avx, avx2, avx512)"
-    exit 1
+    exit-with-error "Builds on local machines require the -i option to be passed (ISA: avx, avx2, avx512)"
   fi
   host=local
   isa=$_arg_isa
@@ -150,14 +149,10 @@ else
       isa=avx512
       compiler="${_arg_compiler:-icc}"
     else
-      set +x
-      echo 'You seem to be running on Marconi but the environment variable ENV_KNL_HOME is not set. This script currently only supports Marconi A2, so please do `module load env-knl` to select the KNL partition.'
-      exit 1
+      exit-with-error 'You seem to be running on Marconi but the environment variable ENV_KNL_HOME is not set. This script currently only supports Marconi A2, so please do `module load env-knl` to select the KNL partition.'
     fi
   else
-    set +x
-    echo "This machine is neither explicitly a 'local' machine nor JURECA nor Hazel Hen nor Marconi A2. It is not clear what should be done, please update the script."
-    exit 1
+    exit-with-error "This machine is neither explicitly a 'local' machine nor JURECA nor Hazel Hen nor Marconi A2. It is not clear what should be done, please update the script."
   fi
 fi
 
@@ -234,9 +229,7 @@ case "$compiler" in
         base_flags="-xMIC-AVX512 -O3"
         ;;
       *)
-        set +x
-        echo "Compiler ICC is not supported on $host."
-        exit 1
+        exit-with-error "Compiler ICC is not supported on $host."
     esac
     ;;
   gcc)
@@ -282,14 +275,11 @@ case "$compiler" in
         base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=native"
         ;;
       *)
-        set +x
-        echo "Compiler GCC is not supported on $host."
-        exit 1
+        exit-with-error "Compiler GCC is not supported on $host."
     esac
     ;;
   *)
-    echo 'This compiler is not supported by this script. Choose another one or add another block to the `case` in this script.'
-    exit 1
+    exit-with-error 'This compiler is not supported by this script. Choose another one or add another block to the `case` in this script.'
     ;;
 esac
 
