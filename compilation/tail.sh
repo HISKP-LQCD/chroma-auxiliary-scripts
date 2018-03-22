@@ -293,6 +293,10 @@ case "$compiler" in
     ;;
 esac
 
+# Show versions of compilers used.
+$cc_name --version
+$cxx_name --version
+
 # Directory for the installed files (headers, libraries, executables). This
 # contains the chosen compiler in the dirname such that multiple compilers can
 # be used simultaneously.
