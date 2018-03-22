@@ -230,7 +230,7 @@ case "$compiler" in
         cc_name=cc
         cxx_name=CC
         host_cxx=icpc
-        base_flags="-xAVX2 -O3"
+        base_flags="-xCORE-AVX2 -O3"
         ;;
       marconi-a2)
         checked-module load intel/pe-xe-2017--binary
