@@ -1,0 +1,2 @@
+By,Bz,Cores,Lt,Lx,Ly,Lz,PadXY,PadXYZ,Sy,Sz,geom1,geom2,geom3,geom4,gflops_total_err,gflops_total_val,lt,lx,ly,lz,nodes,precision,ranks,ranks_per_node,soalen,threads_per_core,veclen
+4,4,12,16,16,16,16,1,0,1,1,1,1,1,2,1.44545473669,128.7085,8,16,16,16,1.0,DOUBLE,2,2,2,1,4
