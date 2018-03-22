@@ -592,11 +592,26 @@ case $host in
   hazelhen)
     # There is a Python 3 installation from SLES. However, the needed PIP 3 is
     # not installed, and we need this in order to install a third-party library
-    # which is not installed either.
-    module load tools/python
+    # which is not installed either. On some systems, there is no `pip3`
+    # command but `puthon3 -m pip` gives access to PIP. This is unfortunately
+    # not the case on this machine.
+    #
+    # There is quite an arrangement of Python 3 installations:
+    #
+    # - /usr/bin/python3 (3.4.6)
+    # - /opt/python/17.11.1/bin/python3 (3.6.1)
+    # - /opt/python/3.6.1.1/bin/python3 (3.6.1)
+    # - /sw/hazelhen-cle6/hlrs/tools/python/3.4.3/bin/python3 (3.4.3) [tools/python]
+    #
+    # The last one is accessed via a module.
+    #
+    # We chose the Python 3.6 installation in `/opt`. This is not available as
+    # a module, so we need to set the paths ourselves.
 
-    python_include_dir=/sw/hazelhen-cle6/hlrs/tools/python/3.4.3/include/python3.4m/
-    python_library=/sw/hazelhen-cle6/hlrs/tools/python/3.4.3/lib/libpython3.4m.a
+    python_include_dir=/opt/python/3.6.1.1/include
+    python_library=/opt/python/3.6.1.1/lib/libpython3.so
+
+    export PATH="/opt/python/3.6.1.1/bin:$PATH"
     ;;
   marconi-a2)
     checked-module load cmake
