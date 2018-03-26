@@ -543,7 +543,30 @@ fi
 ###############################################################################
 
 if [[ "$_arg_qdpjit" = on ]]; then
-  exit
+  repo=qdp-jit
+  print-fancy-heading $repo
+
+  cflags="$base_cflags $openmp_flags"
+  cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
+
+  pushd $repo
+  autoreconf-if-needed
+  popd
+
+  mkdir -p "$build/$repo"
+  pushd "$build/$repo"
+  if ! [[ -f Makefile ]]; then
+    $sourcedir/$repo/configure $base_configure \
+      --enable-openmp \
+      --enable-sse --enable-sse2 \
+      --enable-parallel-arch=parscalar \
+      --enable-precision=$_arg_precision \
+      --with-libxml2="$libxml" \
+      --without-cuda \
+      CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+  fi
+  make-make-install
+  popd
 fi
 
 ###############################################################################
