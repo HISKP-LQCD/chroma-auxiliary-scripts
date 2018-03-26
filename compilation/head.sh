@@ -109,9 +109,14 @@ make-make-install() {
       echo "There was issue with the compilation, doing again with single process to give readable error messages."
       print-fancy-heading "Compile again"
       make VERBOSE=1
-      exit 1
     fi
-    make install VERBOSE=1
+
+    if ! nice make install; then
+      echo "There was issue with the installation, doing again with single process to give readable error messages."
+      print-fancy-heading "Install again"
+      make install VERBOSE=1
+    fi
+
     touch build-succeeded
     if [[ -d "$prefix/lib" ]]; then
       pushd "$prefix/lib"

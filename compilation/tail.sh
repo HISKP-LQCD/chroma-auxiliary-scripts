@@ -56,8 +56,6 @@ if [[ "$_arg_qdpjit" = on ]]; then
     if ! [[ -f "$basename" ]]; then
       wget "$url"
     fi
-    tar -xf "$basename"
-    mv llvm-6.0.0 "$repo"
   fi
 fi
 
@@ -187,8 +185,8 @@ case "$compiler" in
 
     case "$host" in
       jureca)
-        checked-module load Intel/2017.2.174-GCC-5.4.0
-        checked-module load IntelMPI/2017.2.174
+        checked-module load Intel/2018.1.163-GCC-5.4.0
+        checked-module load IntelMPI/2018.1.163
         silent module list
         cc_name=mpiicc
         cxx_name=mpiicpc
@@ -474,24 +472,34 @@ if [[ "$_arg_qdpjit" = on ]]; then
   repo=llvm
   print-fancy-heading $repo
 
+  if ! [[ -d "$repo" ]]; then
+    tar -xf "$basename"
+    mv llvm-6.0.0.src "$repo"
+  fi
+
+  case $host in
+    jureca)
+      checked-module load CMake
+      ;;
+  esac
+
   cflags="$base_cflags $openmp_flags"
   cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
 
   mkdir -p "$build/$repo"
   pushd "$build/$repo"
   if ! [[ -f Makefile ]]; then
-    cmake  \
-      -DCMAKE_CXX_FLAGS="$cxxflags" \
-      -DCMAKE_CXX_COMPILER="$(which $cxx_name)" \
+      cmake  \
+      -DCMAKE_CXX_COMPILER="$(which g++)" \
       -DLLVM_ENABLE_TERMINFO=OFF \
-      -DCMAKE_C_COMPILER="$(which $cc_name)" \
-      -DCMAKE_C_FLAGS="$cflags" \
+      -DCMAKE_C_COMPILER="$(which gcc)" \
       -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_INSTALL_PREFIX="$prefix" \
       -DLLVM_TARGETS_TO_BUILD=X86 \
       -DLLVM_ENABLE_ZLIB=OFF \
       -DBUILD_SHARED_LIBS=ON \
       -DLLVM_ENABLE_RTTI=ON  \
+      -DLLVM_ENABLE_LIBXML2=OFF \
       "$sourcedir/$repo"
   fi
   make-make-install
@@ -535,7 +543,7 @@ fi
 ###############################################################################
 
 if [[ "$_arg_qdpjit" = on ]]; then
-  :
+  exit
 fi
 
 ###############################################################################
