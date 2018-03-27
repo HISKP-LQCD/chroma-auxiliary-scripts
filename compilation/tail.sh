@@ -65,7 +65,7 @@ if [[ "$_arg_qdpjit" = off ]]; then
   clone-if-needed https://github.com/usqcd-software/qdpxx.git $repo devel
 else
   repo=qdp-jit
-  clone-if-needed https://github.com/fwinter/qdp-jit.git $repo master
+  clone-if-needed https://github.com/fwinter/qdp-jit.git $repo llvm-cpu-inner-loop-no11-qshift
 fi
 
 # Jinja2
@@ -343,6 +343,7 @@ cflags="$base_cflags $openmp_flags"
 cxxflags="$base_cxxflags $openmp_flags"
 
 pushd $repo
+ensure-git-branch master
 autoreconf-if-needed
 popd
 
@@ -504,6 +505,12 @@ if [[ "$_arg_qdpjit" = on ]]; then
   fi
   make-make-install
   popd
+
+  # LLVM has built some shared objects (`libLLVMSupport.so.6`). Since we did
+  # not install them in a standard path, we need to make sure that the dynamic
+  # loader knows about our path as well. This variable needs to be exported
+  # such that sub-processes inherit it.
+  export LD_LIBRARY_PATH="$prefix/lib:$LD_LIBRARY_PATH"
 fi
 
 ###############################################################################
@@ -549,7 +556,19 @@ if [[ "$_arg_qdpjit" = on ]]; then
   cflags="$base_cflags $openmp_flags"
   cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
 
-  pushd $repo
+  pushd "$repo"
+
+  # Depending on the machine architecture that we work on, we need a different
+  # branch of QDP-JIT.
+  case $host in
+    jureca)
+      ensure-git-branch llvm-cpu-inner-loop-no11-qshift
+      ;;
+    some-nvidia-machine)
+      ensure-git-branch llvm-nvptx
+      ;;
+  esac
+
   autoreconf-if-needed
   popd
 
@@ -558,11 +577,11 @@ if [[ "$_arg_qdpjit" = on ]]; then
   if ! [[ -f Makefile ]]; then
     $sourcedir/$repo/configure $base_configure \
       --enable-openmp \
-      --enable-sse --enable-sse2 \
-      --enable-parallel-arch=parscalar \
       --enable-precision=$_arg_precision \
+      --enable-llvm6-trunk \
+      --with-qmp="$prefix" \
+      --with-llvm="$prefix" \
       --with-libxml2="$libxml" \
-      --without-cuda \
       CFLAGS="$cflags" CXXFLAGS="$cxxflags"
   fi
   make-make-install
@@ -734,6 +753,8 @@ cxxflags="$base_cxxflags $openmp_flags $cxx11_flags"
 pushd $repo
 autoreconf-if-needed
 popd
+
+exit
 
 # Select a default SoA length.
 case "$host" in
