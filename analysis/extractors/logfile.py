@@ -45,7 +45,7 @@ patterns_iterations = {
 patterns_resiuals = {
     #'invcg2': re.compile(r'CG_SOLVER: (\d+) iterations.*'),
     #'minvcg': re.compile(r'MInvCG2: (\d+) iterations'),
-    'QPhiX Clover M-Shift CG': re.compile(r'shift[0]  Actual \|\| r \|\| / \|\| b \|\| = ([\d.e+-]+)'),
+    'QPhiX Clover M-Shift CG': re.compile(r'shift[\d+]  Actual \|\| r \|\| / \|\| b \|\| = ([\d.e+-]+)'),
     #'QPhiX Clover BICGSTAB': re.compile(r'QPHIX_CLOVER_BICGSTAB_SOLVER: (\d+) iters,.*'),
     'QPhiX Clover CG': re.compile(r'QPHIX_CLOVER_CG_SOLVER: \|\| r \|\| / \|\| b \|\| = ([\d.e+-]+)'),
 }
