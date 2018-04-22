@@ -663,6 +663,13 @@ cxx=$(which $cxx_name)
 cmake_python_include_dir="$(python3 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")"
 cmake_python_library="$(python3 -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))")"
 
+# The tests in QPhiX currently
+if [[ "$_arg_qdpjit" = on ]]; then
+  qphix_testing=OFF
+else
+  qphix_testing=ON
+fi
+
 mkdir -p "$build/$repo"
 pushd "$build/$repo"
 if ! [[ -f Makefile ]]; then
@@ -679,7 +686,7 @@ if ! [[ -f Makefile ]]; then
     -Dtm_clover=TRUE \
     -Dcean=FALSE \
     -Dmm_malloc=TRUE \
-    -Dtesting=TRUE \
+    -Dtesting="$qphix_testing" \
     -DPYTHON_INCLUDE_DIR="$cmake_python_include_dir"  \
     -DPYTHON_LIBRARY="$cmake_python_library" \
     $sourcedir/$repo
