@@ -758,8 +758,6 @@ pushd $repo
 autoreconf-if-needed
 popd
 
-exit
-
 # Select a default SoA length.
 case "$host" in
   jureca|hazelhen)
