@@ -619,9 +619,6 @@ case $host in
     # We chose the Python 3.6 installation in `/opt`. This is not available as
     # a module, so we need to set the paths ourselves.
 
-    python_include_dir=/opt/python/3.6.1.1/include
-    python_library=/opt/python/3.6.1.1/lib/libpython3.so
-
     export PATH="/opt/python/3.6.1.1/bin:$PATH"
     ;;
   marconi-a2)
