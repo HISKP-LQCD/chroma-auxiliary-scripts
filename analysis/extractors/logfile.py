@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2016-2018 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
 import collections
@@ -65,8 +65,8 @@ def parse_logfile_to_shard(logfile):
         with open(logfile) as f:
             lines = [line for line in f]
 
+    bucket = bucket_before
     for line in lines:
-        bucket = bucket_before
         m = doing_update_pattern.search(line)
         if m:
             update_no = int(m.group(1))
@@ -76,8 +76,10 @@ def parse_logfile_to_shard(logfile):
 
     if len(bucket_update.keys()) > 0:
         last_update = max(bucket_update.keys())
+        print(bucket_update[last_update])
         last_line = bucket_update[last_update][-1]
-        if not last_line.startswith('HMC: total time = '):
+        secondlast_line = bucket_update[last_update][-2]
+        if not any(x.startswith('HMC: total time = ') for x in [last_line, secondlast_line]):
             del bucket_update[last_update]
 
     for line in bucket_before:
@@ -100,6 +102,8 @@ def parse_logfile_to_shard(logfile):
     shard_file = names.log_shard(logfile)
     with open(shard_file, 'w') as f:
         json.dump(results, f, indent=4, sort_keys=True)
+
+    return results
 
 
 def parse_update_block(lines):

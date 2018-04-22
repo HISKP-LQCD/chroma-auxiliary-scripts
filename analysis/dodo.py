@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2017 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2017-2018 Martin Ueding <dev@martin-ueding.de>
 
 import glob
 import itertools
@@ -15,8 +15,6 @@ import names
 import transforms
 import visualizers
 import wflow
-
-os.chdir('/home/mu/Dokumente/Studium/Master_Science_Physik/Masterarbeit/Runs')
 
 directories = list(filter(os.path.isdir, os.listdir()))
 

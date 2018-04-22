@@ -1,4 +1,4 @@
-# Copyright © 2014-2015, 2017 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2014-2015, 2017-2018 Martin Ueding <dev@martin-ueding.de>
 
 """
 Plots of data sets.
@@ -6,7 +6,6 @@ Plots of data sets.
 
 import logging
 
-import matplotlib.backends.backend_agg
 import matplotlib.figure
 import numpy as np
 
@@ -58,7 +57,6 @@ def plot_correlator(sets, name, shift, offset=False):
     ax2.set_ylabel(r'$\frac{1}{2} [C(t) + C(T-t)]$')
     ax2.grid(True)
 
-    canvas = matplotlib.backends.backend_agg.FigureCanvasAgg(fig_f)
     canvas.print_figure('{}_folded.pdf'.format(name))
 
 
@@ -89,5 +87,4 @@ def plot_effective_mass(sets, name):
     ax2.grid(True)
     ax2.margins(0.05, 0.05)
 
-    canvas = matplotlib.backends.backend_agg.FigureCanvasAgg(fig)
     canvas.print_figure('{}_m_eff.pdf'.format(name))
