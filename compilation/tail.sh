@@ -646,11 +646,11 @@ which python3
 if ! python3 -c 'import jinja2'; then
   pip3 install --user "$markupsafe_source_archive"
   pip3 install --user "$jinja_source_archive"
-fi
 
-# Now it should work, if not, there is nothing this script can do right now.
-if ! python3 -c 'import jinja2'; then
-  exit-with-error 'The Python 3 library jinja2 is not installed and could not be installed automatically. You need to manually make sure that it is installed.'
+  # Now it should work, if not, there is nothing this script can do right now.
+  if ! python3 -c 'import jinja2'; then
+    exit-with-error 'The Python 3 library jinja2 is not installed and could not be installed automatically. You need to manually make sure that it is installed.'
+  fi
 fi
 
 cxxflags="$base_cxxflags $openmp_flags $cxx11_flags $qphix_flags"
