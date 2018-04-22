@@ -35,6 +35,7 @@ def task_logfiles_to_shards():
             }
 
         merged_name = names.log_extract(directory)
+        log_long_name = names.log_long(directory)
 
         yield {
             'actions': [(transforms.merge_json_shards, [shard_names, merged_name])],
@@ -42,6 +43,14 @@ def task_logfiles_to_shards():
             'name': merged_name,
             'file_dep': shard_names,
             'targets': [merged_name],
+        }
+
+        yield {
+            'actions': [(transforms.io_log_json_to_long, [merged_name, log_long_name])],
+            'basename': 'logfile_to_long',
+            'name': log_long_name,
+            'file_dep': [merged_name],
+            'targets': [log_long_name],
         }
 
 

@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016-2017 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2016-2018 Martin Ueding <dev@martin-ueding.de>
 
 import collections
+import csv
 import glob
 import json
 import os
@@ -228,6 +229,47 @@ def io_running_mean(path_in, path_out, window=100):
     r = x.rolling(window)
     rolling_mean = r.mean().dropna()
     rolling_mean.to_csv(path_out, sep='\t')
+
+
+def io_log_json_to_long(path_in, path_out):
+    cols = ['gflops', 'iters', 'residuals']
+
+    rows = []
+
+    print(path_in)
+
+    with open(path_in) as f:
+        updates = json.load(f)
+
+    for update, update_data in sorted(updates.items()):
+        nodes = update_data['nodes']
+        subgrid_volume = update_data['subgrid_volume']
+
+        for solver, solver_data in update_data['solvers'].items():
+            print(update, solver, solver_data.keys())
+            for items in zip(*[solver_data[c] for c in cols if c in solver_data]):
+                if len(items) == 3:
+                    gflops, iters, residual = items
+                else:
+                    gflops, iters = items
+                    residual = 'NA'
+
+                rows.append([
+                    update,
+                    nodes,
+                    subgrid_volume,
+                    solver,
+                    gflops,
+                    iters,
+                    residual
+                ])
+
+    with open(path_out, 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(['Update', 'Nodes', 'Subgrid_Volume', 'Solver', 'GFLOPS', 'Iterations', 'Residual'])
+        for row in rows:
+            writer.writerow(row)
+
 
 
 if __name__ == '__main__':

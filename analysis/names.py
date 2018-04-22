@@ -1,4 +1,4 @@
-# Copyright © 2017 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2017-2018 Martin Ueding <dev@martin-ueding.de>
 
 import re
 import os
@@ -49,6 +49,11 @@ def log_shard(logfile):
 @_ensure_dir
 def log_extract(directory):
     return os.path.join(directory, 'extract', 'extract-log.json')
+
+
+@_ensure_dir
+def log_long(directory):
+    return os.path.join(directory, 'extract', 'log-long.csv')
 
 
 @_ensure_dir
