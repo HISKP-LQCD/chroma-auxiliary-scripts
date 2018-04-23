@@ -266,7 +266,7 @@ def io_log_json_to_long(path_in, path_out):
 
     with open(path_out, 'w') as f:
         writer = csv.writer(f)
-        writer.writerow(['Update', 'Nodes', 'Subgrid_Volume', 'Solver', 'GFLOPS', 'Iterations', 'Residual'])
+        writer.writerow(['Update', 'Ranks', 'Subgrid_Volume', 'Solver', 'GFLOPS', 'Iterations', 'Residual'])
         for row in rows:
             writer.writerow(row)
 
