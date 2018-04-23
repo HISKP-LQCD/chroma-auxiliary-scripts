@@ -11,7 +11,7 @@ the output XML with the XPath query system and extract some data and plot it.
 - `python3-numpy`
 - `python3-scipy`
 - `python3-matplotlib`
-- `python3-doit
+- `python3-doit`
 
 ## Usage
 
