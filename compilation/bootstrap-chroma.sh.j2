@@ -824,7 +824,7 @@ case "$_arg_host" in
 
     export PATH="/opt/python/3.6.1.1/bin:$PATH"
     ;;
-  jureca)
+  jureca|jureca-booster)
     checked-module load CMake
     checked-module load Python
     ;;
@@ -967,14 +967,16 @@ popd
 
 # Select a default SoA length.
 case "$_arg_host" in
-  jureca|hazelhen)
+  hazelhen|jureca)
     soalen=4
     inner_soalen=4
     ;;
-  marconi-a2)
+  jureca-booster|marconi-a2)
     soalen=8
     inner_soalen=4
     ;;
+  *)
+    exit-with-error "There is no default setting for the soalen for machine $_arg_host, please add this to the script."
 esac
 
 # Overwrite with the value that the user has chosen, if it is set.
