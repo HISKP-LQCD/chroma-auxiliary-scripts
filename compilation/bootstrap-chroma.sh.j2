@@ -435,6 +435,14 @@ case "$compiler" in
     qphix_configure=""
 
     case "$_arg_host" in
+      hazelhen)
+        silent module swap PrgEnv-cray PrgEnv-gnu
+        silent module list
+        cc_name=cc
+        cxx_name=CC
+        host_cxx=g++
+        base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
+        ;;
       jureca)
         checked-module load GCC
         checked-module load ParaStationMPI
@@ -444,13 +452,11 @@ case "$compiler" in
         host_cxx=g++
         base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
         ;;
-      hazelhen)
-        silent module swap PrgEnv-cray PrgEnv-gnu
-        silent module list
-        cc_name=cc
-        cxx_name=CC
+      local)
+        cc_name=mpicc
+        cxx_name=mpic++
         host_cxx=g++
-        base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
+        base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=native"
         ;;
       marconi-a2)
         checked-module load gnu
@@ -460,12 +466,6 @@ case "$compiler" in
         cxx_name=mpic++
         host_cxx=g++
         base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=knl"
-        ;;
-      local)
-        cc_name=mpicc
-        cxx_name=mpic++
-        host_cxx=g++
-        base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=native"
         ;;
       *)
         exit-with-error "Compiler GCC is not supported on $_arg_host."
@@ -558,51 +558,6 @@ repo=libxml2
 print-fancy-heading $repo
 
 case "$_arg_host" in
-  jureca|marconi-a2)
-    cflags="$base_cflags"
-    cxxflags="$base_cxxflags"
-
-    pushd $repo
-    if ! [[ -f configure ]]; then
-      mkdir -p m4
-      pushd m4
-      ln -fs /usr/share/aclocal/pkg.m4 .
-      popd
-      checked-module load Autotools
-      NOCONFIGURE=yes ./autogen.sh
-    fi
-    popd
-
-    mkdir -p "$build/$repo"
-    pushd "$build/$repo"
-    if ! [[ -f Makefile ]]; then
-      $sourcedir/$repo/configure $base_configure \
-        --without-zlib \
-        --without-python \
-        --without-readline \
-        --without-threads \
-        --without-history \
-        --without-reader \
-        --without-writer \
-        --with-output \
-        --without-ftp \
-        --without-http \
-        --without-pattern \
-        --without-catalog \
-        --without-docbook \
-        --without-iconv \
-        --without-schemas \
-        --without-schematron \
-        --without-modules \
-        --without-xptr \
-        --without-xinclude \
-        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
-    fi
-    make-make-install
-    popd
-
-    libxml="$prefix/bin/xml2-config"
-    ;;
   hazelhen)
     cflags="$base_cflags"
     cxxflags="$base_cxxflags"
@@ -645,6 +600,51 @@ case "$_arg_host" in
         --without-xptr \
         --without-libz \
         --without-lzma \
+        --without-xinclude \
+        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+    fi
+    make-make-install
+    popd
+
+    libxml="$prefix/bin/xml2-config"
+    ;;
+  jureca|marconi-a2)
+    cflags="$base_cflags"
+    cxxflags="$base_cxxflags"
+
+    pushd $repo
+    if ! [[ -f configure ]]; then
+      mkdir -p m4
+      pushd m4
+      ln -fs /usr/share/aclocal/pkg.m4 .
+      popd
+      checked-module load Autotools
+      NOCONFIGURE=yes ./autogen.sh
+    fi
+    popd
+
+    mkdir -p "$build/$repo"
+    pushd "$build/$repo"
+    if ! [[ -f Makefile ]]; then
+      $sourcedir/$repo/configure $base_configure \
+        --without-zlib \
+        --without-python \
+        --without-readline \
+        --without-threads \
+        --without-history \
+        --without-reader \
+        --without-writer \
+        --with-output \
+        --without-ftp \
+        --without-http \
+        --without-pattern \
+        --without-catalog \
+        --without-docbook \
+        --without-iconv \
+        --without-schemas \
+        --without-schematron \
+        --without-modules \
+        --without-xptr \
         --without-xinclude \
         CFLAGS="$cflags" CXXFLAGS="$cxxflags"
     fi
@@ -789,10 +789,6 @@ repo=qphix
 print-fancy-heading $repo
 
 case "$_arg_host" in
-  jureca)
-    checked-module load CMake
-    checked-module load Python
-    ;;
   hazelhen)
     # There is a Python 3 installation from SLES. However, the needed PIP 3 is
     # not installed, and we need this in order to install a third-party library
@@ -813,6 +809,10 @@ case "$_arg_host" in
     # a module, so we need to set the paths ourselves.
 
     export PATH="/opt/python/3.6.1.1/bin:$PATH"
+    ;;
+  jureca)
+    checked-module load CMake
+    checked-module load Python
     ;;
   marconi-a2)
     checked-module load cmake
@@ -900,14 +900,14 @@ repo=gmp
 print-fancy-heading $repo
 
 case "$_arg_host" in
+  hazelhen)
+    gmp="-lgmp"
+    ;;
   jureca)
     set +x
     checked-module load GMP
     set -x
     gmp="$EBROOTGMP"
-    ;;
-  hazelhen)
-    gmp="-lgmp"
     ;;
   marconi-a2)
     # The GNU MP library installed on the Marconi system, but it might be
