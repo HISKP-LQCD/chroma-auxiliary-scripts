@@ -12,7 +12,7 @@ import jinja2
 arg_compiled = 'args.sh'
 arg_template = 'args.m4'
 arg_temporary = 'args-raw.sh'
-script_compiled = 'bootstrap-chroma.sh'
+script_compiled = 'bootstrap-chroma'
 script_template = 'bootstrap-chroma.sh.j2'
 
 
@@ -48,6 +48,8 @@ def main():
 
     with open(script_compiled, "w") as f:
         f.write(template.render(arg_parsing=arg_parsing))
+
+    os.chmod(script_compiled, 0o755)
 
 
 if __name__ == "__main__":
