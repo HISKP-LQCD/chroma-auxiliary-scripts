@@ -498,7 +498,7 @@ mkdir -p "$build"
 # but this has not always worked properly, therefore this additional thing.
 # Additionally we might install auxiliary software like CMake on some systems,
 # we want it to be preferred over the system-wide installed versions.
-PATH=$prefix/bin:$PATH
+export PATH="$prefix/bin:$PATH"
 
 # Basic flags that will be used for all compilations. The full path to the C
 # and C++ compiler are queried here and stored. Changes in modules later on
@@ -606,9 +606,9 @@ case "$_arg_host" in
     make-make-install
     popd
 
-    libxml="$prefix/bin/xml2-config"
+    libxml="$prefix"
     ;;
-  jureca|marconi-a2)
+  jureca|jureca-booster|marconi-a2)
     cflags="$base_cflags"
     cxxflags="$base_cxxflags"
 
@@ -651,10 +651,13 @@ case "$_arg_host" in
     make-make-install
     popd
 
-    libxml="$prefix/bin/xml2-config"
+    libxml="$prefix"
     ;;
   local)
     libxml="/usr/include/libxml2"
+    ;;
+  *)
+    exit-with-error "There is no libxml2 specification for machine $_arg_host. Please extent this script."
     ;;
 esac
 
@@ -720,6 +723,12 @@ if [[ "$_arg_qdpjit" = off ]]; then
   pushd $repo
   autoreconf-if-needed
   popd
+
+  # We need to make sure that the `xml2-config` program can be found by a
+  # subprocess.
+  if ! bash -c 'xml2-config --help'; then
+    exit-with-error "For some reason the xml2-config program cannot be found in the PATH although it should be installed into a location that is installed to the PATH. The value of PATH is $PATH."
+  fi
 
   mkdir -p "$build/$repo"
   pushd "$build/$repo"
