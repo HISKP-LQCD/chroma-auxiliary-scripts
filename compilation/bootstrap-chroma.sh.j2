@@ -50,16 +50,6 @@ silent() {
   return $status
 }
 
-print-help() {
-  cat <<EOF
-Usage: $0 [OPTIONS] BASE
-
-Have a look at the manual page (bootstrap-chroma.1.md) or its compiled version
-(bootstrap.1) for a full description.
-EOF
-  exit 1
-}
-
 # On some machines, the `module` command does not set the exit status when it
 # fails. Also it annoyingly outputs everything on standard error. This function
 # parses the output and checks for the word `error` case insensitively. The
@@ -332,43 +322,32 @@ popd
 #                           Compiler Flag Selection                           #
 ###############################################################################
 
-# Determine the fully qualified hostname and then set the optimal default
-# compiler for the architecture found.
-hostname_f="$(hostname -f)"
-
-if [[ "$_arg_autodetect_machine" = off ]]; then
-  if [[ -z "$_arg_isa" ]]; then
-    exit-with-error "Builds on local machines require the -i option to be passed (ISA: avx, avx2, avx512)"
-  fi
-  host=local
-  isa=$_arg_isa
-  compiler="${_arg_compiler:-gcc}"
-else
-  if [[ "$hostname_f" =~ eslogin[0-9]+ ]]; then
-    host=hazelhen
+case "$_arg_host" in
+  hazelhen)
     isa=avx2
     compiler="${_arg_compiler:-icc}"
-  elif [[ "$hostname_f" =~ [^.]*\.jureca ]]; then
-    if [[ "${LMOD_SYSTEM_NAME-}" = jurecabooster ]]; then
-      host=jurecabooster
-      isa=avx512
-    else
-      host=jureca
-      isa=avx2
+    ;;
+  jureca)
+    isa=avx2
+    ;;
+  jureca-booster)
+    isa=avx512
+    ;;
+  local)
+    if [[ -z "$_arg_isa" ]]; then
+      exit-with-error "Builds on local machines require the -i option to be passed (ISA: avx, avx2, avx512)"
     fi
+    isa=$_arg_isa
+    compiler="${_arg_compiler:-gcc}"
+    ;;
+  marconi-a2)
+    isa=avx512
     compiler="${_arg_compiler:-icc}"
-  elif [[ "$hostname_f" =~ [^.]*\.marconi.cineca.it ]]; then
-    if [[ -n "${ENV_KNL_HOME-}" ]]; then
-      host=marconi-a2
-      isa=avx512
-      compiler="${_arg_compiler:-icc}"
-    else
-      exit-with-error 'You seem to be running on Marconi but the environment variable ENV_KNL_HOME is not set. This script currently only supports Marconi A2, so please do `module load env-knl` to select the KNL partition.'
-    fi
-  else
-    exit-with-error "This machine is neither explicitly a 'local' machine nor JURECA nor Hazel Hen nor Marconi A2. It is not clear what should be done, please update the script."
-  fi
-fi
+    ;;
+  *)
+    exit_with_error "The machine $_arg_machine is not supported by this script. Please use one of the supported machine or ideally extend this script at https://github.com/HISKP-LQCD/chroma-auxiliary-scripts/tree/master/compilation :-)"
+    ;;
+esac
 
 # Set up the chosen compiler.
 case "$compiler" in
@@ -397,7 +376,7 @@ case "$compiler" in
     # gets enabled here.
     qphix_configure="--enable-cean"
 
-    case "$host" in
+    case "$_arg_host" in
       jureca)
         checked-module load Intel/2018.1.163-GCC-5.4.0
         checked-module load IntelMPI/2018.1.163
@@ -407,7 +386,7 @@ case "$compiler" in
         host_cxx=icpc
         base_flags="-xAVX2 -O3"
         ;;
-      jurecabooster)
+      jureca-booster)
         checked-module use /usr/local/software/jurecabooster/OtherStages
         checked-module load Stages/2017a
         checked-module load Intel/2017.2.174-GCC-5.4.0
@@ -443,7 +422,7 @@ case "$compiler" in
         base_flags="-xMIC-AVX512 -O3"
         ;;
       *)
-        exit-with-error "Compiler ICC is not supported on $host."
+        exit-with-error "Compiler ICC is not supported on $_arg_host."
     esac
     ;;
   gcc)
@@ -455,7 +434,7 @@ case "$compiler" in
     qphix_flags="-Drestrict=__restrict__"
     qphix_configure=""
 
-    case "$host" in
+    case "$_arg_host" in
       jureca)
         checked-module load GCC
         checked-module load ParaStationMPI
@@ -489,7 +468,7 @@ case "$compiler" in
         base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=native"
         ;;
       *)
-        exit-with-error "Compiler GCC is not supported on $host."
+        exit-with-error "Compiler GCC is not supported on $_arg_host."
     esac
     ;;
   *)
@@ -528,7 +507,7 @@ base_cxxflags="$base_flags"
 base_cflags="$base_flags $c99_flags"
 base_configure="--prefix=$prefix CC=$(which $cc_name) CXX=$(which $cxx_name) --enable-option-checking"
 
-case "$host" in
+case "$_arg_host" in
   hazelhen)
     # The “huge pages” are used on Hazel Hen. This leads to the inability to run
     # execute programs on the login nodes that are compiled with the MPI compiler
@@ -536,7 +515,7 @@ case "$host" in
     # `./configure` script won't try to execute the test programs.
     base_configure="$base_configure --host=x86_64-linux-gnu"
     ;;
-  jurecabooster|marconi-a2)
+  jureca-booster|marconi-a2)
     # Marconi A2 has a cross compilation from Haswell to Knights Landing,
     # therefore one needs to tell GNU Autotools that programs compiled with the
     # target compiler cannot be executed on the host.
@@ -578,7 +557,7 @@ popd
 repo=libxml2
 print-fancy-heading $repo
 
-case "$host" in
+case "$_arg_host" in
   jureca|marconi-a2)
     cflags="$base_cflags"
     cxxflags="$base_cxxflags"
@@ -692,7 +671,7 @@ if [[ "$_arg_qdpjit" = on ]]; then
     mv llvm-6.0.0.src "$repo"
   fi
 
-  case $host in
+  case "$_arg_host" in
     jureca)
       checked-module load CMake
       ;;
@@ -774,7 +753,7 @@ if [[ "$_arg_qdpjit" = on ]]; then
 
   # Depending on the machine architecture that we work on, we need a different
   # branch of QDP-JIT.
-  case $host in
+  case "$_arg_host" in
     jureca)
       ensure-git-branch llvm-cpu-inner-loop-no11-qshift
       ;;
@@ -809,7 +788,7 @@ fi
 repo=qphix
 print-fancy-heading $repo
 
-case $host in
+case "$_arg_host" in
   jureca)
     checked-module load CMake
     checked-module load Python
@@ -842,7 +821,7 @@ case $host in
 esac
 
 set +x
-if [[ "$host" != "local" ]]; then
+if [[ "$_arg_host" != "local" ]]; then
   module list
 fi
 set -x
@@ -920,7 +899,7 @@ fi
 repo=gmp
 print-fancy-heading $repo
 
-case "$host" in
+case "$_arg_host" in
   jureca)
     set +x
     checked-module load GMP
@@ -973,7 +952,7 @@ autoreconf-if-needed
 popd
 
 # Select a default SoA length.
-case "$host" in
+case "$_arg_host" in
   jureca|hazelhen)
     soalen=4
     inner_soalen=4
