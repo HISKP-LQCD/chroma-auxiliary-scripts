@@ -329,9 +329,12 @@ case "$_arg_host" in
     ;;
   jureca)
     isa=avx2
+    compiler="${_arg_compiler:-icc}"
     ;;
   jureca-booster)
     isa=avx512
+    compiler="${_arg_compiler:-icc}"
+    module load Architecture/KNL
     ;;
   local)
     if [[ -z "$_arg_isa" ]]; then
@@ -345,7 +348,7 @@ case "$_arg_host" in
     compiler="${_arg_compiler:-icc}"
     ;;
   *)
-    exit_with_error "The machine $_arg_machine is not supported by this script. Please use one of the supported machine or ideally extend this script at https://github.com/HISKP-LQCD/chroma-auxiliary-scripts/tree/master/compilation :-)"
+    exit_with_error "The machine $_arg_machine is not supported by this script. Please use one of the supported machines (see -h for help) or ideally extend this script at https://github.com/HISKP-LQCD/chroma-auxiliary-scripts/tree/master/compilation :-)"
     ;;
 esac
 
@@ -388,9 +391,11 @@ case "$compiler" in
         ;;
       jureca-booster)
         checked-module use /usr/local/software/jurecabooster/OtherStages
-        checked-module load Stages/2017a
-        checked-module load Intel/2017.2.174-GCC-5.4.0
-        checked-module load IntelMPI/2017.2.174
+        #checked-module load Stages/2017a
+        checked-module load Intel
+        #checked-module load Intel/2017.2.174-GCC-5.4.0
+        checked-module load IntelMPI
+        #checked-module load IntelMPI/2017.2.174
         checked-module load CMake
         silent module list
         cc_name=mpiicc
