@@ -22,3 +22,4 @@ analysis/physical_point/mpi-vs-aml-band.tsv
 analysis/physical_point/mpi-vs-aml-data.tsv
 analysis/physical_point/mpi-vs-aml-fit.tsv
 analysis/test.tsv
+compilation/bootstrap-chroma.sh
