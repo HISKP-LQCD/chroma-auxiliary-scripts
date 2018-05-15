@@ -917,7 +917,7 @@ case "$_arg_host" in
   hazelhen)
     gmp="-lgmp"
     ;;
-  jureca)
+  jureca|jureca-booster)
     set +x
     checked-module load GMP
     set -x
@@ -949,6 +949,9 @@ case "$_arg_host" in
 
     gmp="$prefix"
     ;;
+  *)
+    exit-with-error "There is no default setting for the gmp for machine $_arg_host, please add this to the script."
+    ;;
 esac
 
 ###############################################################################
@@ -977,6 +980,7 @@ case "$_arg_host" in
     ;;
   *)
     exit-with-error "There is no default setting for the soalen for machine $_arg_host, please add this to the script."
+    ;;
 esac
 
 # Overwrite with the value that the user has chosen, if it is set.
