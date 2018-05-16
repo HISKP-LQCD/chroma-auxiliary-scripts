@@ -36,7 +36,7 @@ After this script ran though, you will have the following directories::
     BASE/sources/qphix
 ])
 
-ARG_POSITIONAL_SINGLE([host], [Machine to build on, can be one of the following: hazelhen, jureca, jureca-booster, local, marconi-a2], [])
+ARG_POSITIONAL_SINGLE([host], [Machine to build on, can be one of the following: hazelhen, jureca, jureca-booster, local, marconi-a2, qbig], [])
 ARG_POSITIONAL_SINGLE([basedir], [Base path], [])
 
 ARG_OPTIONAL_BOOLEAN([verbose], [V], [Print Bash commands executed], [on])

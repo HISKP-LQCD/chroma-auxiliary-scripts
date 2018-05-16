@@ -353,6 +353,10 @@ case "$_arg_host" in
     isa=avx512
     compiler="${_arg_compiler:-icc}"
     ;;
+  qbig)
+    isa=avx
+    compiler="${_arg_compiler:-gcc}"
+    ;;
   *)
     exit_with_error "The machine $_arg_machine is not supported by this script. Please use one of the supported machines (see -h for help) or ideally extend this script at https://github.com/HISKP-LQCD/chroma-auxiliary-scripts/tree/master/compilation :-)"
     ;;
@@ -478,6 +482,12 @@ case "$compiler" in
         host_cxx=g++
         base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=knl"
         ;;
+      qbig)
+        cc_name=mpicc
+        cxx_name=mpic++
+        host_cxx=g++
+        base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=sandybridge"
+        ;;
       *)
         exit-with-error "Compiler GCC is not supported on $_arg_host."
     esac
@@ -520,10 +530,10 @@ base_configure="--prefix=$prefix CC=$(which $cc_name) CXX=$(which $cxx_name) --e
 
 case "$_arg_host" in
   hazelhen)
-    # The “huge pages” are used on Hazel Hen. This leads to the inability to run
-    # execute programs on the login nodes that are compiled with the MPI compiler
-    # wrapper. Autotools need to be told that it cross compiles such that the
-    # `./configure` script won't try to execute the test programs.
+    # The “huge pages” are used on Hazel Hen. This leads to the inability to
+    # run execute programs on the login nodes that are compiled with the MPI
+    # compiler wrapper. Autotools need to be told that it cross compiles such
+    # that the `./configure` script won't try to execute the test programs.
     base_configure="$base_configure --host=x86_64-linux-gnu"
     ;;
   jureca-booster|marconi-a2)
@@ -569,7 +579,7 @@ repo=libxml2
 print-fancy-heading $repo
 
 case "$_arg_host" in
-  hazelhen)
+  hazelhen|qbig)
     cflags="$base_cflags"
     cxxflags="$base_cxxflags"
     cflags="-O3"
@@ -840,11 +850,13 @@ case "$_arg_host" in
     ;;
 esac
 
-set +x
-if [[ "$_arg_host" != "local" ]]; then
-  module list
-fi
-set -x
+case "$_arg_host" in
+  hazelhen|jureca|jureca-booster|marconi-a2)
+    silent module list
+    ;;
+  *)
+    ;;
+esac
 
 # Check whether Python 3 interpreter is there. The following calls Python 3 and
 # lets it do explicitly nothing. That must always work. Then we output the path
@@ -929,7 +941,7 @@ case "$_arg_host" in
     set -x
     gmp="$EBROOTGMP"
     ;;
-  marconi-a2)
+  marconi-a2|qbig)
     # The GNU MP library installed on the Marconi system, but it might be
     # linked against an older version of the standard library. Therefore we
     # compile it from scratch.
@@ -976,7 +988,7 @@ popd
 
 # Select a default SoA length.
 case "$_arg_host" in
-  hazelhen|jureca)
+  hazelhen|jureca|qbig)
     soalen=4
     inner_soalen=4
     ;;
