@@ -3,15 +3,15 @@ ARG_HELP([Installs Chroma with dependencies from scratch.
 This is a script to install Chroma, QPhiX, QDP++, QMP, and their
 dependencies on the following HPC systems:
 
-+--------------+----------------------------+------------------------------+
-| Name         | Architecture               | Location                     |
-+==============+============================+==============================+
-| Hazel Hen    | Haswell (AVX2)             | Stuttgart, Germany           |
-+--------------+----------------------------+------------------------------+
-| JURECA       | Haswell (AVX2)             | Jülich, Germany              |
-+--------------+----------------------------+------------------------------+
-| Marconi A2   | Knights Landing (AVX512)   | Casalecchio di Reno, Italy   |
-+--------------+----------------------------+------------------------------+
+=============== ====================== ==========================
+Name            Architecture           Location
+=============== ====================== ==========================
+Hazel Hen       Haswell                Stuttgart, Germany
+JURECA          Haswell                Jülich, Germany
+JURECA Booster  Knights Landung        Jülich, Germany
+Marconi A2      Knights Landing        Casalecchio di Reno, Italy
+QBIG            Sandy Bridge / Haswell Bonn, Germany
+=============== ====================== ==========================
 
 The script will automatically find out which computer you run it on. If
 this check fails, the script need to be fixed.
