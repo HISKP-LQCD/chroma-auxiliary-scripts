@@ -43,7 +43,7 @@ ARG_OPTIONAL_BOOLEAN([verbose], [V], [Print Bash commands executed.], [on])
 ARG_OPTIONAL_BOOLEAN([download-only], [d], [Download only. This is needed for systems like Hazel Hen where outgoing connections are not allowed. Run the script with the this option on your workstation, rsync everything to the machine and then compile there.], [off])
 
 ARG_OPTIONAL_SINGLE([compiler], [c], [Compiler family to use, defaults to best on given machine.], [])
-ARG_OPTIONAL_SINGLE([make-j], [j], [Maximum number of parallel processes used by make], [$(nproc)])
+ARG_OPTIONAL_SINGLE([make-j], [j], [Maximum number of parallel processes used by "make". The default value is the number of cores on the current machine.], [$(nproc)])
 ARG_OPTIONAL_SINGLE([isa], [i], [Manual instruction set architecture (ISA), usually automatically set. Can also be used to override ISA in edge cases, like using AVX2 on KNL in order to use SoA length of 2 in double precision.], )
 
 ARG_OPTIONAL_BOOLEAN([qdpjit], , [Use QDP-JIT instead of QDP++.], [off])
