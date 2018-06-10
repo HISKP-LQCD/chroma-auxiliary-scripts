@@ -362,6 +362,11 @@ case "$_arg_host" in
     ;;
 esac
 
+# If the user has specified an ISA, we override the setting.
+if [[ -n "$_arg_isa" ]]; then
+  isa="$_arg_isa"
+fi
+
 # Set up the chosen compiler.
 case "$compiler" in
   # The cray compiler does not support half-precision data types (yet). So
@@ -397,7 +402,6 @@ case "$compiler" in
         cc_name=mpiicc
         cxx_name=mpiicpc
         host_cxx=icpc
-        base_flags="-xAVX2 -O3"
         ;;
       jureca-booster)
         checked-module use /usr/local/software/jurecabooster/OtherStages
@@ -411,7 +415,6 @@ case "$compiler" in
         cc_name=mpiicc
         cxx_name=mpiicpc
         host_cxx=icpc
-        base_flags="-xMIC-AVX512 -O3"
         ;;
       hazelhen)
         # On Hazel Hen, the default compiler is the Cray compiler. One needs to
@@ -425,7 +428,6 @@ case "$compiler" in
         cc_name=cc
         cxx_name=CC
         host_cxx=icpc
-        base_flags="-xCORE-AVX2 -O3"
         ;;
       marconi-a2)
         checked-module load intel/pe-xe-2017--binary
@@ -434,10 +436,21 @@ case "$compiler" in
         cc_name=mpiicc
         cxx_name=mpiicpc
         host_cxx=icpc
-        base_flags="-xMIC-AVX512 -O3"
         ;;
       *)
         exit-with-error "Compiler ICC is not supported on $_arg_host."
+    esac
+
+    case "$isa" in
+      avx)
+        base_flags="-xAVX -O3"
+        ;;
+      avx2)
+        base_flags="-xCORE-AVX2 -O3"
+        ;;
+      avx512)
+        base_flags="-xMIC-AVX512 -O3"
+        ;;
     esac
     ;;
   gcc)
@@ -449,6 +462,18 @@ case "$compiler" in
     qphix_flags="-Drestrict=__restrict__"
     qphix_configure=""
 
+    case "$isa" in
+      avx)
+        base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=sandybridge"
+        ;;
+      avx2)
+        base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
+        ;;
+      avx512)
+        base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=knl"
+        ;;
+    esac
+
     case "$_arg_host" in
       hazelhen)
         silent module swap PrgEnv-cray PrgEnv-gnu
@@ -456,7 +481,6 @@ case "$compiler" in
         cc_name=cc
         cxx_name=CC
         host_cxx=g++
-        base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
         ;;
       jureca)
         checked-module load GCC
@@ -465,7 +489,6 @@ case "$compiler" in
         cc_name=mpicc
         cxx_name=mpic++
         host_cxx=g++
-        base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
         ;;
       local)
         cc_name=mpicc
@@ -480,13 +503,11 @@ case "$compiler" in
         cc_name=mpicc
         cxx_name=mpic++
         host_cxx=g++
-        base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=knl"
         ;;
       qbig)
         cc_name=mpicc
         cxx_name=mpic++
         host_cxx=g++
-        base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=sandybridge"
         ;;
       *)
         exit-with-error "Compiler GCC is not supported on $_arg_host."
