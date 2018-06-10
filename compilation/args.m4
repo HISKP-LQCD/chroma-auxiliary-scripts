@@ -36,26 +36,26 @@ After this script ran though, you will have the following directories::
     BASE/sources/qphix
 ])
 
-ARG_POSITIONAL_SINGLE([host], [Machine to build on, can be one of the following: hazelhen, jureca, jureca-booster, local, marconi-a2, qbig], [])
-ARG_POSITIONAL_SINGLE([basedir], [Base path], [])
+ARG_POSITIONAL_SINGLE([host], [Machine to build on, can be one of the following: hazelhen, jureca, jureca-booster, local, marconi-a2, qbig.], [])
+ARG_POSITIONAL_SINGLE([basedir], [Base path for compilation and installation.], [])
 
-ARG_OPTIONAL_BOOLEAN([verbose], [V], [Print Bash commands executed], [on])
-ARG_OPTIONAL_BOOLEAN([download-only], [d], [Download only (for systems like Hazel Hen)], [off])
+ARG_OPTIONAL_BOOLEAN([verbose], [V], [Print Bash commands executed.], [on])
+ARG_OPTIONAL_BOOLEAN([download-only], [d], [Download only. This is needed for systems like Hazel Hen where outgoing connections are not allowed. Run the script with the this option on your workstation, rsync everything to the machine and then compile there.], [off])
 
-ARG_OPTIONAL_SINGLE([compiler], [c], [Compiler family to use, defaults to best on given machine], [])
+ARG_OPTIONAL_SINGLE([compiler], [c], [Compiler family to use, defaults to best on given machine.], [])
 ARG_OPTIONAL_SINGLE([make-j], [j], [Maximum number of parallel processes used by make], [$(nproc)])
-ARG_OPTIONAL_SINGLE([isa], [i], [Manual instruction set architecture (ISA), usually automatically set], )
+ARG_OPTIONAL_SINGLE([isa], [i], [Manual instruction set architecture (ISA), usually automatically set. Can also be used to override ISA in edge cases, like using AVX2 on KNL in order to use SoA length of 2 in double precision.], )
 
-ARG_OPTIONAL_BOOLEAN([qdpjit], , [Use QDP-JIT instead of QDP++], [off])
+ARG_OPTIONAL_BOOLEAN([qdpjit], , [Use QDP-JIT instead of QDP++.], [off])
 
-ARG_OPTIONAL_BOOLEAN([only-qphix], [q], [Only compile QPhiX, not Chroma], [off])
-ARG_OPTIONAL_SINGLE([qphix-branch], [Q], [QPhiX git branch], [devel])
-ARG_OPTIONAL_SINGLE([precision], [p], [Precision of solver, can be "double", "float"], [double])
-ARG_OPTIONAL_SINGLE([precision-inner], [P], [Precision of inner solver, can be "double", "float" or "half"], [single])
-ARG_OPTIONAL_SINGLE([soalen], [s], [Structure of array (SoA) length], )
-ARG_OPTIONAL_SINGLE([soalen-inner], [S], [Structure of array (SoA) length for inner solver], )
+ARG_OPTIONAL_BOOLEAN([only-qphix], [q], [Only compile QPhiX, not Chroma.], [off])
+ARG_OPTIONAL_SINGLE([qphix-branch], [Q], [QPhiX git branch to use.], [devel])
+ARG_OPTIONAL_SINGLE([precision], [p], [Precision of solver, can be "double", "float".], [double])
+ARG_OPTIONAL_SINGLE([precision-inner], [P], [Precision of inner solver, can be "double", "float" or "half".], [single])
+ARG_OPTIONAL_SINGLE([soalen], [s], [Structure of array (SoA) length.], )
+ARG_OPTIONAL_SINGLE([soalen-inner], [S], [Structure of array (SoA) length for inner solver.], )
 
-ARG_OPTIONAL_SINGLE([chroma-branch], [C], [Chroma git branch], [devel])
+ARG_OPTIONAL_SINGLE([chroma-branch], [C], [Chroma git branch to use.], [devel])
 
 ARGBASH_SET_INDENT([  ])
 ARGBASH_GO
