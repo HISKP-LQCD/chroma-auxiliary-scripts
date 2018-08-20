@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2017 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2017-2018 Martin Ueding <dev@martin-ueding.de>
 
 import argparse
 import collections
@@ -28,8 +28,10 @@ def main():
     ensembles = [
         Ensemble(
             'L = 16 Forward Replica',
-            ('/work/hbn28/hbn28e/0106-Mpi660-L16-T32/cfg',),
+            ('/work/hbn28/hbn28e/0106-Mpi660-L16-T32/cfg',
+             '/arch2/hbn28/hbn28e/0106-Mpi660-L16-T32/cfg',),
             ('/work/hbn28/hbn28e/0106-Mpi660-L16-T32/stout',
+             '/arch2/hbn28/hbn28e/0106-Mpi660-L16-T32/stout',
              '/hiskp2/gauges/0106-Mpi660-L16-T32/stout_smeared',),
             ('/work/hbn28/hbn284/eigensystems/0106-Mpi660-L16-T32',
              '/hiskp2/eigensystems/0106-Mpi660-L16-T32/hyp_062_062_3/nev_120'),
@@ -37,8 +39,10 @@ def main():
         ),
         Ensemble(
             'L = 24 Forward Replica',
-            ('/work/hbn28/hbn28e/0120-Mpi270-L24-T96/cfg',),
+            ('/work/hbn28/hbn28e/0120-Mpi270-L24-T96/cfg',
+             '/arch2/hbn28/hbn28e/0120-Mpi270-L24-T96/cfg',),
             ('/work/hbn28/hbn28e/0120-Mpi270-L24-T96/stout',
+             '/arch2/hbn28/hbn28e/0120-Mpi270-L24-T96/stout',
              '/hiskp2/gauges/0120-Mpi270-L24-T96/stout_smeared',),
             ('/work/hbn28/hbn284/eigensystems/0120-Mpi270-L24-T96',
              '/hiskp2/eigensystems/0120-Mpi270-L24-T96/hyp_062_062_3/nev_120'),
@@ -46,8 +50,10 @@ def main():
         ),
         Ensemble(
             'L = 24 Backward Replica',
-            ('/work/hbn28/hbn28e/0122-Mpi270-L24-T96-backwards/cfg',),
+            ('/work/hbn28/hbn28e/0122-Mpi270-L24-T96-backwards/cfg',
+             '/arch2/hbn28/hbn28e/0122-Mpi270-L24-T96-backwards/cfg',),
             ('/work/hbn28/hbn28e/0122-Mpi270-L24-T96-backwards/stout',
+             '/arch2/hbn28/hbn28e/0122-Mpi270-L24-T96-backwards/stout',
              '/hiskp2/gauges/sWC_A2p1_Mpi270_L24T96/backwards/stout'),
             ('/work/hbn28/hbn284/eigensystems/sWC_A2p1_Mpi270_L24T96_backwards',
              '/hiskp2/eigensystems/sWC_A2p1_Mpi270_L24T96_backwards'),
@@ -55,15 +61,19 @@ def main():
         ),
         Ensemble(
             'L = 32 Forward Replica',
-            ('/work/hbn28/hbn28e/0121-Mpi270-L32-T96/cfg',),
-            ('/work/hbn28/hbn28e/0121-Mpi270-L32-T96/stout',),
+            ('/work/hbn28/hbn28e/0121-Mpi270-L32-T96/cfg',
+             '/arch2/hbn28/hbn28e/0121-Mpi270-L32-T96/cfg'),
+            ('/work/hbn28/hbn28e/0121-Mpi270-L32-T96/stout',
+             '/arch2/hbn28/hbn28e/0121-Mpi270-L32-T96/stout',),
             ('/work/hbn28/hbn284/eigensystems/0121-Mpi270-L32-T96',),
             (),
         ),
         Ensemble(
             'L = 32 Backward Replica',
-            ('/work/hbn28/hbn28e/0123-Mpi270-L32-T96-backwards/cfg',),
-            ('/work/hbn28/hbn28e/0123-Mpi270-L32-T96-backwards/stout',),
+            ('/work/hbn28/hbn28e/0123-Mpi270-L32-T96-backwards/cfg',
+             '/arch2/hbn28/hbn28e/0123-Mpi270-L32-T96-backwards/cfg',),
+            ('/work/hbn28/hbn28e/0123-Mpi270-L32-T96-backwards/stout',
+             '/arch2/hbn28/hbn28e/0123-Mpi270-L32-T96-backwards/stout',),
             ('/work/hbn28/hbn284/eigensystems/0123-Mpi270-L32-T96-backwards',),
             (),
         ),
