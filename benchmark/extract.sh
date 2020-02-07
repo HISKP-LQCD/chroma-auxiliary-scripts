@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright © 2017 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2017 Martin Ueding <martin-ueding.de>
 
 ../marconi-benchmark.py clover-*-????.txt --output perf-clover.csv
 ../marconi-benchmark.py tm-48*-????.txt --output perf-tm.csv

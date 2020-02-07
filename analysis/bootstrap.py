@@ -1,4 +1,4 @@
-# Copyright © 2014-2017 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2014-2017 Martin Ueding <martin-ueding.de>
 
 import random
 
