@@ -1,4 +1,4 @@
-# Copyright © 2014-2015, 2017 Martin Ueding <martin-ueding.de>
+# Copyright © 2014-2015, 2017 Martin Ueding <mu@martin-ueding.de>
 
 import numpy as np
 import scipy.optimize as op

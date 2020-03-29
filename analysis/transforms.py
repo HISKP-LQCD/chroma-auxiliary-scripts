@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016-2018 Martin Ueding <martin-ueding.de>
+# Copyright © 2016-2018 Martin Ueding <mu@martin-ueding.de>
 
 import collections
 import csv

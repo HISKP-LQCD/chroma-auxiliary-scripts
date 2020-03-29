@@ -1,4 +1,4 @@
-# Copyright © 2017-2018 Martin Ueding <martin-ueding.de>
+# Copyright © 2017-2018 Martin Ueding <mu@martin-ueding.de>
 
 import re
 import os

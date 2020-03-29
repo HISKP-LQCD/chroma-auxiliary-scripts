@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright © 2016-2017 Martin Ueding <martin-ueding.de>
+# Copyright © 2016-2017 Martin Ueding <mu@martin-ueding.de>
 
 import os
 

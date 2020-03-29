@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright © 2016 Martin Ueding <martin-ueding.de>
+# Copyright © 2016 Martin Ueding <mu@martin-ueding.de>
 # Licensed under the MIT license.
 
 set -e

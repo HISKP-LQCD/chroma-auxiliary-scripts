@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# Copyright © YEAR Martin Ueding <martin-ueding.de>
+# Copyright © YEAR Martin Ueding <mu@martin-ueding.de>
 
 import argparse
 import collections

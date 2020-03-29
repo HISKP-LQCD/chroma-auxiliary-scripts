@@ -1,5 +1,5 @@
 #!/bin/bash -x
-# Copyright © 2016-2017 Martin Ueding <martin-ueding.de>
+# Copyright © 2016-2017 Martin Ueding <mu@martin-ueding.de>
 
 #SBATCH --nodes=8
 #SBATCH --ntasks-per-node=1

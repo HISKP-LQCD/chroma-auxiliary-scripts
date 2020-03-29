@@ -1,4 +1,4 @@
-# Copyright © 2017 Martin Ueding <martin-ueding.de>
+# Copyright © 2017 Martin Ueding <mu@martin-ueding.de>
 
 import glob
 import os
