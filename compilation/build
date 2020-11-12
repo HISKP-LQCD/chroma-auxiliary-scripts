@@ -21,7 +21,7 @@ def make_argparse():
        os.path.getmtime(arg_compiled) >= os.path.getmtime(arg_template):
         return
 
-    output = subprocess.check_output(['argbash', arg_template, '--no-commented'])
+    output = subprocess.check_output(['./bin/argbash', arg_template, '--no-commented'])
     lines = output.decode().strip().split('\n')
 
     filtered = filter(lambda x: 'START OF CODE' in x[1],
