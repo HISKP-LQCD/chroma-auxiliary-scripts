@@ -19,20 +19,31 @@ def main():
     template = env.get_template('chroma-smear.template.xml')
 
     ini_files = []
-
+    print(options.directory,options.gauge_config )
     for gauge_config in options.gauge_config:
         print('Working on {} …'.format(gauge_config))
         basename = os.path.basename(gauge_config)
-        dirname = os.path.dirname(gauge_config)
-        base, ext = os.path.splitext(basename)
+#        dirname = os.path.dirname(gauge_config)
+        dirname = os.path.dirname(options.directory[0])
+        dirname_out = os.path.dirname(options.directory_out[0])
+#        base, ext = os.path.splitext(basename)
+        base, ext = os.path.splitext(gauge_config)
+#        base, ext = os.path.splitext(options.derectory)
 
+        conf_in='{}/{}'.format(options.directory[0],gauge_config)
+        conf_out='{}/{}'.format(options.directory_out[0],gauge_config)
+        print(conf_in)
         filename_smeared = '{}.stout6{}'.format(base, ext)
-        filename_xml = '{}.stout6.xml'.format(base)
-        filename_chroma_input = '{}.stout6.chroma-ini.xml'.format(os.path.join(dirname, base))
+#        filename_xml = '{}.stout6.xml'.format(base)
+        filename_xml = '{}.stout6.xml'.format(gauge_config)
+        #filename_chroma_input = '{}.stout6.chroma-ini.xml'.format(os.path.join(dirname, base))
+        filename_chroma_input = '{}.stout6.chroma-ini.xml'.format(os.path.join(gauge_config))
 
         rendered = template.render(
-            config_in_file=gauge_config,
-            config_out_file=filename_smeared,
+#            config_in_file=gauge_config,
+            config_in_file=conf_in,
+#            config_out_file=filename_smeared,
+            config_out_file=conf_out,
             xml_out_file=filename_xml,
         )
 
@@ -46,16 +57,18 @@ def main():
     with open(os.path.join(dirname, 'smear-job.slurm.sh'), 'w') as f:
         f.write('''#!/bin/bash 
 
+
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=02:00:00
-#SBATCH --partition=devel
+#SBATCH --time=00:10:00
+#SBATCH --partition=skl_usr_dbg
+#SBATCH --account=INF20_lqcd123
 #SBATCH --cpus-per-task=24
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=ueding@hiskp.uni-bonn.de
 
-module load Intel
-module load IntelMPI
+# module load Intel
+# module load IntelMPI
+#module load Core/lmod/6.6
 
 export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 export KMP_AFFINITY=scatter,0
@@ -63,7 +76,7 @@ export KMP_AFFINITY=scatter,0
 ''')
 
         for ini_file in ini_files:
-            f.write('srun ~/jureca-local-icc/bin/chroma -i "{}" -by 8 -bz 8 -c 24 -sy 1 -sz 1 -pxy 1 -pxyz 0 -minct 2\n'.format(ini_file))
+            f.write('srun /marconi/home/userexternal/mgarofal/chroma/local-icc/bin/chroma -i "{}" -by 8 -bz 8 -c 6 -sy 1 -sz 1 -pxy 1 -pxyz 0 -minct 2\n'.format(ini_file))
 
 
 
@@ -75,6 +88,8 @@ def _parse_args():
     :rtype: Namespace
     '''
     parser = argparse.ArgumentParser(description='')
+    parser.add_argument('directory', nargs=1, help='directory of the confs')
+    parser.add_argument('directory_out', nargs=1, help='directory of the output')
     parser.add_argument('gauge_config', nargs='+', help='LIME files to smear')
     options = parser.parse_args()
 

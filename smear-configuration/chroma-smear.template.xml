@@ -10,7 +10,7 @@ smear it, and then stores it to disk.
         <cfg_file>{{ config_in_file }}</cfg_file>
     </Cfg>
     <Param>
-        <nrow>16 16 16 32</nrow>
+        <nrow>20 20 20 40</nrow>
         <InlineMeasurements>
             <!-- Measure the plaquette -->
             <elem>
@@ -32,7 +32,7 @@ smear it, and then stores it to disk.
                     <LinkSmearingType>STOUT_SMEAR</LinkSmearingType>
                     <version>3</version>
                     <smear_dirs>1 1 1 1</smear_dirs>
-                    <link_smear_fact>1.1</link_smear_fact>
+                    <link_smear_fact>0.11</link_smear_fact>
                     <link_smear_num>6</link_smear_num>
                 </Param>
 
