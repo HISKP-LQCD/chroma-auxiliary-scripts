@@ -353,6 +353,10 @@ case "$_arg_host" in
     isa=avx512
     compiler="${_arg_compiler:-icc}"
     ;;
+  marconi-a3)
+    isa=avx2
+    compiler="${_arg_compiler:-icc}"
+    ;;
   qbig)
     isa=avx
     compiler="${_arg_compiler:-gcc}"
@@ -380,8 +384,8 @@ case "$compiler" in
     c99_flags="-hstd=c99"
     cxx11_flags="-hstd=c++11"
     disable_warnings_flags=""
-    qphix_flags=""
-    qphix_configure=""
+    #qphix_flags=""
+    #qphix_configure=""
     ;;
   icc)
     color_flags=""
@@ -389,10 +393,10 @@ case "$compiler" in
     c99_flags="-std=c99"
     cxx11_flags="-std=c++11"
     disable_warnings_flags="-Wno-all -Wno-pedantic -diag-disable 1224"
-    qphix_flags="-restrict"
+    #qphix_flags="-restrict"
     # QPhiX can make use of the Intel “C Extended Array Notation”, this
     # gets enabled here.
-    qphix_configure="--enable-cean"
+    #qphix_configure="--enable-cean"
 
     case "$_arg_host" in
       jureca)
@@ -437,6 +441,14 @@ case "$compiler" in
         cxx_name=mpiicpc
         host_cxx=icpc
         ;;
+      marconi-a3)
+        checked-module load intel/pe-xe-2018--binary
+        checked-module load intelmpi
+        silent module list
+        cc_name=mpiicc
+        cxx_name=mpiicpc
+        host_cxx=icpc
+        ;;
       *)
         exit-with-error "Compiler ICC is not supported on $_arg_host."
     esac
@@ -470,7 +482,8 @@ case "$compiler" in
         base_flags="-O3 -finline-limit=50000 $color_flags -march=haswell"
         ;;
       avx512)
-        base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=knl"
+        base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags "
+#-march=knl
         ;;
     esac
 
@@ -496,7 +509,7 @@ case "$compiler" in
         host_cxx=g++
         base_flags="-O3 -finline-limit=50000 -fmax-errors=1 $color_flags -march=native"
         ;;
-      marconi-a2)
+      marconi-a2|marconi-a3)
         checked-module load gnu
         checked-module load ParaStationMPI
         silent module list
@@ -557,7 +570,7 @@ case "$_arg_host" in
     # that the `./configure` script won't try to execute the test programs.
     base_configure="$base_configure --host=x86_64-linux-gnu"
     ;;
-  jureca-booster|marconi-a2)
+  jureca-booster|marconi-a2|marconi-a3)
     # Marconi A2 has a cross compilation from Haswell to Knights Landing,
     # therefore one needs to tell GNU Autotools that programs compiled with the
     # target compiler cannot be executed on the host.
@@ -660,7 +673,53 @@ case "$_arg_host" in
       pushd m4
       ln -fs /usr/share/aclocal/pkg.m4 .
       popd
-      checked-module load Autotools
+#      checked-module load Autotools
+      NOCONFIGURE=yes ./autogen.sh
+    fi
+    popd
+
+    mkdir -p "$build/$repo"
+    pushd "$build/$repo"
+    if ! [[ -f Makefile ]]; then
+      $sourcedir/$repo/configure $base_configure \
+        --without-zlib \
+        --without-python \
+        --without-readline \
+        --without-threads \
+        --without-history \
+        --without-reader \
+        --without-writer \
+        --with-output \
+        --without-ftp \
+        --without-http \
+        --without-pattern \
+        --without-catalog \
+        --without-docbook \
+        --without-iconv \
+        --without-schemas \
+        --without-schematron \
+        --without-modules \
+        --without-xptr \
+        --without-xinclude \
+        CFLAGS="$cflags" CXXFLAGS="$cxxflags"
+    fi
+    make-make-install
+    popd
+
+    libxml="$prefix"
+    ;;
+  marconi-a3)
+    cflags="$base_cflags"
+    cxxflags="$base_cxxflags"
+
+    pushd $repo
+    if ! [[ -f configure ]]; then
+      mkdir -p m4
+      pushd m4
+      ln -fs /usr/share/aclocal/pkg.m4 .
+      popd
+     # there is no module Autotools in marconi-A3, seems to work without
+#      checked-module load Autotools
       NOCONFIGURE=yes ./autogen.sh
     fi
     popd
@@ -835,7 +894,8 @@ fi
 ###############################################################################
 #                                    QPhiX                                    #
 ###############################################################################
-
+if [ 2+2 =5 ]
+then
 repo=qphix
 print-fancy-heading $repo
 
@@ -869,10 +929,14 @@ case "$_arg_host" in
     checked-module load cmake
     checked-module load python
     ;;
+  marconi-a3)
+    checked-module load cmake
+    checked-module load python/3.6.4
+    ;;
 esac
 
 case "$_arg_host" in
-  hazelhen|jureca|jureca-booster|marconi-a2)
+  hazelhen|jureca|jureca-booster|marconi-a2|marconi-a3)
     silent module list
     ;;
   *)
@@ -945,6 +1009,7 @@ if [[ "$_arg_only_qphix" = "true" ]]; then
   exit 0
 fi
 
+fi
 ###############################################################################
 #                             GNU Multi Precision                             #
 ###############################################################################
@@ -962,7 +1027,7 @@ case "$_arg_host" in
     set -x
     gmp="$EBROOTGMP"
     ;;
-  marconi-a2|qbig)
+  marconi-a2|qbig|marconi-a3)
     # The GNU MP library installed on the Marconi system, but it might be
     # linked against an older version of the standard library. Therefore we
     # compile it from scratch.
@@ -1013,7 +1078,7 @@ case "$_arg_host" in
     soalen=4
     inner_soalen=4
     ;;
-  jureca-booster|marconi-a2)
+  jureca-booster|marconi-a2|marconi-a3)
     soalen=8
     inner_soalen=4
     ;;
@@ -1039,14 +1104,15 @@ if ! [[ -f Makefile ]]; then
     --with-gmp="$gmp" \
     --with-libxml2="$libxml" \
     --with-qdp="$prefix" \
-    --with-qphix-solver="$prefix" \
-    --enable-qphix-solver-compress12 \
-    --enable-qphix-solver-arch=$isa \
-    --enable-qphix-solver-soalen=$soalen \
-    --enable-qphix-solver-inner-soalen=$inner_soalen \
-    --enable-qphix-solver-inner-type=$_arg_precision_inner \
     CFLAGS="$cflags" CXXFLAGS="$cxxflags"
 fi
+
+#    --with-qphix-solver="$prefix" \
+#    --enable-qphix-solver-compress12 \
+#    --enable-qphix-solver-arch=$isa \
+#    --enable-qphix-solver-soalen=$soalen \
+#    --enable-qphix-solver-inner-soalen=$inner_soalen \
+#    --enable-qphix-solver-inner-type=$_arg_precision_inner \
 make-make-install
 popd
 
